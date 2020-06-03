@@ -761,10 +761,11 @@ void panic_handler(const char *reason);
 /* Port-specific settings (override port settings defaulted in chcore.h).    */
 /*===========================================================================*/
 // chprintf float enable
-#define CHPRINTF_USE_FLOAT true
-#define SHELL_USE_HISTORY true
-#define SHELL_USE_COMPLETION true
-#define SHELL_USE_ESC_SEQ true
+#define CHPRINTF_USE_FLOAT      TRUE
+#define SHELL_USE_HISTORY       TRUE
+#define SHELL_USE_COMPLETION    TRUE
+#define SHELL_USE_ESC_SEQ       TRUE
+#define SHELL_CMD_TEST_ENABLED  FALSE
 #endif  /* CHCONF_H */
 
 /** @} */
