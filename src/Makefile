@@ -136,7 +136,8 @@ LDSCRIPT= ./STM32F746xG_max.ld
 # setting.
 CSRC = $(ALLCSRC) \
        $(TESTSRC) \
-       main.c
+       main.c \
+       panic.c
 
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
