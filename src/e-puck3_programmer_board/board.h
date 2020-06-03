@@ -33,8 +33,8 @@
 /*
  * Board identifier.
  */
-#define BOARD_ST_NUCLEO144_F746ZG
-#define BOARD_NAME                  "STMicroelectronics STM32 Nucleo144-F746ZG"
+#define BOARD_EPUCK3_PRGRAMMER
+#define BOARD_NAME                  "e-puck3 programmer"
 
 /*
  * Ethernet PHY type.
@@ -52,7 +52,7 @@
 #define STM32_LSEDRV                (3U << 3U)
 
 #if !defined(STM32_HSECLK)
-#define STM32_HSECLK                8000000U
+#define STM32_HSECLK                26000000U
 #endif
 
 #define STM32_HSE_BYPASS
