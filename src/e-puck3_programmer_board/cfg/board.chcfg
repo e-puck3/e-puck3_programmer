@@ -15,8 +15,8 @@ https://github.com/cburlacu/cube2chibi
   <board_functions></board_functions>
   <subtype>STM32F746xx</subtype>
   <clocks HSEFrequency="26000000" HSEBypass="true" LSEFrequency="32768" LSEBypass="false" VDD="300" LSEDrive="3 High Drive (default)"/>
-  <ports><GPIOA><pin0 ID="ZIO_D32_TIM2_CH1" Type="PushPull" Level="High" Speed="Maximum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-      <pin1 ID="Brushless_sense_mot4A" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
+  <ports><GPIOA><pin0 ID="VBUS_sense" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
+      <pin1 ID="Brushless_sense_mot4A" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"></pin1>
       <pin2 ID="Brushless_sense_mot4B" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
       <pin3 ID="Brushless_sense_mot4C" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
       <pin4 ID="Current_sense_mot2A" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
@@ -25,47 +25,47 @@ https://github.com/cburlacu/cube2chibi
       <pin7 ID="H_bridge_mot4AN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="3"/>
       <pin8 ID="RESET_HUB_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin9 ID="USB_VBUS" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin10 ID="UART_PROG_ESP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="7"/>
+      <pin10 ID="UART_PROG_ESP_RX" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="7"></pin10>
       <pin11 ID="USB_DM" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="10"/>
       <pin12 ID="USB_DP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="10"/>
       <pin13 ID="SWDIO" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="0"/>
       <pin14 ID="SWCLK" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="0"/>
-      <pin15 ID="H_bridge_mot2AP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-    </GPIOA><GPIOB><pin0 ID="H_bridge_mot3AP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
+      <pin15 ID="H_bridge_mot2AP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="1"/>
+    </GPIOA><GPIOB><pin0 ID="H_bridge_mot3AP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="2"/>
       <pin1 ID="Current_sense_mot4A" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
-      <pin2 ID="BAT__INRUSH_LIMIT_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
-      <pin3 ID="H_bridge_mot2AN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin4 ID="H_bridge_mot2CP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin5 ID="H_bridge_mot2CN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin6 ID="UART_PROG_ESP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="7"/>
-      <pin7 ID="H_bridge_mot3BN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
+      <pin2 ID="BAT_PLUS_INRUSH_LIMIT_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
+      <pin3 ID="H_bridge_mot2AN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="1"/>
+      <pin4 ID="H_bridge_mot2CP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="2"/>
+      <pin5 ID="H_bridge_mot2CN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="2"/>
+      <pin6 ID="UART_PROG_ESP_TX" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="7"></pin6>
+      <pin7 ID="H_bridge_mot3BN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="2"/>
       <pin8 ID="EN_ESP32" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin9 ID="GPIO0_ESP32" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
-      <pin10 ID="H_bridge_mot2BP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin11 ID="H_bridge_mot2BN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin12 ID="PWR_ON" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
-      <pin13 ID="EN_CAN_PROG_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
+      <pin10 ID="H_bridge_mot2BP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="1"/>
+      <pin11 ID="H_bridge_mot2BN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="1"/>
+      <pin12 ID="PWR_ON" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"></pin12>
+      <pin13 ID="EN_CAN_PROG_n" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin14 ID="H_bridge_mot4BN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="3"/>
       <pin15 ID="H_bridge_mot4CN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="3"/>
     </GPIOB><GPIOC><pin0 ID="Brushless_sense_mot2C" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
-      <pin1 ID="BAT__sense" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
+      <pin1 ID="BAT_PLUS_sense" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
       <pin2 ID="Current_sense_mot1A" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
       <pin3 ID="Current_sense_mot1B" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
       <pin4 ID="Current_sense_mot4B" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
       <pin5 ID="Current_sense_mot3B" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
-      <pin6 ID="H_bridge_mot4AP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin7 ID="H_bridge_mot4BP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin8 ID="H_bridge_mot4CP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin9 ID="H_bridge_mot3AN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin10 ID="UART_uC_ESP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="7"/>
-      <pin11 ID="UART_uC_ESP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="7"/>
+      <pin6 ID="H_bridge_mot4AP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="3"/>
+      <pin7 ID="H_bridge_mot4BP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="3"/>
+      <pin8 ID="H_bridge_mot4CP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="3"/>
+      <pin9 ID="H_bridge_mot3AN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="2"/>
+      <pin10 ID="UART_uC_ESP_TX" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="7"/>
+      <pin11 ID="UART_uC_ESP_RX" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="7"/>
       <pin12 ID="EN_EXTENSION_TOP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
-      <pin13 ID="BUTTON" Type="PushPull" Level="High" Speed="Maximum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin14 ID="OSC32_IN" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin15 ID="OSC32_OUT" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-    </GPIOC><GPIOD><pin0 ID="ZIO_D67_CAN1_RX" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="9"/>
-      <pin1 ID="ZIO_D66_CAN1_TX" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="9"/>
-      <pin2 ID="STATUS_LED1_R" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
+      <pin13 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin14 ID="OSC32_IN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
+      <pin15 ID="OSC32_OUT" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
+    </GPIOC><GPIOD><pin0 ID="CAN1_RX" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Alternate" Alternate="9"></pin0>
+      <pin1 ID="CAN1_TX" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="9"/>
+      <pin2 ID="STATUS_LED1_R" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin3 ID="STATUS_LED1_G" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin4 ID="STATUS_LED1_B" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin5 ID="STATUS_LED2_R" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
@@ -74,26 +74,26 @@ https://github.com/cburlacu/cube2chibi
       <pin8 ID="STATUS_LED3_R" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin9 ID="STATUS_LED3_G" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin10 ID="STATUS_LED3_B" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
-      <pin11 ID="CS_ENCODER1_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
-      <pin12 ID="H_bridge_mot3BP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin13 ID="I2C_PD_CONTROLLER" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="4"/>
-      <pin14 ID="H_bridge_mot3CP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin15 ID="H_bridge_mot3CN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-    </GPIOD><GPIOE><pin0 ID="UART_CMD" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="8"/>
-      <pin1 ID="UART_CMD" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="8"/>
+      <pin11 ID="CS_ENCODER1_n" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
+      <pin12 ID="H_bridge_mot3BP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="2"></pin12>
+      <pin13 ID="I2C_SDA_PD_CONTROLLER" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="4"/>
+      <pin14 ID="H_bridge_mot3CP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="2"/>
+      <pin15 ID="H_bridge_mot3CN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="2"/>
+    </GPIOD><GPIOE><pin0 ID="UART_CMD_RX" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="8"/>
+      <pin1 ID="UART_CMD_TX" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="8"/>
       <pin2 ID="EN_DRIVER_4" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin3 ID="GPIO4_ESP32" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
-      <pin4 ID="ZIO_D57_SAI1_FS_A" Type="PushPull" Level="High" Speed="Maximum" Resistor="PullUp" Mode="Input" Alternate="0"/>
+      <pin4 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
       <pin5 ID="SWD_uC_SWCLK" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin6 ID="SWD_uC_SWDIO" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
-      <pin7 ID="CS_ENCODER2_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
+      <pin7 ID="CS_ENCODER2_n" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin8 ID="H_bridge_mot1AN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="1"/>
-      <pin9 ID="H_bridge_mot1AP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
+      <pin9 ID="H_bridge_mot1AP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="1"/>
       <pin10 ID="H_bridge_mot1BN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="1"/>
-      <pin11 ID="H_bridge_mot1BP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
+      <pin11 ID="H_bridge_mot1BP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="1"/>
       <pin12 ID="H_bridge_mot1CN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="1"/>
-      <pin13 ID="H_bridge_mot1CP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin14 ID="CS_ENCODER3_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
+      <pin13 ID="H_bridge_mot1CP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="1"/>
+      <pin14 ID="CS_ENCODER3_n" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin15 ID="RESET_uC" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
     </GPIOE><GPIOF><pin0 ID="GPIO13_ESP32" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin1 ID="HUB_CONNECT" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
@@ -106,41 +106,89 @@ https://github.com/cburlacu/cube2chibi
       <pin8 ID="Brushless_sense_mot3B" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
       <pin9 ID="Brushless_sense_mot2A" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
       <pin10 ID="Brushless_sense_mot2B" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
-      <pin11 ID="PRIORITY_TO_VBUS" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
-      <pin12 ID="ARD_D8" Type="PushPull" Level="High" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-      <pin13 ID="CS_ENCODER4_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
-      <pin14 ID="I2C_PD_CONTROLLER" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="4"/>
+      <pin11 ID="PRIORITY_TO_VBUS" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
+      <pin12 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin13 ID="CS_ENCODER4_n" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
+      <pin14 ID="I2C_SCL_PD_CONTROLLER" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="4"/>
       <pin15 ID="EN_DRIVER_1" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
-    </GPIOF><GPIOG><pin0 ID="FAULT_DRIVER_1_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin1 ID="FAULT_DRIVER_2_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin2 ID="FAULT_DRIVER_4_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin3 ID="FAULT_DRIVER_3_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
+    </GPIOF><GPIOG><pin0 ID="FAULT_DRIVER_1_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
+      <pin1 ID="FAULT_DRIVER_2_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
+      <pin2 ID="FAULT_DRIVER_4_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
+      <pin3 ID="FAULT_DRIVER_3_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
       <pin4 ID="VBUS_HOST" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin5 ID="INT_PD_CTRL_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
+      <pin5 ID="INT_PD_CTRL_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
       <pin6 ID="VBUS_DEVICES" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
-      <pin7 ID="USB_GPIO_IN" Type="PushPull" Level="High" Speed="Maximum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-      <pin8 ID="BYPASS_HUB_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
-      <pin9 ID="EN_EXTENSION_BOTTOM" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
+      <pin7 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
+      <pin8 ID="BYPASS_HUB_n" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"></pin8>
+      <pin9 ID="EN_EXTENSION_BOTTOM" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"></pin9>
       <pin10 ID="PWR_ON_BTN_STATE_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
       <pin11 ID="EN_DRIVER_3" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
-      <pin12 ID="ENCODERS_GATE_DRIVERS" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="5"/>
-      <pin13 ID="ENCODERS_GATE_DRIVERS" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="5"/>
-      <pin14 ID="ENCODERS_GATE_DRIVERS" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="5"/>
-      <pin15 ID="" Type="PushPull" Level="High" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-    </GPIOG><GPIOH><pin0 ID="OSC_IN" Type="PushPull" Level="High" Speed="Maximum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin1 ID="OSC_OUT" Type="PushPull" Level="High" Speed="Maximum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin2 ID="" Type="PushPull" Level="High" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-      <pin3 ID="" Type="PushPull" Level="High" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-      <pin4 ID="" Type="PushPull" Level="High" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-      <pin5 ID="" Type="PushPull" Level="High" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-      <pin6 ID="" Type="PushPull" Level="High" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-      <pin7 ID="" Type="PushPull" Level="High" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-      <pin8 ID="" Type="PushPull" Level="High" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-      <pin9 ID="" Type="PushPull" Level="High" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-      <pin10 ID="" Type="PushPull" Level="High" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-      <pin11 ID="" Type="PushPull" Level="High" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-      <pin12 ID="" Type="PushPull" Level="High" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-      <pin13 ID="" Type="PushPull" Level="High" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-      <pin14 ID="" Type="PushPull" Level="High" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-      <pin15 ID="" Type="PushPull" Level="High" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
-    </GPIOH></ports></board>
+      <pin12 ID="ENCODERS_GATE_DRIVERS_SPI6_MISO" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="5"/>
+      <pin13 ID="ENCODERS_GATE_DRIVERS_SPI6_SCK" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="5"/>
+      <pin14 ID="ENCODERS_GATE_DRIVERS_SPI6_MOSI" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="5"/>
+      <pin15 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+    </GPIOG><GPIOH><pin0 ID="OSC_IN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
+      <pin1 ID="OSC_OUT" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
+      <pin2 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin3 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin4 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin5 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin6 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin7 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin8 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin9 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin10 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin11 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin12 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin13 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin14 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin15 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+    </GPIOH><GPIOI><pin0 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin1 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin2 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin3 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin4 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin5 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin6 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin7 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin8 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin9 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin10 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin11 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin12 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin13 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin14 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin15 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+    </GPIOI><GPIOJ><pin0 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin1 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin2 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin3 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin4 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin5 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin6 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin7 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin8 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin9 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin10 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin11 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin12 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin13 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin14 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin15 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+    </GPIOJ><GPIOK><pin0 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin1 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin2 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin3 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin4 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin5 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin6 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin7 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin8 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin9 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin10 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin11 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin12 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin13 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin14 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+      <pin15 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
+    </GPIOK></ports></board>
