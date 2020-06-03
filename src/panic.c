@@ -18,6 +18,17 @@
 void panic_handler(const char *reason)
 {
     (void)reason;
+
+    // Turns ON all LEDS in white
+    palClearLine(LINE_STATUS_LED1_R);
+    palClearLine(LINE_STATUS_LED1_G);
+    palClearLine(LINE_STATUS_LED1_B);
+	palClearLine(LINE_STATUS_LED2_R);
+	palClearLine(LINE_STATUS_LED2_G);
+	palClearLine(LINE_STATUS_LED2_B);
+	palClearLine(LINE_STATUS_LED3_R);
+	palClearLine(LINE_STATUS_LED3_G);
+	palClearLine(LINE_STATUS_LED3_B);
   
     while (1) {
     }
