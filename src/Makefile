@@ -142,7 +142,8 @@ CSRC = $(ALLCSRC) \
        user_shell.c \
        platform.c \
        device_policy_manager.c \
-       usb_pd_controller.c
+       usb_pd_controller.c \
+       USB3803.c
 
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
