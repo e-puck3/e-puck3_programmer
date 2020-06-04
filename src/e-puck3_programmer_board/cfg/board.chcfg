@@ -23,7 +23,7 @@ https://github.com/cburlacu/cube2chibi
       <pin5 ID="CURRENT_SENSE_MOT2B" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
       <pin6 ID="CURRENT_SENSE_MOT3A" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
       <pin7 ID="H_BRIDGE_MOT4AN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="3"/>
-      <pin8 ID="RESET_HUB_N" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
+      <pin8 ID="RESET_HUB_N" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin9 ID="USB_VBUS" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
       <pin10 ID="UART_PROG_ESP_RX" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="7"></pin10>
       <pin11 ID="USB_DM" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="10"/>
@@ -119,7 +119,7 @@ https://github.com/cburlacu/cube2chibi
       <pin5 ID="INT_PD_CTRL_N" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
       <pin6 ID="VBUS_DEVICES" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin7 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
-      <pin8 ID="BYPASS_HUB_N" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"></pin8>
+      <pin8 ID="BYPASS_HUB_N" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"></pin8>
       <pin9 ID="EN_EXTENSION_BOTTOM" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"></pin9>
       <pin10 ID="PWR_ON_BTN_STATE_N" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
       <pin11 ID="EN_DRIVER_3" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>

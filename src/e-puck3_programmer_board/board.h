@@ -495,7 +495,7 @@
                                      PIN_ODR_LOW(GPIOA_CURRENT_SENSE_MOT2B) |\
                                      PIN_ODR_LOW(GPIOA_CURRENT_SENSE_MOT3A) |\
                                      PIN_ODR_LOW(GPIOA_H_BRIDGE_MOT4AN) |   \
-                                     PIN_ODR_LOW(GPIOA_RESET_HUB_N) |       \
+                                     PIN_ODR_HIGH(GPIOA_RESET_HUB_N) |      \
                                      PIN_ODR_LOW(GPIOA_USB_VBUS) |          \
                                      PIN_ODR_LOW(GPIOA_UART_PROG_ESP_RX) |  \
                                      PIN_ODR_LOW(GPIOA_USB_DM) |            \
@@ -1197,7 +1197,7 @@
                                      PIN_ODR_LOW(GPIOG_INT_PD_CTRL_N) |     \
                                      PIN_ODR_LOW(GPIOG_VBUS_DEVICES) |      \
                                      PIN_ODR_LOW(GPIOG_PIN7) |              \
-                                     PIN_ODR_HIGH(GPIOG_BYPASS_HUB_N) |     \
+                                     PIN_ODR_LOW(GPIOG_BYPASS_HUB_N) |      \
                                      PIN_ODR_LOW(GPIOG_EN_EXTENSION_BOTTOM) |\
                                      PIN_ODR_LOW(GPIOG_PWR_ON_BTN_STATE_N) |\
                                      PIN_ODR_LOW(GPIOG_EN_DRIVER_3) |       \
