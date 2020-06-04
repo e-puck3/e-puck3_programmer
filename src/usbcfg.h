@@ -34,9 +34,9 @@
 
 #define USB_DEVICE_VID      0x1D50
 #define USB_DEVICE_PID      0x6018
-#define USB_VENDOR_NAME     "Black Sphere Technologie"
-#define USB_DEVICE_NAME     "Blackmagic Probe"
-#define USB_SERIAL_NUMBER   "Serial Number"
+#define USB_VENDOR_NAME     "EPFL"
+#define USB_DEVICE_NAME     "E-PUCK3 PROGRAMMER"
+#define USB_SERIAL_NUMBER   "EPUCK"
 #define USB_SERIAL1_NAME    "GDB Server"
 #ifdef USE_TWO_USB_SERIAL
 #define USB_SERIAL2_NAME    "Serial Monitor"

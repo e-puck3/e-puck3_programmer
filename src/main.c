@@ -11,6 +11,8 @@
 
 #include "ch.h"
 #include "hal.h"
+#include "usbcfg.h"
+#include "user_shell.h"
 
 
 static THD_WORKING_AREA(waBlinker,128);
@@ -74,6 +76,10 @@ int main(void) {
 
 
 	while (true){
+		if(isUSBConfigured()){
+			//spawns the shell if the usb is connected
+			spawn_shell();
+		}
 		chThdSleepMilliseconds(500);
 	}
 
