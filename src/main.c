@@ -72,6 +72,8 @@ int main(void) {
 	halInit();
 	chSysInit();
 
+	usbSerialStart();
+
 	chThdCreateStatic(waBlinker, sizeof(waBlinker), NORMALPRIO, Blinker, NULL);
 
 
