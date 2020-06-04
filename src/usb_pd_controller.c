@@ -22,13 +22,13 @@
 
 /*
  * I2C configuration object.
- * I2C2_TIMINGR: 1000 kHz with I2CCLK = 54 MHz, rise time = 100 ns,
- *               fall time = 10 ns (0x0080091C)
+ * I2C2_TIMINGR: 1000 kHz with I2CCLK = 216 MHz, rise time = 100 ns,
+ *               fall time = 10 ns (0x20A00E28)
  */
 static const I2CConfig i2c2config = {
-    0x0080091C,
-    0,
-    0
+    .timingr    = 0x20A00E28,
+    .cr1        = 0,
+    .cr2        = 0,
 };
 
 /*
@@ -39,7 +39,7 @@ static struct pdbs_config pd_config = {
     .v        = 0,
     .i        = 200,
     .vmin     = 12000,
-    .vmax     = 19000,
+    .vmax     = 20000,
     .status   = PDBS_CONFIG_STATUS_VALID,
 };
 
@@ -60,9 +60,9 @@ static struct pdbs_dpm_data dpm_data = {
  */
 static struct pdb_config pdb_config = {
     .fusb = {
-        &I2CD2,
+        &I2CD4,
         FUSB302B_ADDR,
-        LINE_INT_PD_CTRL_n
+        LINE_INT_PD_CTRL_N
     },
     .dpm = {
     	pdbs_dpm_init,
@@ -82,7 +82,7 @@ static struct pdb_config pdb_config = {
     },
     .dpm_data = &dpm_data,
     .pd_config = &pd_config,
-    .vbus_line = LINE_PWR_PP_STATE,
+    .vbus_line = LINE_VBUS_HOST,
 };
 
 /********************               PRIVATE FUNCTIONS              ********************/

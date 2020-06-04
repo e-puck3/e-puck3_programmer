@@ -15,6 +15,7 @@
 #include "chprintf.h"
 #include "usbcfg.h"
 #include "user_shell.h"
+#include "usb_pd_controller.h"
 
 
 static THD_WORKING_AREA(waShell,2048);
@@ -23,7 +24,8 @@ static char sc_histbuf[SHELL_MAX_HIST_BUFF];
 static char* completion_buffer[SHELL_MAX_COMPLETIONS];
 
 static const ShellCommand commands[] = {
-	{NULL, NULL}
+  USB_PD_CONTROLLER_SHELL_CMD
+  {NULL, NULL}
 };
 
 static const ShellConfig shell_cfg = {

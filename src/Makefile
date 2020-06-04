@@ -120,8 +120,8 @@ include $(CHIBIOS)/os/various/shell/shell.mk
 BLACKMAGIC = ../blackmagic
 include $(BLACKMAGIC)/src/platforms/stm32-ChibiOS/Blackmagic_ChibiOS.mk
 
-# PDBLIB = ../usb_pd_controller/pdblib
-# include $(PDBLIB)/pdblib.mk
+PDBLIB = ../usb_pd_controller/pdblib
+include $(PDBLIB)/pdblib.mk
 
 # THDULIB = ../threads_utilities_ChibiOS
 # USE_THREADS_TIMESTAMPS = true
@@ -140,7 +140,9 @@ CSRC = $(ALLCSRC) \
        panic.c \
        usbcfg.c \
        user_shell.c \
-       platform.c
+       platform.c \
+       device_policy_manager.c \
+       usb_pd_controller.c
 
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
