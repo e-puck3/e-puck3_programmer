@@ -13,6 +13,7 @@
 #include "hal.h"
 #include "usbcfg.h"
 #include "user_shell.h"
+#include "gdb.h"
 
 
 static THD_WORKING_AREA(waBlinker,128);
@@ -73,6 +74,9 @@ int main(void) {
 	chSysInit();
 
 	usbSerialStart();
+
+	initGDBEvents();
+	gdbStart();
 
 	chThdCreateStatic(waBlinker, sizeof(waBlinker), NORMALPRIO, Blinker, NULL);
 

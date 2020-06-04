@@ -117,8 +117,8 @@ include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v7m.mk
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 include $(CHIBIOS)/os/various/shell/shell.mk
 
-# BLACKMAGIC = ../blackmagic
-# include $(BLACKMAGIC)/src/platforms/stm32-ChibiOS/Blackmagic_ChibiOS.mk
+BLACKMAGIC = ../blackmagic
+include $(BLACKMAGIC)/src/platforms/stm32-ChibiOS/Blackmagic_ChibiOS.mk
 
 # PDBLIB = ../usb_pd_controller/pdblib
 # include $(PDBLIB)/pdblib.mk
@@ -139,7 +139,8 @@ CSRC = $(ALLCSRC) \
        main.c \
        panic.c \
        usbcfg.c \
-       user_shell.c
+       user_shell.c \
+       platform.c
 
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
