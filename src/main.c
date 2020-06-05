@@ -15,6 +15,7 @@
 #include "user_shell.h"
 #include "gdb.h"
 #include "usb_pd_controller.h"
+#include "usb_hub.h"
 
 
 static THD_WORKING_AREA(waBlinker,128);
@@ -77,6 +78,8 @@ int main(void) {
 	usbSerialStart();
 
 	usbPDControllerStart();
+
+	usbHubStart();
 
 	initGDBEvents();
 	gdbStart();

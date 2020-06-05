@@ -64,7 +64,6 @@
 #define I2C_STATUS_COMMAND_REG					0xFF
 
 /********************                 CONFIGURATION                ********************/
-								
 // default = 0x9B, Self-powered, High_speed, MTT, EOP disable, individual sensing, individual switching
 // modified = 0x1B, Bus-powered, High_speed, MTT, EOP disable, individual sensing, individual switching
 #define CONFIG_DATA_BYTE_1						0x1B
@@ -85,32 +84,112 @@
 // modified = 0x32, 100ms until a port has power
 #define POWER_ON_TIME							0x32
 
-typedef struct{
-	uint8_t 	i2c_address_7bits;
-	ioline_t	vbus_host_line;
-	ioline_t	vbus_devices_line;
-	ioline_t	reset_n_line;
-	ioline_t	bypass_n_line;
-	ioline_t	hub_connect_line;
-}USB3803_t;
-
-static const USB3803_t hub ={
-	.i2c_address_7bits 	= USB3803_I2C_ADDRESS00_7BITS,
-	.vbus_host_line 	= LINE_VBUS_HOST,
-	.vbus_devices_line 	= LINE_VBUS_DEVICES,
-	.reset_n_line 		= LINE_RESET_HUB_N,
-	.bypass_n_line 		= LINE_BYPASS_HUB_N,
-	.hub_connect_line 	= LINE_HUB_CONNECT,
-};
+// default = 0x14, Charge detection enabled for SDP, CDP, and DCP
+// modified = 0x00, Charge detection completely disabled
+#define BATTERY_CHARGER_MODE 					0x00
 
 
-/********************                PUBLIC FUNCITONS              ********************/
+/********************   SERIAL_PORT_INTERLOCK_CONTROL_REG CONFIG   ********************/
+// config_n = 1, connect_n = 1
+#define CONFIG_MODE_ENABLED 		 			0x03
+// config_n = 0, connect_n = 1
+#define CONFIG_MODE_DISABLED 		 			0x02
 
-void usb3803_reset_hub(void){
-	palClearLine(hub.reset_n_line);
+
+/********************               PRIVATE FUNCITONS              ********************/
+
+#define SET_RESET_HUB(x) 			palClearLine(x->reset_n_line)
+#define UNSET_RESET_HUB(x) 			palSetLine(x->reset_n_line)
+#define ENABLE_BYPASS_MODE(x) 		palClearLine(x->bypass_n_line)
+#define DISABLE_BYPASS_MODE(x) 		palSetLine(x->bypass_n_line)
+#define ENABLE_VBUS_DEVICES(x) 		palSetLine(x->vbus_devices_line)
+#define DISABLE_VBUS_DEVICES(x) 	palClearLine(x->vbus_devices_line)
+#define SET_HUB_CONNECT(x)			palSetLine(x->hub_connect_line)
+#define CLEAR_HUB_CONNECT(x)		palSetLine(x->hub_connect_line)
+
+static uint8_t _read_byte(USB3803_t* hub, uint8_t reg){
+	uint8_t rxbuf;
+
+	i2cAcquireBus(hub->i2cp);
+	i2cMasterTransmit(hub->i2cp, hub->i2c_address_7bits, &reg, 1, &rxbuf, 1);
+	i2cReleaseBus(hub->i2cp);
+
+	return rxbuf;
+}
+
+static void _write_byte(USB3803_t* hub, uint8_t reg, uint8_t byte){
+	uint8_t txbuf[2] = {reg, byte};
+
+	i2cAcquireBus(hub->i2cp);
+	i2cMasterTransmit(hub->i2cp, hub->i2c_address_7bits, txbuf, 2, NULL, 0);
+	i2cReleaseBus(hub->i2cp);
+}
+
+static void _write_byte_multi(USB3803_t* hub, uint8_t reg, uint8_t *bytes, uint8_t len){
+	
+	uint8_t txbuf[len + 1];
+
+    /* Prepare the transmit buffer */
+    txbuf[0] = reg;
+    for (uint8_t i = 0 ; i < len; i++) {
+        txbuf[i + 1] = bytes[i];
+    }
+
+	i2cAcquireBus(hub->i2cp);
+	i2cMasterTransmit(hub->i2cp, hub->i2c_address_7bits, txbuf, len+1, NULL, 0);
+	i2cReleaseBus(hub->i2cp);
 }
 
 
+/********************               PUBLIC FUNCITONS               ********************/
+
+void USB3803_configure(USB3803_t* hub){
+	// we should not have HUB_CONNECT high when the hub is in reset state
+	CLEAR_HUB_CONNECT(hub);
+
+	// Tells the devices  VBUS is disconnected
+	DISABLE_VBUS_DEVICES(hub);
+
+	SET_RESET_HUB(hub);
+	DISABLE_BYPASS_MODE(hub);
+	chThdSleepMilliseconds(1);
+	UNSET_RESET_HUB(hub);
+
+	// Waits for the hub to be initialized (max 4ms in the datasheet)
+	chThdSleepMilliseconds(5);
+
+	// Puts the hub into config mode to let us configure it
+	_write_byte(hub, SERIAL_PORT_INTERLOCK_CONTROL_REG, CONFIG_MODE_ENABLED);
+
+	uint8_t temp_buf[] = {
+							CONFIG_DATA_BYTE_1,
+							CONFIG_DATA_BYTE_2,
+							CONFIG_DATA_BYTE_3,
+							NON_REMOVABLE_DEVICES
+	};
+
+	// Configures only the registers we need to change
+	_write_byte_multi(hub, CONFIG_DATA_BYTE_1_REG, temp_buf, sizeof(temp_buf));
+	_write_byte(hub, MAX_POWER_BUS_REG, MAX_POWER_BUS);
+	_write_byte(hub, POWER_ON_TIME_REG, POWER_ON_TIME);
+	_write_byte(hub, BATTERY_CHARGER_MODE_REG, BATTERY_CHARGER_MODE);
+
+	// Puts the hub out of the config mode
+	_write_byte(hub, SERIAL_PORT_INTERLOCK_CONTROL_REG, CONFIG_MODE_DISABLED);
+
+	// Gives order to connect to USB
+	SET_HUB_CONNECT(hub);
+
+	chThdSleepMilliseconds(5);
+
+	// Tells the device VBUS is connected
+	ENABLE_VBUS_DEVICES(hub);
+
+}
+
+
+
+
 // First put SERIAL_PORT_INTERLOCK_CONTROL-config_n to 1 to put in config mode (keep connect_n to 1)
-// Then write ehat you want
+// Then write what you want
 // Finally put SERIAL_PORT_INTERLOCK_CONTROL-config_n to 0 to resume normal operation (keep connect_n to 1)
