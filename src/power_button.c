@@ -1,13 +1,14 @@
 /**
  * @file	power_button.c
- * @brief  	Controls the power button. Contains the functions to trun ON and OFF
+ * @brief  	Controls the power button. Contains the functions to turn ON and OFF
  * 			the robot. Sends events when a power on or power off occurs.
  * 
  * @written by  	Eliot Ferragni
- * @creation date	19.06.2018
+ * @creation date	05.06.2020
  */
 
-#include "main.h"
+#include "ch.h"
+#include "hal.h"
 #include "power_button.h"
 
 static virtual_timer_t power_timer;
@@ -43,7 +44,7 @@ static THD_FUNCTION(power_button_thd, arg)
 	chRegSetThreadName("Power Button management");
 
 	/* Enabling events on both edges of the button line.*/
-	palEnableLineEvent(LINE_PWR_ON_BTN, PAL_EVENT_MODE_BOTH_EDGES);
+	palEnableLineEvent(LINE_PWR_ON_BTN_STATE_N, PAL_EVENT_MODE_BOTH_EDGES);
 
 	if(power_on_reset){
 		powerButtonTurnOnOff(POWER_ON);
@@ -51,7 +52,7 @@ static THD_FUNCTION(power_button_thd, arg)
 
 	while(1){
 		//waiting until an event on the line is detected
-		palWaitLineTimeout(LINE_PWR_ON_BTN, TIME_INFINITE);
+		palWaitLineTimeout(LINE_PWR_ON_BTN_STATE_N, TIME_INFINITE);
 		//if the button is pressed, we begin to count
 		if(isPowerButtonPressed()){
 			if(power_state == POWER_OFF){
@@ -84,7 +85,7 @@ void powerButtonStartSequence(void){
 		is called before the main */
 
 	if(isPowerButtonPressed()){
-		//turn on the robot if we pressed the button and there is no USB connexion
+		//turns on the robot if we pressed the button and there is no USB connection
 		//since we are before the chSysInit(), we simply store into a variable that we 
 		//need to power on the robot. It will be applied in the thread
 		power_on_reset = true;
@@ -92,7 +93,7 @@ void powerButtonStartSequence(void){
 }
 
 uint8_t isPowerButtonPressed(void){
-	return !palReadLine(LINE_PWR_ON_BTN);
+	return !palReadLine(LINE_PWR_ON_BTN_STATE_N);
 }
 
 uint8_t powerButtonGetPowerState(void){
@@ -108,13 +109,11 @@ void powerButtonTurnOnOff(uint8_t state){
 void powerButtonTurnOnOffI(uint8_t state){
 	if(state == POWER_ON){
 		power_state = POWER_ON;
-		palSetLine(LINE_PWR_ON_OUT);
-		//setLedI(GREEN_LED, LED_MID_POWER);
+		palSetLine(LINE_PWR_ON);
 		chEvtBroadcastFlagsI(&power_event, POWER_ON_FLAG);
 	}else{
 		power_state = POWER_OFF;
-		palClearLine(LINE_PWR_ON_OUT);
-		//setLedI(GREEN_LED, LED_NO_POWER);
+		palClearLine(LINE_PWR_ON);
 		chEvtBroadcastFlagsI(&power_event, POWER_OFF_FLAG);
 	}
 }

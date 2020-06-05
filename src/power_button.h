@@ -1,16 +1,17 @@
 /**
  * @file	power_button.h
- * @brief  	Controls the power button. Contains the functions to trun ON and OFF
+ * @brief  	Controls the power button. Contains the functions to turn ON and OFF
  * 			the robot. Sends events when a power on or power off occurs.
  * 
  * @written by  	Eliot Ferragni
- * @creation date	19.06.2018
+ * @creation date	05.06.2020
  */
 
 #ifndef POWER_BUTTON_H
 #define POWER_BUTTON_H
 
-#include "main.h"
+#include "ch.h"
+#include "hal.h"
 
 #define POWER_ON				1
 #define POWER_OFF				0

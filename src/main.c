@@ -16,6 +16,7 @@
 #include "gdb.h"
 #include "usb_pd_controller.h"
 #include "usb_hub.h"
+#include "power_button.h"
 
 
 static THD_WORKING_AREA(waBlinker,128);
@@ -65,6 +66,11 @@ static THD_FUNCTION(Blinker,arg) {
 
 int main(void) {
 	
+	/**
+	 * Special function to handle the turn on if we pressed the button without
+	 * the usb cable plugged. Called before everything to catch the button pressed.
+	 */
+	powerButtonStartSequence();
 	/*
 	* System initializations.
 	* - HAL initialization, this also initializes the configured device drivers
@@ -75,13 +81,34 @@ int main(void) {
 	halInit();
 	chSysInit();
 
+	/**
+	 * Init the events objects. Better to do it before any modules that use them since
+	 * they are global.
+	 */
+
+	chEvtObjectInit(&power_event);
+	//chEvtObjectInit(&battery_info_event);
+	chEvtObjectInit(&gdb_status_event);
+	// chEvtObjectInit(&communications_event);
+
+	/*
+	* Starts the handling of the power button
+	*/
+	powerButtonStart();
+	/*
+	* Initializes two serial-over-USB CDC drivers and starts and connects the USB.
+	*/
 	usbSerialStart();
 
 	usbPDControllerStart();
-
+	/*
+	* Starts the thread managing the USB hub
+	*/
 	usbHubStart();
 
-	initGDBEvents();
+	/*
+	* Starts the GDB system
+	*/
 	gdbStart();
 
 	chThdCreateStatic(waBlinker, sizeof(waBlinker), NORMALPRIO, Blinker, NULL);
