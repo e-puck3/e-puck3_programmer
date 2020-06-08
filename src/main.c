@@ -17,6 +17,7 @@
 #include "usb_pd_controller.h"
 #include "usb_hub.h"
 #include "power_button.h"
+#include "voltage_measurement.h"
 
 
 static THD_WORKING_AREA(waBlinker,128);
@@ -72,43 +73,49 @@ int main(void) {
 	 */
 	powerButtonStartSequence();
 	/*
-	* System initializations.
-	* - HAL initialization, this also initializes the configured device drivers
-	*   and performs the board-specific initializations.
-	* - Kernel initialization, the main() function becomes a thread and the
-	*   RTOS is active.
-	*/
+	 * System initializations.
+	 * - HAL initialization, this also initializes the configured device drivers
+	 *   and performs the board-specific initializations.
+	 * - Kernel initialization, the main() function becomes a thread and the
+	 *   RTOS is active.
+	 */
 	halInit();
 	chSysInit();
 
-	/**
-	 * Init the events objects. Better to do it before any modules that use them since
+	/*
+	 * Inits the event objects. Better to do it before any modules that use them since
 	 * they are global.
 	 */
 
 	chEvtObjectInit(&power_event);
-	//chEvtObjectInit(&battery_info_event);
+	chEvtObjectInit(&vbus_info_event);
+	chEvtObjectInit(&battery_info_event);
 	chEvtObjectInit(&gdb_status_event);
 	// chEvtObjectInit(&communications_event);
 
 	/*
-	* Starts the handling of the power button
-	*/
+	 * Starts the handling of the power button
+	 */
 	powerButtonStart();
 	/*
-	* Initializes two serial-over-USB CDC drivers and starts and connects the USB.
-	*/
+	 * Starts the voltage measurement thread
+	 */
+	voltageMesurementStart();
+	/*
+	 * Initializes two serial-over-USB CDC drivers and starts and connects the USB
+	 */
 	usbSerialStart();
-
+	/*
+	 * Initializes the USB PD controller
+	 */
 	usbPDControllerStart();
 	/*
-	* Starts the thread managing the USB hub
-	*/
+	 * Starts the thread managing the USB hub
+	 */
 	usbHubStart();
-
 	/*
-	* Starts the GDB system
-	*/
+	 * Starts the GDB system
+	 */
 	gdbStart();
 
 	chThdCreateStatic(waBlinker, sizeof(waBlinker), NORMALPRIO, Blinker, NULL);
