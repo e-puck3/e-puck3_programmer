@@ -1,50 +1,88 @@
 /**
- * @file	battery_measurement.h
- * @brief  	Functions to measure the battery voltage and change the battery state accordingly
+ * @file	voltage_measurement.h
+ * @brief  	Functions to measure the battery and VBus voltages and change the battery state accordingly
  * 			Uses the event system to signal a new state
  * 
  * @written by  	Eliot Ferragni
  * @creation date	26.06.2018
  */
 
-#ifndef BATTERY_MEASUREMENT_H
-#define BATTERY_MEASUREMENT_H
+#ifndef VOLTAGE_MEASUREMENT_H
+#define VOLTAGE_MEASUREMENT_H
 
-#include "main.h"
+#include "ch.h"
+#include "hal.h"
 
 
-/* BATTERY---[ R1 ]--*--- measure
-                     |
-                     |
-                   [ R2 ]
-                     |
-                    GND
+/* BATTERY/VBUS---[ R1 ]--*--- measure
+                	      |
+               		      |
+               		    [ R2 ]
+                	      |
+               		     GND
 */
 
-#define RESISTOR_R1             220 //kohm
-#define RESISTOR_R2             330 //kohm
+#define ADC_VOLTAGE 				ADCD1
 
-#define MAX_VOLTAGE				4.2f	//volt GREEN
-#define GOOD_VOLTAGE			3.50f	//volt ORANGE
-#define LOW_VOLTAGE				3.40f	//volt RED
-#define VERY_LOW_VOLTAGE		3.30f	//volt RED BLINKING
-#define MIN_VOLTAGE				3.20f	//volt RED BLINKING + QUICK TURNOFF
+////////////////////////////////////////////BATTERY ZONE///////////////////////////////////////////
+#define NB_OF_ELEMENTS_BATTERY		2
 
-#define BATTERY_LOW_TIME_MS		10000 	//time before shutting down the system when in very low voltage
-#define CHANGE_STATE_TIME_MS	3000	//time before changing the battery state 
+//per battery element
+#define BATT_MAX_VOLTAGE			(4.2f * NB_OF_ELEMENTS_BATTERY)	//volt GREEN
+#define BATT_GOOD_VOLTAGE			(3.5f * NB_OF_ELEMENTS_BATTERY)	//volt ORANGE
+#define BATT_LOW_VOLTAGE			(3.4f * NB_OF_ELEMENTS_BATTERY)	//volt RED
+#define BATT_VERY_LOW_VOLTAGE		(3.3f * NB_OF_ELEMENTS_BATTERY)	//volt RED BLINKING
+#define BATT_MIN_VOLTAGE			(3.2f * NB_OF_ELEMENTS_BATTERY)	//volt RED BLINKING + QUICK TURNOFF
+
+#define BATTERY_LOW_TIME_MS			10000 	//time before shutting down the system when in min voltage
+#define CHANGE_STATE_TIME_MS		3000	//time before changing the battery state 
 
 //Event source used to send events to other threads
 extern event_source_t battery_info_event;
 
-#define MAX_VOLTAGE_FLAG		(1<<0)
-#define GOOD_VOLTAGE_FLAG		(1<<1)
-#define LOW_VOLTAGE_FLAG		(1<<2)
-#define VERY_LOW_VOLTAGE_FLAG	(1<<3)
-#define MIN_VOLTAGE_FLAG		(1<<4)
+// A flag is set when the voltage is equal or below this flag and above the previous flag.
+#define BATT_MAX_VOLTAGE_FLAG		(1<<0)
+#define BATT_GOOD_VOLTAGE_FLAG		(1<<1)
+#define BATT_LOW_VOLTAGE_FLAG		(1<<2)
+#define BATT_VERY_LOW_VOLTAGE_FLAG	(1<<3)
+#define BATT_MIN_VOLTAGE_FLAG		(1<<4)
+
+
+/////////////////////////////////////////////VBUS ZONE/////////////////////////////////////////////
+
+#define VBUS_HIGHEST_VOLTAGE		20
+#define VBUS_THIRD_STEP				15
+#define VBUS_SECOND_STEP			12
+#define VBUS_FIRST_STEP				9
+#define VBUS_DEFAULT_VOLTAGE		5
+
+//Event source used to send events to other threads
+extern event_source_t vbus_info_event;
+
+// A flag is set when the voltage is equal or above this flag and below the next flag.
+#define VBUS_HIGHEST_VOLTAGE_FLAG	(1<<0)
+#define VBUS_THIRD_STEP_FLAG		(1<<1)
+#define VBUS_SECOND_STEP_FLAG		(1<<2)
+#define VBUS_FIRST_STEP_FLAG		(1<<3)
+#define VBUS_DEFAULT_VOLTAGE_FLAG	(1<<4)
+
+typedef struct{
+	float	vbus;
+	float	battery;
+	float	temperature;
+}voltage_measurement_t;
 
 /**
- * @brief Starts the battery measurement thread
+ * @brief Starts the voltage measurement thread
  */
-void batteryMesurementStart(void);
+void voltageMesurementStart(void);
 
-#endif  /* BATTERY_MEASUREMENT_H */
+/**
+ * @brief 	Gets the measurements values and put them into the 
+ * 			voltage_measurement_t* pointer given.
+ * 
+ * @param measurements Pointer to the voltage_measurement_t structure to fill
+ */	
+void voltageMesurementGet(voltage_measurement_t* measurements);
+
+#endif  /* VOLTAGE_MEASUREMENT_H */
