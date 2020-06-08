@@ -113,6 +113,36 @@ void mp_flash_lock(void)
 }
 
 /*---------------------------------------------------------------------------*/
+/** @brief Program a 32 bit Word to FLASH
+
+This performs all operations necessary to program a 32 bit word to FLASH memory.
+The program error flag should be checked separately for the event that memory
+was not properly erased.
+
+@param[in] address Starting address in Flash.
+@param[in] data word to write
+*/
+
+void flash_program_word(uint32_t address, uint32_t data)
+{
+	/* Ensure that all flash operations are complete. */
+	flash_wait_for_last_operation();
+	flash_set_program_size(FLASH_CR_PROGRAM_X32);
+
+	/* Enable writes to flash. */
+	FLASH_CR |= FLASH_CR_PG;
+
+	/* Program the word. */
+	MMIO32(address) = data;
+
+	/* Wait for the write to complete. */
+	flash_wait_for_last_operation();
+
+	/* Disable writes to flash. */
+	FLASH_CR &= ~FLASH_CR_PG;
+}
+
+/*---------------------------------------------------------------------------*/
 /** @brief Program an 8 bit Byte to FLASH
 
 This performs all operations necessary to program an 8 bit byte to FLASH memory.
