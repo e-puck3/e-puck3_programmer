@@ -91,7 +91,7 @@ This enables write access to the Flash memory. It is locked by default on
 reset.
 */
 
-void mp_flash_unlock(void)
+void flash_unlock(void)
 {
 	/* Clear the unlock sequence state. */
 	FLASH_CR |= FLASH_CR_LOCK;
@@ -107,7 +107,7 @@ void mp_flash_unlock(void)
 Used to prevent spurious writes to FLASH.
 */
 
-void mp_flash_lock(void)
+void flash_lock(void)
 {
 	FLASH_CR |= FLASH_CR_LOCK;
 }
@@ -153,7 +153,7 @@ was not properly erased.
 @param[in] data byte to write
 */
 
-void mp_flash_program_byte(uint32_t address, uint8_t data)
+void flash_program_byte(uint32_t address, uint8_t data)
 {
 	flash_wait_for_last_operation();
 	flash_set_program_size(FLASH_CR_PROGRAM_X8);
@@ -179,7 +179,7 @@ See the reference manual or the FLASH programming manual for details.
 @param[in] sector (0 - 11 for some parts, 0-23 on others)
 */
 
-void mp_flash_erase_sector(uint8_t sector)
+void flash_erase_sector(uint8_t sector)
 {
 	flash_wait_for_last_operation();
 	flash_set_program_size(FLASH_CR_PROGRAM_X32);
