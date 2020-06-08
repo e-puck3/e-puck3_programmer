@@ -11,11 +11,12 @@
 #define ASEBA_CAN_INTERFACE_H
 
 #include "vm.h"
-#include "main.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define CAN_ASEBA	CAND1
 
 void aseba_can_start(uint16 id);
 

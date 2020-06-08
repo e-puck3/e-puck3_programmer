@@ -8,17 +8,19 @@
  * @creation date	29.06.2018
  */
 
-#include "main.h"
+#include "ch.h"
+#include "hal.h"
 #include "communications.h"
 #include "aseba_can_interface.h"
 #include "aseba_bridge.h"
-#include "flash_common_f24.h"
+#include "flash.h"
+#include "usbcfg.h"
 
-#define CONFIG_SECTOR	15			//corresponds to the last sector of the flash for the 413
+#define CONFIG_SECTOR	7			//corresponds to the last sector of the flash for the 746
 #define PATTERN_FLASH	0xABCDEC	//arbitrary patern to detect if the block has already been written
 
 //flash variables. used in writeModeToFlash() and findLastModeWrittenToFlash()
-extern uint32_t _config_start; //sector 15	//defined in the .ld file
+extern uint32_t _config_start; //sector 7	//defined in the .ld file
 extern uint32_t _config_end;				//defined in the .ld file
 
 static uint32_t config_start = (uint32_t)&_config_start;
@@ -66,7 +68,7 @@ void writeModeToFlash(comm_modes_t choice){
 
 	//erases the flash if we are at the end or if we found nothing on it
 	if( (config_addr == 0) || (config_addr >= (config_end - sizeof(uint32_t)) ) ){
-		flash_erase_sector(CONFIG_SECTOR, FLASH_CR_PROGRAM_X32);
+		flash_erase_sector(CONFIG_SECTOR);
 		config_addr = config_start;
 	}
 
@@ -138,7 +140,7 @@ static THD_FUNCTION(uart_to_usb_thd, arg)
 				if(nb_times_read > 1)
 					chEvtBroadcastFlags(&communications_event, ACTIVE_COMMUNICATION_FLAG);
 				
-				if((communicationGetActiveMode() == UART_407_PASSTHROUGH) && getControlLineState(SERIAL_INTERFACE, CONTROL_LINE_DTR))
+				if((communicationGetActiveMode() == UART_779_PASSTHROUGH) && getControlLineState(SERIAL_INTERFACE, CONTROL_LINE_DTR))
 					chnWriteTimeout((BaseChannel*)&USB_SERIAL, c, 1, TIME_INFINITE);
 				else if(communicationGetActiveMode() == UART_ESP_PASSTHROUGH)
 					chnWriteTimeout((BaseChannel*)&USB_SERIAL, c, 1, TIME_INFINITE);
@@ -186,7 +188,7 @@ void communicationsStart(void){
 	    .cr3 = 0,
 	};
 
-	static const SerialConfig ser_cfg_407 = {
+	static const SerialConfig ser_cfg_779 = {
 	    .speed = 115200,
 	    .cr1 = 0,
 	    .cr2 = 0,
@@ -197,7 +199,7 @@ void communicationsStart(void){
 	 * Configures the two serial over uart drivers
 	 */
 	sdStart(&UART_ESP, &ser_cfg_esp);
-	sdStart(&UART_407, &ser_cfg_407);
+	sdStart(&UART_779, &ser_cfg_779);
 
 	/**
 	 * Configures the can for Aseba and the threads of the Aseba Bridge
@@ -230,9 +232,9 @@ void communicationsSwitchModeTo(comm_modes_t mode, uint8_t writeToflash){
 	}
 	else{
 		pauseAsebaBridge();
-		if(mode == UART_407_PASSTHROUGH){
-			uart_used = &UART_407;
-			active_mode = UART_407_PASSTHROUGH;
+		if(mode == UART_779_PASSTHROUGH){
+			uart_used = &UART_779;
+			active_mode = UART_779_PASSTHROUGH;
 		}else if(mode == UART_ESP_PASSTHROUGH){
 			uart_used = &UART_ESP;
 			active_mode = UART_ESP_PASSTHROUGH;
@@ -252,5 +254,5 @@ comm_modes_t communicationGetActiveMode(void){
 
 //we get the gpio0 pin status of the ESP32. 0 is for connected and 1 for not connected.
 uint8_t communicationIsBluetoothConnected(void){
-	return !palReadLine(LINE_ESP_GPIO0);
+	return !palReadLine(LINE_GPIO0_ESP32);
 }

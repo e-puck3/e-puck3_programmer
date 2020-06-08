@@ -146,7 +146,16 @@ CSRC = $(ALLCSRC) \
        USB3803.c \
        usb_hub.c \
        power_button.c \
-       voltage_measurement.c
+       voltage_measurement.c \
+       flash/flash.c \
+       communications.c \
+       aseba_vm/aseba_bridge.c \
+       aseba_vm/aseba_can_interface.c \
+       aseba_vm/can-buffer.c \
+       aseba_vm/can-net.c \
+       aseba_vm/natives.c \
+       aseba_vm/vm-buffer.c \
+       aseba_vm/vm.c \
 
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
@@ -177,7 +186,7 @@ TCPPSRC =
 ASMSRC = $(ALLASMSRC)
 ASMXSRC = $(ALLXASMSRC)
 
-INCDIR = $(ALLINC) $(TESTINC)
+INCDIR = $(ALLINC) $(TESTINC) aseba_vm/ flash/
 
 #
 # Project, sources and paths

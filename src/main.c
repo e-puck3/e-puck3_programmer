@@ -18,6 +18,7 @@
 #include "usb_hub.h"
 #include "power_button.h"
 #include "voltage_measurement.h"
+#include "communications.h"
 
 
 static THD_WORKING_AREA(waBlinker,128);
@@ -113,6 +114,10 @@ int main(void) {
 	 * Starts the thread managing the USB hub
 	 */
 	usbHubStart();
+	/**
+	 * Starts the communication thread
+	 */
+	communicationsStart();
 	/*
 	 * Starts the GDB system
 	 */

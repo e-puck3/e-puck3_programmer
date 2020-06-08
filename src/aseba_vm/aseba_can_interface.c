@@ -55,14 +55,14 @@ void can_init(void)
 {
 
     /* CAN cell init.
-     * Setting the bitrate to 1MBit. APB1 = 48MHz,
-     * prescaler = 3 -> 16MHz time quanta frequency.
-     * 1tq sync + 9tq bit segment1 (TS1) + 6tq bit segment2 (TS2) =
-     * 16time quanta per bit period, therefor 16MHz/16 = 1MHz
+     * Setting the bitrate to 1MBit. APB1 = 54MHz,
+     * prescaler = 3 -> 18MHz time quanta frequency.
+     * 1tq sync + 10tq bit segment1 (TS1) + 7tq bit segment2 (TS2) =
+     * 18time quanta per bit period, therefor 18MHz/18 = 1MHz
      */
     static const CANConfig can1_config = {
         .mcr = CAN_MCR_ABOM | CAN_MCR_TXFP,
-        .btr = CAN_BTR_SJW(1-1) | CAN_BTR_TS1(9-1) | CAN_BTR_TS2(6-1) | CAN_BTR_BRP(3-1)
+        .btr = CAN_BTR_SJW(1-1) | CAN_BTR_TS1(10-1) | CAN_BTR_TS2(7-1) | CAN_BTR_BRP(3-1)
     };
 
     canStart(&CAN_ASEBA, &can1_config);

@@ -11,16 +11,20 @@
 #ifndef COMMUNICATIONS_H
 #define COMMUNICATIONS_H
 
+#include "hal.h"
+
 //functionning modes of the communications thread
 //the USB side is always the USB_SERIAL comm port
 typedef enum{
-	UART_407_PASSTHROUGH = 0,
+	UART_779_PASSTHROUGH = 0,
 	UART_ESP_PASSTHROUGH,
 	ASEBA_CAN_TRANSLATOR,
 	NB_COMM_MODES,
 }comm_modes_t;
 
 #define DEFAULT_COMM_MODE			UART_ESP_PASSTHROUGH
+#define UART_779 					SD3
+#define UART_ESP 					SD1
 
 //Event source used to send events to other threads
 extern event_source_t communications_event;
@@ -32,7 +36,7 @@ extern event_source_t communications_event;
 /**
  * @brief Starts the communications thread
  * 
- * @details Handles the uart407 <-> USB translator, the uartESP <-> USB 
+ * @details Handles the uart779 <-> USB translator, the uartESP <-> USB 
  * 			and the Aseba CAN <-> USB translator
  */
 void communicationsStart(void);

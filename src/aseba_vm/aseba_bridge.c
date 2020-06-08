@@ -13,7 +13,6 @@
 
 #include "can-net.h"
 #include "consts.h"
-#include "main.h"
 #include "chprintf.h"
 #include "communications.h"
 
