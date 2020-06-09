@@ -92,7 +92,7 @@ int main(void) {
 	chEvtObjectInit(&vbus_info_event);
 	chEvtObjectInit(&battery_info_event);
 	chEvtObjectInit(&gdb_status_event);
-	// chEvtObjectInit(&communications_event);
+	chEvtObjectInit(&communications_event);
 
 	/*
 	 * Starts the handling of the power button
