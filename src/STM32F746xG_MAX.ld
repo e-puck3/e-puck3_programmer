@@ -27,9 +27,9 @@
  */
 MEMORY
 {
-    flash0 (rx) : org = 0x08000000, len = 768M        /* Flash as AXIM (writable) */
-    flash1 (rx) : org = 0x00200000, len = 768M        /* Flash as ITCM */
-    config (rx) : org = 0x08000000, len = 256M        /* Flash for the config */
+    flash0 (rx) : org = 0x08000000, len = 768k        /* Flash as AXIM (writable) */
+    flash1 (rx) : org = 0x00200000, len = 768k        /* Flash as ITCM */
+    config (rx) : org = 0x080C0000, len = 256k        /* Flash for the config */
     flash2 (rx) : org = 0x00000000, len = 0
     flash3 (rx) : org = 0x00000000, len = 0
     flash4 (rx) : org = 0x00000000, len = 0
@@ -46,8 +46,8 @@ MEMORY
     ram7   (wx) : org = 0x00000000, len = 0
 }
 
-_config_start = ORIGIN(flash1);
-_config_end = ORIGIN(flash1) + LENGTH(flash1);
+_config_start = ORIGIN(config);
+_config_end = ORIGIN(config) + LENGTH(config);
 
 /* For each data/text section two region are defined, a virtual region
    and a load region (_LMA suffix).*/
