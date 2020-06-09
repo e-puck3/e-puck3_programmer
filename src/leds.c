@@ -1,165 +1,135 @@
 /**
  * @file	leds.c
- * @brief  	Functions to manage the RGB led connected to the programmer. Not inteded to be used by the user
- * 			because the RGB led is already completely used by leds_states.c
+ * @brief  	Functions to manage the RGB leds connected to the programmer. Not intended to be used by the user
+ * 			because the RGB leds are already completely used by leds_states.c
  * 
  * @written by  	Eliot Ferragni
- * @creation date	19.06.2018
+ * @creation date	09.06.2020
  */
 
-#include "main.h"
+#include "ch.h"
+#include "hal.h"
 #include "leds.h"
 
-#define PWM_CLOCK_FREQUENCY		100000		//100kHz
-#define PWM_PERIOD 				1000		//=> resolution = 1000 and 
-											//   PWM frequency = PWM_CLOCK_FREQUENCY/PWM_PERIOD = 100Hz
-
-static uint8_t pwm_status = NOT_CONFIGURED;
-
-static uint16_t leds_values[NB_LEDS] = {0};
+static uint16_t leds_values[NB_RGB_LEDS][NB_LEDS] = {LED_NO_POWER};
 
 /////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
-/**
- * @brief Turns OFF the three leds. Called each time the PWM resets its counter
- * 
- * @param pwmp PWM driver (not used)
- */
-static void clearLedsCb(PWMDriver *pwmp) {
 
-	(void)pwmp;
-	palSetLine(LINE_LED_RED);
-	palSetLine(LINE_LED_GREEN);
-	palSetLine(LINE_LED_BLUE);
+// Simulates a 100Hz PWM with duty cycles increment of 10% -> 10 differents levels
+static THD_WORKING_AREA(waLeds, 128);
+static THD_FUNCTION(thLeds, arg) {
 
+	chRegSetThreadName("RGB leds PWM");
+	
+	(void)arg;
+	
+	uint8_t counter = 0;
+
+    while(1){
+    	counter = (counter+1) % LED_MAX_POWER;
+
+    	// turns ON each led if duty-cycle not 0
+    	if(counter == 0){
+			if(leds_values[STATUS_LED1][RED_LED] != LED_NO_POWER){
+				palClearLine(LINE_STATUS_LED1_R);
+			}
+			if(leds_values[STATUS_LED1][GREEN_LED] != LED_NO_POWER){
+				palClearLine(LINE_STATUS_LED1_G);
+			}
+			if(leds_values[STATUS_LED1][BLUE_LED] != LED_NO_POWER){
+				palClearLine(LINE_STATUS_LED1_B);
+			}
+			if(leds_values[STATUS_LED2][RED_LED] != LED_NO_POWER){
+				palClearLine(LINE_STATUS_LED2_R);
+			}
+			if(leds_values[STATUS_LED2][GREEN_LED] != LED_NO_POWER){
+				palClearLine(LINE_STATUS_LED2_G);
+			}
+			if(leds_values[STATUS_LED2][BLUE_LED] != LED_NO_POWER){
+				palClearLine(LINE_STATUS_LED2_B);
+			}
+			if(leds_values[STATUS_LED3][RED_LED] != LED_NO_POWER){
+				palClearLine(LINE_STATUS_LED3_R);
+			}
+			if(leds_values[STATUS_LED3][GREEN_LED] != LED_NO_POWER){
+				palClearLine(LINE_STATUS_LED3_G);
+			}
+			if(leds_values[STATUS_LED3][BLUE_LED] != LED_NO_POWER){
+				palClearLine(LINE_STATUS_LED3_B);
+			}
+    	}
+    	// turns OFF a led when we reach its value
+    	else{
+			if(counter >= leds_values[STATUS_LED1][RED_LED]){
+				palSetLine(LINE_STATUS_LED1_R);
+			}
+			if(counter >= leds_values[STATUS_LED1][GREEN_LED]){
+				palSetLine(LINE_STATUS_LED1_G);
+			}
+			if(counter >= leds_values[STATUS_LED1][BLUE_LED]){
+				palSetLine(LINE_STATUS_LED1_B);
+			}
+			if(counter >= leds_values[STATUS_LED2][RED_LED]){
+				palSetLine(LINE_STATUS_LED2_R);
+			}
+			if(counter >= leds_values[STATUS_LED2][GREEN_LED]){
+				palSetLine(LINE_STATUS_LED2_G);
+			}
+			if(counter >= leds_values[STATUS_LED2][BLUE_LED]){
+				palSetLine(LINE_STATUS_LED2_B);
+			}
+			if(counter >= leds_values[STATUS_LED3][RED_LED]){
+				palSetLine(LINE_STATUS_LED3_R);
+			}
+			if(counter >= leds_values[STATUS_LED3][GREEN_LED]){
+				palSetLine(LINE_STATUS_LED3_G);
+			}
+			if(counter >= leds_values[STATUS_LED3][BLUE_LED]){
+				palSetLine(LINE_STATUS_LED3_B);
+			}
+    	}
+
+    	chThdSleepMilliseconds(1);
+    }
 }
-
-/**
- * @brief 	Turns ON the red led. Called when the counter of the PWM becomes 
- * 			higher than the period of the channel.
- * 
- * @param pwmp PWM driver (not used)
- */
-static void redLedCb(PWMDriver *pwmp) {
-
-	(void)pwmp;
-	palClearLine(LINE_LED_RED);
-}
-
-/**
- * @brief 	Turns ON the green led. Called when the counter of the PWM becomes 
- * 			higher than the period of the channel.
- * 
- * @param pwmp PWM driver (not used)
- */
-static void greenLedCb(PWMDriver *pwmp) {
-
-	(void)pwmp;
-	palClearLine(LINE_LED_GREEN);
-}
-
-/**
- * @brief 	Turns ON the blue led. Called when the counter of the PWM becomes 
- * 			higher than the period of the channel.
- * 
- * @param pwmp PWM driver (not used)
- */
-static void blueLedCb(PWMDriver *pwmp) {
-
-	(void)pwmp;
-	palClearLine(LINE_LED_BLUE);
-}
-
-static PWMConfig pwmLedCfg = {
-	PWM_CLOCK_FREQUENCY,
-	PWM_PERIOD,
-	clearLedsCb,
-	{
-		{PWM_OUTPUT_DISABLED, redLedCb},
-		{PWM_OUTPUT_DISABLED, greenLedCb},
-		{PWM_OUTPUT_DISABLED, blueLedCb},
-		{PWM_OUTPUT_DISABLED, NULL}
-	},
-	0,
-	0
-};
 
 //////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 
 void ledInit(void){
-	pwmStart(&PWM_LED, &pwmLedCfg);
-	pwmEnablePeriodicNotification(&PWM_LED);
-	
-	//enables and disables otherwise we have a kernel panic when trying to disable
-	//if it has never been enabled. This occurs if for example the first value we set with setLed() 
-	//is 0.
-	pwmEnableChannel(&PWM_LED, RED_LED, PWM_PERIOD);
-	pwmEnableChannelNotification(&PWM_LED, RED_LED);
-	pwmDisableChannelNotification(&PWM_LED, RED_LED);
 
-	pwmEnableChannel(&PWM_LED, GREEN_LED, PWM_PERIOD);
-	pwmEnableChannelNotification(&PWM_LED, GREEN_LED);
-	pwmDisableChannelNotification(&PWM_LED, GREEN_LED);
-
-	pwmEnableChannel(&PWM_LED, BLUE_LED, PWM_PERIOD);
-	pwmEnableChannelNotification(&PWM_LED, BLUE_LED);
-	pwmDisableChannelNotification(&PWM_LED, BLUE_LED);
-
-	pwm_status = CONFIGURED;
-
-	//sets the init values. 
-	//For example if someone tried to set a led before the pwm was configured
-	setLed(RED_LED, leds_values[RED_LED]);
-	setLed(GREEN_LED, leds_values[GREEN_LED]);
-	setLed(BLUE_LED, leds_values[BLUE_LED]);
+	chThdCreateStatic(waLeds, sizeof(waLeds), NORMALPRIO, thLeds, NULL);
 }
 
-void toggleLed(led_name_t led, uint16_t value){
+void toggleLed(rgb_led_name_t rgb_led, led_name_t led, uint8_t duty_cycle){
+
+	if(rgb_led>=NB_RGB_LEDS){
+		return;
+	}
 	if(led>=NB_LEDS){
 		return;
 	}
+	if(duty_cycle > LED_MAX_POWER){
+		return;
+	}
 
-	if(leds_values[led] != PWM_PERIOD){
-		setLed(led, LED_NO_POWER);
+	if(leds_values[rgb_led][led] == LED_NO_POWER){
+		leds_values[rgb_led][led] = duty_cycle;
 	}else{
-		setLed(led, value);
+		leds_values[rgb_led][led] = LED_NO_POWER;
 	}
 }
 
-void setLed(led_name_t led, uint16_t value){
-	osalSysLock();
-	setLedI(led, value);
-	osalSysUnlock();
-}
-
-void setLedI(led_name_t led, uint16_t value){
+void setLed(rgb_led_name_t rgb_led, led_name_t led, uint8_t duty_cycle){
+	if(rgb_led>=NB_RGB_LEDS){
+		return;
+	}
 	if(led>=NB_LEDS){
 		return;
 	}
-	if(pwm_status == CONFIGURED){
-
-		if(value>PWM_PERIOD){
-			value = PWM_PERIOD;
-		}
-
-		//final duty-cycle is (100% - value)
-		//because the callback of each led turns it ON.
-		value = PWM_PERIOD - value;
-
-		if(value < 1){
-			value = 1;
-		}
-
-		if(value < PWM_PERIOD){
-			pwmEnableChannelI(&PWM_LED, led, value);
-			pwmEnableChannelNotificationI(&PWM_LED, led);
-		}else{
-			pwmDisableChannelNotificationI(&PWM_LED, led);
-
-		}
-		
+	if(duty_cycle > LED_MAX_POWER){
+		return;
 	}
 
-	//stores the value
-	leds_values[led] = value;
+	leds_values[rgb_led][led] = duty_cycle;
 }

@@ -1,18 +1,18 @@
 /**
  * @file	leds.h
- * @brief  	Functions to manage the RGB led connected to the programmer. Not inteded to be used by the user
- * 			because the RGB led is already completely used by leds_states.c
+ * @brief  	Functions to manage the RGB leds connected to the programmer. Not intended to be used by the user
+ * 			because the RGB leds are already completely used by leds_states.c
  * 
  * @written by  	Eliot Ferragni
- * @creation date	19.06.2018
+ * @creation date	09.06.2020
  */
 
 #ifndef LEDS_H
 #define LEDS_H
 
-#include "main.h"
+#include "hal.h"
 
-//List of the LEDs present on the RGB LED
+//List of the LEDs present on a RGB LED
 typedef enum {
 	RED_LED = 0,
 	GREEN_LED,
@@ -20,43 +20,43 @@ typedef enum {
 	NB_LEDS,
 } led_name_t;
 
+//List of the RGB LEDs
+typedef enum {
+	STATUS_LED1 = 0,
+	STATUS_LED2,
+	STATUS_LED3,
+	NB_RGB_LEDS,
+} rgb_led_name_t;	
 
-#define LED_MAX_POWER		1000
-#define LED_MID_POWER		500
-#define LED_QUARTER_POWER	250
-#define LED_MIN_POWER		1
-#define LED_NO_POWER		0
+#define LED_MAX_POWER		10		// Always ON
+#define LED_MID_POWER		5		//		∧
+#define LED_QUARTER_POWER	2		// PWM at 100Hz
+#define LED_MIN_POWER		1		//		∨
+#define LED_NO_POWER		0		// Always OFF
 
 /**
- * @brief Init the PWM to handle the three leds
+ * @brief Init the PWM to handle the RGB LEDs
  */
-void ledInit(void);
+void ledsInit(void);
 
 /**
- * @brief Toggles the selected led with the value given.
+ * @brief 			Toggles the selected led with the given value.
  * 
+ * @param rgb_led 	RGB LED to update. See rgb_led_name_t
  * @param led 		Led to update. See led_name_t
- * @param value 	New value to give in the case the led was off. 
- * 					;If the led was on, it will simply turn it off.
+ * @param value 	New value to set in the case the led was OFF. 
+ * 					If the led was ON, it will simply be turned OFF.
  */
-void toggleLed(led_name_t led, uint16_t value);
+void toggleLed(rgb_led_name_t rgb_led, led_name_t led, uint8_t duty_cycle);
 
 /**
- * @brief 		Sets the valu of the given led
+ * @brief 		Sets the value of the given led
  * 
- * @param led 	Led to update. See led_name_t
- * @param value New value to give to the led. 
- * 				Range is 0-1000 (0 = completely off and 1000 = completely on)
+ * @param rgb_led 	RGB LED to update. See rgb_led_name_t
+ * @param led 		Led to update. See led_name_t
+ * @param value 	New value to give to the led. 
+ * 					Range is 0-10 (0 = completely OFF and 10 = completely ON)
  */
-void setLed(led_name_t led, uint16_t value);
-
-/**
- * @brief 		Sets the valu of the given led. To be called from an interrupt context
- * 
- * @param led 	Led to update. See led_name_t
- * @param value New value to give to the led. 
- * 				Range is 0-1000 (0 = completely off and 1000 = completely on)
- */
-void setLedI(led_name_t led, uint16_t value);
+void setLed(rgb_led_name_t rgb_led, led_name_t led, uint8_t duty_cycle);
 
 #endif  /* LEDS_H */
