@@ -19,6 +19,7 @@
 #include "power_button.h"
 #include "voltage_measurement.h"
 #include "communications.h"
+#include "leds_management.h"
 
 
 static THD_WORKING_AREA(waBlinker,128);
@@ -95,31 +96,36 @@ int main(void) {
 	chEvtObjectInit(&communications_event);
 
 	/*
-	 * Starts the handling of the power button
+	 * Starts the leds states thread. Must be the first module to not miss events sent by
+	 * the others modules.
+	 */
+	ledsManagementStart();
+	/*
+	 * Starts the handling of the power button.
 	 */
 	powerButtonStart();
 	/*
-	 * Starts the voltage measurement thread
+	 * Starts the voltage measurement thread.
 	 */
 	voltageMesurementStart();
 	/*
-	 * Initializes two serial-over-USB CDC drivers and starts and connects the USB
+	 * Initializes two serial-over-USB CDC drivers and starts and connects the USB.
 	 */
 	usbSerialStart();
 	/*
-	 * Initializes the USB PD controller
+	 * Initializes the USB PD controller.
 	 */
 	usbPDControllerStart();
 	/*
-	 * Starts the thread managing the USB hub
+	 * Starts the thread managing the USB hub.
 	 */
 	usbHubStart();
-	/**
-	 * Starts the communication thread
+	/*
+	 * Starts the communication thread.
 	 */
 	communicationsStart();
 	/*
-	 * Starts the GDB system
+	 * Starts the GDB system.
 	 */
 	gdbStart();
 

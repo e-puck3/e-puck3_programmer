@@ -156,7 +156,8 @@ CSRC = $(ALLCSRC) \
        aseba_vm/natives.c \
        aseba_vm/vm-buffer.c \
        aseba_vm/vm.c \
-       leds.c
+       leds.c \
+       leds_management.c
 
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
