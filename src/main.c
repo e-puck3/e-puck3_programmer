@@ -20,6 +20,7 @@
 #include "voltage_measurement.h"
 #include "communications.h"
 #include "leds_management.h"
+#include "threads_utilities.h"
 
 
 static THD_WORKING_AREA(waBlinker,128);
@@ -68,7 +69,7 @@ static THD_FUNCTION(Blinker,arg) {
 
 
 int main(void) {
-	
+	logNextCreatedThreadsTimestamps();
 	/**
 	 * Special function to handle the turn on if we pressed the button without
 	 * the usb cable plugged. Called before everything to catch the button pressed.

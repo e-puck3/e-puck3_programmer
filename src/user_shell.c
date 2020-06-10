@@ -16,6 +16,7 @@
 #include "usbcfg.h"
 #include "user_shell.h"
 #include "usb_pd_controller.h"
+#include "threads_utilities.h"
 
 
 static THD_WORKING_AREA(waShell,2048);
@@ -25,6 +26,7 @@ static char* completion_buffer[SHELL_MAX_COMPLETIONS];
 
 static const ShellCommand commands[] = {
   USB_PD_CONTROLLER_SHELL_CMD
+  THREADS_UTILITIES_SHELL_CMD
   {NULL, NULL}
 };
 
