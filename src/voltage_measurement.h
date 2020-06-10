@@ -50,12 +50,14 @@ extern event_source_t battery_info_event;
 
 /////////////////////////////////////////////VBUS ZONE/////////////////////////////////////////////
 
-#define VBUS_HIGHEST_VOLTAGE		20
-#define VBUS_THIRD_STEP				15
-#define VBUS_SECOND_STEP			12
-#define VBUS_FIRST_STEP				9
-#define VBUS_DEFAULT_VOLTAGE		5
-#define VBUS_NO_VOLTAGE 			0
+#define VBUS_TOLERANCE				0.95f //for example 19V is valid for a 20V source
+
+#define VBUS_HIGHEST_VOLTAGE		(20 * VBUS_TOLERANCE)
+#define VBUS_THIRD_STEP				(15 * VBUS_TOLERANCE)
+#define VBUS_SECOND_STEP			(12 * VBUS_TOLERANCE)
+#define VBUS_FIRST_STEP				(9 * VBUS_TOLERANCE)
+#define VBUS_DEFAULT_VOLTAGE		(5 * VBUS_TOLERANCE)
+#define VBUS_NO_VOLTAGE 			(0 * VBUS_TOLERANCE)
 
 //Event source used to send events to other threads
 extern event_source_t vbus_info_event;
