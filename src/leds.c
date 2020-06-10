@@ -96,7 +96,7 @@ static THD_FUNCTION(thLeds, arg) {
 
 //////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 
-void ledInit(void){
+void ledsInit(void){
 
 	chThdCreateStatic(waLeds, sizeof(waLeds), NORMALPRIO, thLeds, NULL);
 }
