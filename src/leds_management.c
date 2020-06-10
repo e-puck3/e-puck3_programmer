@@ -1,5 +1,5 @@
 /**
- * @file	leds_states.c
+ * @file	leds_management.c
  * @brief  	Functions to control the states of the leds. It is the module used to control the leds.
  * 			If one tries to set a led outside of this module, it will probably not work as intended, as
  * 			this module updates the states of the leds.
@@ -9,7 +9,7 @@
  * @creation date	10.06.2020
  */
 
-#include "leds_states.h"
+#include "leds_management.h"
 #include "power_button.h"
 #include "voltage_measurement.h"
 #include "communications.h"
@@ -31,8 +31,8 @@ static uint16_t leds_values[NB_RGB_LEDS][NB_LEDS] = {	//    RED				GREEN				BLUE
 
 /////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
-static THD_WORKING_AREA(leds_states_thd_wa, 1024);
-static THD_FUNCTION(leds_states_thd, arg)
+static THD_WORKING_AREA(leds_management_thd_wa, 1024);
+static THD_FUNCTION(leds_management_thd, arg)
 {
 	(void) arg;
 
@@ -257,7 +257,7 @@ static THD_FUNCTION(leds_states_thd, arg)
 
 //////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 
-void ledsStatesStart(void){
+void ledsManagementStart(void){
 
 	/*
 	 *	Starts the PWM managing the leds
@@ -267,6 +267,6 @@ void ledsStatesStart(void){
 	/*
 	 * Starts the leds states thread
 	 */
-	chThdCreateStatic(leds_states_thd_wa, sizeof(leds_states_thd_wa), NORMALPRIO, leds_states_thd, NULL);
+	chThdCreateStatic(leds_management_thd_wa, sizeof(leds_management_thd_wa), NORMALPRIO, leds_management_thd, NULL);
 }
 

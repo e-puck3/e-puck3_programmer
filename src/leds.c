@@ -1,7 +1,7 @@
 /**
  * @file	leds.c
  * @brief  	Functions to manage the RGB leds connected to the programmer. Not intended to be used by the user
- * 			because the RGB leds are already completely used by leds_states.c
+ * 			because the RGB leds are already completely used by leds_management.c
  * 
  * @written by  	Eliot Ferragni
  * @creation date	09.06.2020
