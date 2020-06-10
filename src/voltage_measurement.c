@@ -112,20 +112,22 @@ void vbusStateMachine(void){
 	static uint8_t new_state = VBUS_DEFAULT_VOLTAGE_FLAG;
 
 
-	if(battery_voltage >= VBUS_HIGHEST_VOLTAGE){
+	if(vbus_voltage >= VBUS_HIGHEST_VOLTAGE){
 		new_state = VBUS_HIGHEST_VOLTAGE_FLAG;
 		
-	}else if(battery_voltage >= VBUS_THIRD_STEP){
+	}else if(vbus_voltage >= VBUS_THIRD_STEP){
 		new_state = VBUS_THIRD_STEP_FLAG;
 		
-	}else if(battery_voltage >= VBUS_SECOND_STEP){
+	}else if(vbus_voltage >= VBUS_SECOND_STEP){
 		new_state = VBUS_SECOND_STEP_FLAG;
 		
-	}else if(battery_voltage >= VBUS_FIRST_STEP){
+	}else if(vbus_voltage >= VBUS_FIRST_STEP){
 		new_state = VBUS_FIRST_STEP_FLAG;
 		
+	}else if(vbus_voltage >= VBUS_DEFAULT_VOLTAGE){
+		new_state = VBUS_DEFAULT_VOLTAGE_FLAG;
 	}else{
-		new_state = VBUS_DEFAULT_VOLTAGE;
+		new_state = VBUS_NO_VOLTAGE_FLAG;
 	}
 
 	//checks if we are in the new state for at least CHANGE_STATE_TIME_MS time
