@@ -29,7 +29,7 @@ static const ShellCommand commands[] = {
 };
 
 static const ShellConfig shell_cfg = {
-	(BaseSequentialStream *)&USB_GDB,
+	(BaseSequentialStream *)&SHELL_PORT,
 	commands,
 	sc_histbuf,
 	sizeof(sc_histbuf),

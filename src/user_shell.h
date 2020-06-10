@@ -9,6 +9,13 @@
 #ifndef USER_SHELL_H
 #define USER_SHELL_H
 
+#include "usbcfg.h"
+#define SHELL_PORT		USB_GDB
+
+
+/**
+ * @brief Spawns the shell
+ */
 void spawn_shell(void);
 
 #endif /* USER_SHELL_H */
