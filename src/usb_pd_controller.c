@@ -26,7 +26,7 @@
  *               fall time = 10 ns (0x20A00E28)
  */
 static const I2CConfig i2c2config = {
-    .timingr    = 0x20A00E28,
+    .timingr    = 0x0080091C,
     .cr1        = 0,
     .cr2        = 0,
 };
