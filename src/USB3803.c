@@ -98,14 +98,14 @@
 
 /********************               PRIVATE FUNCITONS              ********************/
 
-#define SET_RESET_HUB(x) 			palClearLine(x->reset_n_line)
-#define UNSET_RESET_HUB(x) 			palSetLine(x->reset_n_line)
-#define ENABLE_BYPASS_MODE(x) 		palClearLine(x->bypass_n_line)
-#define DISABLE_BYPASS_MODE(x) 		palSetLine(x->bypass_n_line)
-#define ENABLE_VBUS_DEVICES(x) 		palSetLine(x->vbus_devices_line)
-#define DISABLE_VBUS_DEVICES(x) 	palClearLine(x->vbus_devices_line)
-#define SET_HUB_CONNECT(x)			palSetLine(x->hub_connect_line)
-#define CLEAR_HUB_CONNECT(x)		palSetLine(x->hub_connect_line)
+#define SET_RESET_HUB(x) 			palClearLine((x)->reset_n_line)
+#define UNSET_RESET_HUB(x) 			palSetLine((x)->reset_n_line)
+#define ENABLE_BYPASS_MODE(x) 		palClearLine((x)->bypass_n_line)
+#define DISABLE_BYPASS_MODE(x) 		palSetLine((x)->bypass_n_line)
+#define ENABLE_VBUS_DEVICES(x) 		palSetLine((x)->vbus_devices_line)
+#define DISABLE_VBUS_DEVICES(x) 	palClearLine((x)->vbus_devices_line)
+#define SET_HUB_CONNECT(x)			palSetLine((x)->hub_connect_line)
+#define CLEAR_HUB_CONNECT(x)		palClearLine((x)->hub_connect_line)
 
 static uint8_t _read_byte(USB3803_t* hub, uint8_t reg){
 	uint8_t rxbuf;
