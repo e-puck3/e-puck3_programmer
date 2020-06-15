@@ -803,7 +803,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOD_STATUS_LED3_B) |\
                                      PIN_OTYPE_PUSHPULL(GPIOD_CS_ENCODER1_n) |\
                                      PIN_OTYPE_PUSHPULL(GPIOD_H_BRIDGE_MOT3BP) |\
-                                     PIN_OTYPE_PUSHPULL(GPIOD_I2C_SDA_PD_CONTROLLER) |\
+                                     PIN_OTYPE_OPENDRAIN(GPIOD_I2C_SDA_PD_CONTROLLER) |\
                                      PIN_OTYPE_PUSHPULL(GPIOD_H_BRIDGE_MOT3CP) |\
                                      PIN_OTYPE_PUSHPULL(GPIOD_H_BRIDGE_MOT3CN))
 #define VAL_GPIOD_OSPEEDR           (PIN_OSPEED_VERYLOW(GPIOD_CAN1_RX) |    \
@@ -819,7 +819,7 @@
                                      PIN_OSPEED_VERYLOW(GPIOD_STATUS_LED3_B) |\
                                      PIN_OSPEED_VERYLOW(GPIOD_CS_ENCODER1_n) |\
                                      PIN_OSPEED_VERYLOW(GPIOD_H_BRIDGE_MOT3BP) |\
-                                     PIN_OSPEED_VERYLOW(GPIOD_I2C_SDA_PD_CONTROLLER) |\
+                                     PIN_OSPEED_HIGH(GPIOD_I2C_SDA_PD_CONTROLLER) |\
                                      PIN_OSPEED_VERYLOW(GPIOD_H_BRIDGE_MOT3CP) |\
                                      PIN_OSPEED_VERYLOW(GPIOD_H_BRIDGE_MOT3CN))
 #define VAL_GPIOD_PUPDR             (PIN_PUPDR_PULLDOWN(GPIOD_CAN1_RX) |    \
@@ -841,14 +841,14 @@
 #define VAL_GPIOD_ODR               (PIN_ODR_LOW(GPIOD_CAN1_RX) |           \
                                      PIN_ODR_LOW(GPIOD_CAN1_TX) |           \
                                      PIN_ODR_HIGH(GPIOD_STATUS_LED1_R) |    \
-                                     PIN_ODR_LOW(GPIOD_STATUS_LED1_G) |     \
-                                     PIN_ODR_LOW(GPIOD_STATUS_LED1_B) |     \
-                                     PIN_ODR_LOW(GPIOD_STATUS_LED2_R) |     \
-                                     PIN_ODR_LOW(GPIOD_STATUS_LED2_G) |     \
-                                     PIN_ODR_LOW(GPIOD_STATUS_LED2_B) |     \
-                                     PIN_ODR_LOW(GPIOD_STATUS_LED3_R) |     \
-                                     PIN_ODR_LOW(GPIOD_STATUS_LED3_G) |     \
-                                     PIN_ODR_LOW(GPIOD_STATUS_LED3_B) |     \
+                                     PIN_ODR_HIGH(GPIOD_STATUS_LED1_G) |    \
+                                     PIN_ODR_HIGH(GPIOD_STATUS_LED1_B) |    \
+                                     PIN_ODR_HIGH(GPIOD_STATUS_LED2_R) |    \
+                                     PIN_ODR_HIGH(GPIOD_STATUS_LED2_G) |    \
+                                     PIN_ODR_HIGH(GPIOD_STATUS_LED2_B) |    \
+                                     PIN_ODR_HIGH(GPIOD_STATUS_LED3_R) |    \
+                                     PIN_ODR_HIGH(GPIOD_STATUS_LED3_G) |    \
+                                     PIN_ODR_HIGH(GPIOD_STATUS_LED3_B) |    \
                                      PIN_ODR_HIGH(GPIOD_CS_ENCODER1_n) |    \
                                      PIN_ODR_LOW(GPIOD_H_BRIDGE_MOT3BP) |   \
                                      PIN_ODR_LOW(GPIOD_I2C_SDA_PD_CONTROLLER) |\
@@ -928,8 +928,8 @@
                                      PIN_OSPEED_VERYLOW(GPIOE_EN_DRIVER_4) |\
                                      PIN_OSPEED_VERYLOW(GPIOE_GPIO4_ESP32) |\
                                      PIN_OSPEED_VERYLOW(GPIOE_PIN4) |       \
-                                     PIN_OSPEED_VERYLOW(GPIOE_SWD_UC_SWCLK) |\
-                                     PIN_OSPEED_VERYLOW(GPIOE_SWD_UC_SWDIO) |\
+                                     PIN_OSPEED_HIGH(GPIOE_SWD_UC_SWCLK) |\
+                                     PIN_OSPEED_HIGH(GPIOE_SWD_UC_SWDIO) |\
                                      PIN_OSPEED_VERYLOW(GPIOE_CS_ENCODER2_N) |\
                                      PIN_OSPEED_VERYLOW(GPIOE_H_BRIDGE_MOT1AN) |\
                                      PIN_OSPEED_VERYLOW(GPIOE_H_BRIDGE_MOT1AP) |\
@@ -1038,7 +1038,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOF_PRIORITY_TO_VBUS) |\
                                      PIN_OTYPE_PUSHPULL(GPIOF_PIN12) |      \
                                      PIN_OTYPE_PUSHPULL(GPIOF_CS_ENCODER4_N) |\
-                                     PIN_OTYPE_PUSHPULL(GPIOF_I2C_SCL_PD_CONTROLLER) |\
+                                     PIN_OTYPE_OPENDRAIN(GPIOF_I2C_SCL_PD_CONTROLLER) |\
                                      PIN_OTYPE_PUSHPULL(GPIOF_EN_DRIVER_1))
 #define VAL_GPIOF_OSPEEDR           (PIN_OSPEED_VERYLOW(GPIOF_GPIO13_ESP32) |\
                                      PIN_OSPEED_VERYLOW(GPIOF_HUB_CONNECT) |\
@@ -1054,7 +1054,7 @@
                                      PIN_OSPEED_VERYLOW(GPIOF_PRIORITY_TO_VBUS) |\
                                      PIN_OSPEED_VERYLOW(GPIOF_PIN12) |      \
                                      PIN_OSPEED_VERYLOW(GPIOF_CS_ENCODER4_N) |\
-                                     PIN_OSPEED_VERYLOW(GPIOF_I2C_SCL_PD_CONTROLLER) |\
+                                     PIN_OSPEED_HIGH(GPIOF_I2C_SCL_PD_CONTROLLER) |\
                                      PIN_OSPEED_VERYLOW(GPIOF_EN_DRIVER_1))
 #define VAL_GPIOF_PUPDR             (PIN_PUPDR_FLOATING(GPIOF_GPIO13_ESP32) |\
                                      PIN_PUPDR_FLOATING(GPIOF_HUB_CONNECT) |\
@@ -1118,7 +1118,7 @@
  * PG7  - PIN7                      (input floating).
  * PG8  - BYPASS_HUB_N              (output pushpull minimum).
  * PG9  - EN_EXTENSION_BOTTOM       (output pushpull minimum).
- * PG10 - PWR_ON_BTN_STATE_N        (input floating).
+ * PG10 - PWR_ON_BTN_STATE_N        (input pullup).
  * PG11 - EN_DRIVER_3               (output pushpull minimum).
  * PG12 - ENCODERS_GATE_DRIVERS_SPI6_MISO(alternate 5).
  * PG13 - ENCODERS_GATE_DRIVERS_SPI6_SCK(alternate 5).
@@ -1183,7 +1183,7 @@
                                      PIN_PUPDR_FLOATING(GPIOG_PIN7) |       \
                                      PIN_PUPDR_FLOATING(GPIOG_BYPASS_HUB_N) |\
                                      PIN_PUPDR_FLOATING(GPIOG_EN_EXTENSION_BOTTOM) |\
-                                     PIN_PUPDR_FLOATING(GPIOG_PWR_ON_BTN_STATE_N) |\
+                                     PIN_PUPDR_PULLUP(GPIOG_PWR_ON_BTN_STATE_N) |\
                                      PIN_PUPDR_FLOATING(GPIOG_EN_DRIVER_3) |\
                                      PIN_PUPDR_FLOATING(GPIOG_ENCODERS_GATE_DRIVERS_SPI6_MISO) |\
                                      PIN_PUPDR_FLOATING(GPIOG_ENCODERS_GATE_DRIVERS_SPI6_SCK) |\
