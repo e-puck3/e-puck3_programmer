@@ -30,9 +30,9 @@
 
 // Temperature calculations
 #define V_25							0.75f	//voltage at 25°C
-#define AVG_SLOPE 						2.5f	//average slope [mV/°C]
+#define AVG_SLOPE 						0.025f	//average slope [mV/°C]
 #define TEMPERATURE_OFFSET				25		//offset to apply to the result [°C]
-#define ADC_12BITS_TO_CELSIUS(in, out)	(out = ((in - V_25) / AVG_SLOPE) + TEMPERATURE_OFFSET)
+#define ADC_12BITS_TO_CELSIUS(in, out)	(out = ((((in * VREF) / ADC_RESOLUTION) - V_25) / AVG_SLOPE) + TEMPERATURE_OFFSET)
 
 #define LOW_PASS_COEFF_A				0.8f
 #define LOW_PASS_COEFF_B				0.2f
@@ -87,16 +87,25 @@ static const ADCConversionGroup adcGroupConfig =  {
  * @param adcp The adc to start
  */
 void ADCdoOneConversion(ADCDriver *adcp){
+	adcp->adc->CR2 |= ADC_CR2_CONT;
 	adcp->adc->CR2 |= ADC_CR2_SWSTART;
+}
+
+/**
+ * @brief 	Stops the conversion of the given ADC
+ * 			The ADC must already be configured in order to work properly
+ * @param adcp The adc to stop
+ */
+void ADCstopConversion(ADCDriver *adcp){
+	adcp->adc->CR2 &= ~ADC_CR2_CONT;
 }
 
 //called each half of the buffer
 static void adcCb(ADCDriver *adcp) {
-
 	// Because the adc is configured as circular, the half buffer
 	// interrupt is set so we compute only when the buffer is full
 	if(adcIsBufferComplete(adcp)){
-
+		ADCstopConversion(adcp);
 		chSysLockFromISR();
 		chBSemSignalI(&measurement_ready);
 		chSysUnlockFromISR();
@@ -236,9 +245,9 @@ static THD_FUNCTION(volt_thd, arg)
 				temperature_raw += adc_samples[i + TEMP_MEASURE];
 			}
 
-			vbus_raw 		/= ADC_NUM_CHANNELS;
-			battery_raw 	/= ADC_NUM_CHANNELS;
-			temperature_raw /= ADC_NUM_CHANNELS;
+			vbus_raw 		/= ADC_NUM_SAMPLES;
+			battery_raw 	/= ADC_NUM_SAMPLES;
+			temperature_raw /= ADC_NUM_SAMPLES;
 
 			//low-pass filter on vbus measurement
 			LOW_PASS_FILTER(vbus_raw, vbus_value);
@@ -252,10 +261,14 @@ static THD_FUNCTION(volt_thd, arg)
 			LOW_PASS_FILTER(temperature_raw, temperature_value);
 			ADC_12BITS_TO_CELSIUS(temperature_value, temperature_celsius);
 
+			// chprintf((BaseSequentialStream *)&USB_SERIAL, "raw :%d, %d, %d \r\n", vbus_raw, battery_raw, temperature_raw);
+			// chprintf((BaseSequentialStream *)&USB_SERIAL, "values :%d, %d, %d \r\n", vbus_value, battery_value, temperature_value);
+			// chprintf((BaseSequentialStream *)&USB_SERIAL, "volt :%f, %f, %f \r\n", vbus_voltage, battery_voltage, temperature_celsius);
+
 			//VBus state update
 			vbusStateMachine();
 			//Battery state update
-			batteryStateMachine();
+			// batteryStateMachine();
 		}
 
 		//sampling at 20Hz
