@@ -565,7 +565,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOB_UART_PROG_ESP_TX) |\
                                      PIN_OTYPE_PUSHPULL(GPIOB_H_BRIDGE_MOT3BN) |\
                                      PIN_OTYPE_PUSHPULL(GPIOB_EN_ESP32) |   \
-                                     PIN_OTYPE_PUSHPULL(GPIOB_GPIO0_ESP32) |\
+                                     PIN_OTYPE_OPENDRAIN(GPIOB_GPIO0_ESP32) |\
                                      PIN_OTYPE_PUSHPULL(GPIOB_H_BRIDGE_MOT2BP) |\
                                      PIN_OTYPE_PUSHPULL(GPIOB_H_BRIDGE_MOT2BN) |\
                                      PIN_OTYPE_PUSHPULL(GPIOB_PWR_ON) |     \
@@ -597,7 +597,7 @@
                                      PIN_PUPDR_FLOATING(GPIOB_UART_PROG_ESP_TX) |\
                                      PIN_PUPDR_FLOATING(GPIOB_H_BRIDGE_MOT3BN) |\
                                      PIN_PUPDR_FLOATING(GPIOB_EN_ESP32) |   \
-                                     PIN_PUPDR_FLOATING(GPIOB_GPIO0_ESP32) |\
+                                     PIN_PUPDR_PULLUP(GPIOB_GPIO0_ESP32) |\
                                      PIN_PUPDR_FLOATING(GPIOB_H_BRIDGE_MOT2BP) |\
                                      PIN_PUPDR_FLOATING(GPIOB_H_BRIDGE_MOT2BN) |\
                                      PIN_PUPDR_FLOATING(GPIOB_PWR_ON) |     \
@@ -612,8 +612,8 @@
                                      PIN_ODR_LOW(GPIOB_H_BRIDGE_MOT2CN) |   \
                                      PIN_ODR_LOW(GPIOB_UART_PROG_ESP_TX) |  \
                                      PIN_ODR_LOW(GPIOB_H_BRIDGE_MOT3BN) |   \
-                                     PIN_ODR_LOW(GPIOB_EN_ESP32) |          \
-                                     PIN_ODR_LOW(GPIOB_GPIO0_ESP32) |       \
+                                     PIN_ODR_HIGH(GPIOB_EN_ESP32) |          \
+                                     PIN_ODR_HIGH(GPIOB_GPIO0_ESP32) |       \
                                      PIN_ODR_LOW(GPIOB_H_BRIDGE_MOT2BP) |   \
                                      PIN_ODR_LOW(GPIOB_H_BRIDGE_MOT2BN) |   \
                                      PIN_ODR_LOW(GPIOB_PWR_ON) |            \
