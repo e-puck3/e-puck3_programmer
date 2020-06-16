@@ -76,7 +76,7 @@ https://github.com/cburlacu/cube2chibi
       <pin10 ID="STATUS_LED3_B" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin11 ID="CS_ENCODER1_n" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin12 ID="H_BRIDGE_MOT3BP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="2"></pin12>
-      <pin13 ID="I2C_SDA_PD_CONTROLLER" Type="OpenDrain" Level="High" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="4"/>
+      <pin13 ID="I2C_SDA_PD_CONTROLLER" Type="OpenDrain" Level="Low" Speed="Maximum" Resistor="Floating" Mode="Alternate" Alternate="4"/>
       <pin14 ID="H_BRIDGE_MOT3CP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="2"/>
       <pin15 ID="H_BRIDGE_MOT3CN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="2"/>
     </GPIOD><GPIOE><pin0 ID="UART_CMD_RX" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="8"/>
@@ -84,8 +84,8 @@ https://github.com/cburlacu/cube2chibi
       <pin2 ID="EN_DRIVER_4" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin3 ID="GPIO4_ESP32" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin4 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
-      <pin5 ID="SWD_UC_SWCLK" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
-      <pin6 ID="SWD_UC_SWDIO" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
+      <pin5 ID="SWD_UC_SWCLK" Type="PushPull" Level="Low" Speed="Maximum" Resistor="Floating" Mode="Output" Alternate="0"/>
+      <pin6 ID="SWD_UC_SWDIO" Type="PushPull" Level="Low" Speed="Maximum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin7 ID="CS_ENCODER2_N" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin8 ID="H_BRIDGE_MOT1AN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="1"/>
       <pin9 ID="H_BRIDGE_MOT1AP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="1"/>
@@ -109,7 +109,7 @@ https://github.com/cburlacu/cube2chibi
       <pin11 ID="PRIORITY_TO_VBUS" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin12 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>
       <pin13 ID="CS_ENCODER4_N" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"></pin13>
-      <pin14 ID="I2C_SCL_PD_CONTROLLER" Type="OpenDrain" Level="High" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="4"/>
+      <pin14 ID="I2C_SCL_PD_CONTROLLER" Type="OpenDrain" Level="Low" Speed="Maximum" Resistor="Floating" Mode="Alternate" Alternate="4"/>
       <pin15 ID="EN_DRIVER_1" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
     </GPIOF><GPIOG><pin0 ID="FAULT_DRIVER_1_n" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>
       <pin1 ID="FAULT_DRIVER_2_N" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullUp" Mode="Input" Alternate="0"/>

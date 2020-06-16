@@ -532,7 +532,7 @@
  * PB6  - UART_PROG_ESP_TX          (alternate 7).
  * PB7  - H_BRIDGE_MOT3BN           (alternate 2).
  * PB8  - EN_ESP32                  (output pushpull minimum).
- * PB9  - GPIO0_ESP32               (output pushpull minimum).
+ * PB9  - GPIO0_ESP32               (output opendrain minimum).
  * PB10 - H_BRIDGE_MOT2BP           (alternate 1).
  * PB11 - H_BRIDGE_MOT2BN           (alternate 1).
  * PB12 - PWR_ON                    (output pushpull minimum).
@@ -597,7 +597,7 @@
                                      PIN_PUPDR_FLOATING(GPIOB_UART_PROG_ESP_TX) |\
                                      PIN_PUPDR_FLOATING(GPIOB_H_BRIDGE_MOT3BN) |\
                                      PIN_PUPDR_FLOATING(GPIOB_EN_ESP32) |   \
-                                     PIN_PUPDR_PULLUP(GPIOB_GPIO0_ESP32) |\
+                                     PIN_PUPDR_PULLUP(GPIOB_GPIO0_ESP32) |  \
                                      PIN_PUPDR_FLOATING(GPIOB_H_BRIDGE_MOT2BP) |\
                                      PIN_PUPDR_FLOATING(GPIOB_H_BRIDGE_MOT2BN) |\
                                      PIN_PUPDR_FLOATING(GPIOB_PWR_ON) |     \
@@ -612,8 +612,8 @@
                                      PIN_ODR_LOW(GPIOB_H_BRIDGE_MOT2CN) |   \
                                      PIN_ODR_LOW(GPIOB_UART_PROG_ESP_TX) |  \
                                      PIN_ODR_LOW(GPIOB_H_BRIDGE_MOT3BN) |   \
-                                     PIN_ODR_HIGH(GPIOB_EN_ESP32) |          \
-                                     PIN_ODR_HIGH(GPIOB_GPIO0_ESP32) |       \
+                                     PIN_ODR_HIGH(GPIOB_EN_ESP32) |         \
+                                     PIN_ODR_HIGH(GPIOB_GPIO0_ESP32) |      \
                                      PIN_ODR_LOW(GPIOB_H_BRIDGE_MOT2BP) |   \
                                      PIN_ODR_LOW(GPIOB_H_BRIDGE_MOT2BN) |   \
                                      PIN_ODR_LOW(GPIOB_PWR_ON) |            \
@@ -879,8 +879,8 @@
  * PE2  - EN_DRIVER_4               (output pushpull minimum).
  * PE3  - GPIO4_ESP32               (output pushpull minimum).
  * PE4  - PIN4                      (input pulldown).
- * PE5  - SWD_UC_SWCLK              (output pushpull minimum).
- * PE6  - SWD_UC_SWDIO              (output pushpull minimum).
+ * PE5  - SWD_UC_SWCLK              (output pushpull maximum).
+ * PE6  - SWD_UC_SWDIO              (output pushpull maximum).
  * PE7  - CS_ENCODER2_N             (output pushpull minimum).
  * PE8  - H_BRIDGE_MOT1AN           (alternate 1).
  * PE9  - H_BRIDGE_MOT1AP           (alternate 1).
@@ -928,8 +928,8 @@
                                      PIN_OSPEED_VERYLOW(GPIOE_EN_DRIVER_4) |\
                                      PIN_OSPEED_VERYLOW(GPIOE_GPIO4_ESP32) |\
                                      PIN_OSPEED_VERYLOW(GPIOE_PIN4) |       \
-                                     PIN_OSPEED_HIGH(GPIOE_SWD_UC_SWCLK) |\
-                                     PIN_OSPEED_HIGH(GPIOE_SWD_UC_SWDIO) |\
+                                     PIN_OSPEED_HIGH(GPIOE_SWD_UC_SWCLK) |  \
+                                     PIN_OSPEED_HIGH(GPIOE_SWD_UC_SWDIO) |  \
                                      PIN_OSPEED_VERYLOW(GPIOE_CS_ENCODER2_N) |\
                                      PIN_OSPEED_VERYLOW(GPIOE_H_BRIDGE_MOT1AN) |\
                                      PIN_OSPEED_VERYLOW(GPIOE_H_BRIDGE_MOT1AP) |\
