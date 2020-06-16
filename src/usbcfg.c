@@ -21,6 +21,8 @@
 
 #include "hal.h"
 #include "usbcfg.h"
+#include "communications.h"
+#include "platform.h"
 
 /*
  * Virtual serial ports over USB.
@@ -554,6 +556,10 @@ static bool requests_hook(USBDriver *usbp) {
           case USB_CDC_CIF_NUM1:
             control_line_states.cdc_cif_num1_dtr = (usbp->setup[2] & 1) ? TRUE : FALSE;
             control_line_states.cdc_cif_num1_rts = (usbp->setup[2] & 2) ? TRUE : FALSE;
+            if(communicationGetActiveMode() == UART_ESP_PASSTHROUGH){
+              gpio_set_val(GPIOB, GPIOB_EN_ESP32, !control_line_states.cdc_cif_num1_rts || control_line_states.cdc_cif_num1_dtr);
+              gpio_set_val(GPIOB, GPIOB_GPIO0_ESP32, control_line_states.cdc_cif_num1_rts || !control_line_states.cdc_cif_num1_dtr);
+            }
             return TRUE;
 #endif /* USE_TWO_USB_SERIAL */
         }
