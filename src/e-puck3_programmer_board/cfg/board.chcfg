@@ -57,7 +57,7 @@ https://github.com/cburlacu/cube2chibi
       <pin7 ID="H_BRIDGE_MOT4BP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="3"/>
       <pin8 ID="H_BRIDGE_MOT4CP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="3"/>
       <pin9 ID="H_BRIDGE_MOT3AN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="2"/>
-      <pin10 ID="UART_UC_ESP_TX" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="7"/>
+      <pin10 ID="UART_UC_ESP_TX" Type="OpenDrain" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="7"/>
       <pin11 ID="UART_UC_ESP_RX" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="7"/>
       <pin12 ID="EN_EXTENSION_TOP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin13 ID="" Type="PushPull" Level="Low" Speed="Minimum" Resistor="PullDown" Mode="Input" Alternate="0"/>

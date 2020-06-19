@@ -683,7 +683,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOC_H_BRIDGE_MOT4BP) |\
                                      PIN_OTYPE_PUSHPULL(GPIOC_H_BRIDGE_MOT4CP) |\
                                      PIN_OTYPE_PUSHPULL(GPIOC_H_BRIDGE_MOT3AN) |\
-                                     PIN_OTYPE_PUSHPULL(GPIOC_UART_UC_ESP_TX) |\
+                                     PIN_OTYPE_OPENDRAIN(GPIOC_UART_UC_ESP_TX) |\
                                      PIN_OTYPE_PUSHPULL(GPIOC_UART_UC_ESP_RX) |\
                                      PIN_OTYPE_PUSHPULL(GPIOC_EN_EXTENSION_TOP) |\
                                      PIN_OTYPE_PUSHPULL(GPIOC_PIN13) |      \
