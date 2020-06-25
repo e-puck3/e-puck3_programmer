@@ -25,16 +25,11 @@ static uint8_t power_state = POWER_OFF;
 void powerButtonCb(void* par){
 	uint8_t choice = (uint32_t)par;
 
-	chSysLockFromISR();
-	powerButtonTurnOnOffI(choice);
-	chSysUnlockFromISR();
-	
+	powerButtonTurnOnOff(choice);
 }
 
 //Event source used to send events to other threads
 event_source_t power_event;
-
-static uint8_t power_on_reset = false;
 
 static THD_WORKING_AREA(power_button_thd_wa, 128);
 static THD_FUNCTION(power_button_thd, arg)
@@ -45,10 +40,6 @@ static THD_FUNCTION(power_button_thd, arg)
 
 	/* Enabling events on both edges of the button line.*/
 	palEnableLineEvent(LINE_PWR_ON_BTN_STATE_N, PAL_EVENT_MODE_BOTH_EDGES);
-
-	if(power_on_reset){
-		powerButtonTurnOnOff(POWER_ON);
-	}
 
 	while(1){
 		//waiting until an event on the line is detected
@@ -85,10 +76,7 @@ void powerButtonStartSequence(void){
 		is called before the main */
 
 	if(isPowerButtonPressed()){
-		//turns on the robot if we pressed the button and there is no USB connection
-		//since we are before the chSysInit(), we simply store into a variable that we 
-		//need to power on the robot. It will be applied in the thread
-		power_on_reset = true;
+		powerButtonTurnOnOff(POWER_ON);
 	}
 }
 
@@ -101,19 +89,11 @@ uint8_t powerButtonGetPowerState(void){
 }
 
 void powerButtonTurnOnOff(uint8_t state){
-	osalSysLock();
-	powerButtonTurnOnOffI(state);
-	osalSysUnlock();
-}
-
-void powerButtonTurnOnOffI(uint8_t state){
 	if(state == POWER_ON){
 		power_state = POWER_ON;
 		palSetLine(LINE_PWR_ON);
-		chEvtBroadcastFlagsI(&power_event, POWER_ON_FLAG);
 	}else{
 		power_state = POWER_OFF;
 		palClearLine(LINE_PWR_ON);
-		chEvtBroadcastFlagsI(&power_event, POWER_OFF_FLAG);
 	}
 }

@@ -118,7 +118,6 @@ int main(void) {
 	 * they are global.
 	 */
 
-	chEvtObjectInit(&power_event);
 	chEvtObjectInit(&vbus_info_event);
 	chEvtObjectInit(&battery_info_event);
 	chEvtObjectInit(&gdb_status_event);

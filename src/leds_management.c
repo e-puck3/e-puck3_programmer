@@ -21,13 +21,12 @@
 static uint16_t leds_values[NB_RGB_LEDS][NB_LEDS] = {	//    RED				GREEN				BLUE
 														{LED_NO_POWER, 		LED_QUARTER_POWER, 	LED_NO_POWER},
 														{LED_NO_POWER, 		LED_NO_POWER, 		LED_NO_POWER},
-														{LED_QUARTER_POWER, LED_QUARTER_POWER, 	LED_NO_POWER}};
+														{LED_MAX_POWER, 	LED_QUARTER_POWER, 	LED_NO_POWER}};
 
-#define POWER_EVENT 			EVENT_MASK(0)
-#define VBUS_INFO_EVENT 		EVENT_MASK(1)
-#define BATTERY_INFO_EVENT		EVENT_MASK(2)
-#define GDB_STATUS_EVENT 		EVENT_MASK(3)
-#define COMMUNICATIONS_EVENT 	EVENT_MASK(4)
+#define VBUS_INFO_EVENT 		EVENT_MASK(0)
+#define BATTERY_INFO_EVENT		EVENT_MASK(1)
+#define GDB_STATUS_EVENT 		EVENT_MASK(2)
+#define COMMUNICATIONS_EVENT 	EVENT_MASK(3)
 
 /////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
@@ -52,13 +51,11 @@ static THD_FUNCTION(leds_management_thd, arg)
 
 	event_listener_t vbus_info_event_listener;
 	event_listener_t battery_info_event_listener;
-	event_listener_t power_event_listener;
 	event_listener_t gdb_status_event_listener;
 	event_listener_t communications_event_listener;
 
 	chEvtRegisterMask(&vbus_info_event, &vbus_info_event_listener, VBUS_INFO_EVENT);
 	chEvtRegisterMask(&battery_info_event, &battery_info_event_listener, BATTERY_INFO_EVENT);
-	chEvtRegisterMask(&power_event, &power_event_listener, POWER_EVENT);
 	chEvtRegisterMask(&gdb_status_event, &gdb_status_event_listener, GDB_STATUS_EVENT);
 	chEvtRegisterMask(&communications_event, &communications_event_listener, COMMUNICATIONS_EVENT);
 
@@ -73,20 +70,7 @@ static THD_FUNCTION(leds_management_thd, arg)
 		events = chEvtWaitOneTimeout(ALL_EVENTS, TIME_IMMEDIATE);
 		//power events come from the power_button module
 		//the leds near the power button is STATUS_LED1
-		if (events & POWER_EVENT) {
-			flags = chEvtGetAndClearFlags(&power_event_listener);
-			//turns on the leds
-			if(flags & POWER_ON_FLAG){
-				setLed(STATUS_LED1, RED_LED, leds_values[STATUS_LED1][RED_LED]);
-				setLed(STATUS_LED1, GREEN_LED, leds_values[STATUS_LED1][GREEN_LED]);
-			}
-			//turns off the leds
-			else if(flags & POWER_OFF_FLAG){
-				setLed(STATUS_LED1, RED_LED, LED_NO_POWER); 
-				setLed(STATUS_LED1, GREEN_LED, LED_NO_POWER);
-			}
-		//battery vents come from the voltage_measurement module
-		}else if(events & BATTERY_INFO_EVENT){
+		if(events & BATTERY_INFO_EVENT){
 			flags = chEvtGetAndClearFlags(&battery_info_event_listener);
 			if(flags & BATT_MIN_VOLTAGE_FLAG){
 				//red blinking
@@ -115,8 +99,8 @@ static THD_FUNCTION(leds_management_thd, arg)
 				leds_values[STATUS_LED1][GREEN_LED] = LED_QUARTER_POWER;
 			}
 
-			//updates the leds if the robot is ON if it is not blinking
-			if(powerButtonGetPowerState() == POWER_ON && !low_power_state){
+			//updates the leds if it should not blink
+			if(!low_power_state){
 				setLed(STATUS_LED1, RED_LED, leds_values[STATUS_LED1][RED_LED]);
 				setLed(STATUS_LED1, GREEN_LED, leds_values[STATUS_LED1][GREEN_LED]);
 			}
@@ -200,8 +184,8 @@ static THD_FUNCTION(leds_management_thd, arg)
 				leds_values[STATUS_LED2][BLUE_LED] = LED_QUARTER_POWER;	
 			}
 
-			//updates the leds if the robot is ON if it is not blinking
-			if(powerButtonGetPowerState() == POWER_ON && !communicating_state){
+			//updates the leds if it should not blink
+			if(!communicating_state){
 				setLed(STATUS_LED2, RED_LED, leds_values[STATUS_LED2][RED_LED]);
 				setLed(STATUS_LED2, GREEN_LED, leds_values[STATUS_LED2][GREEN_LED]);
 				setLed(STATUS_LED2, BLUE_LED, leds_values[STATUS_LED2][BLUE_LED]);
@@ -211,10 +195,10 @@ static THD_FUNCTION(leds_management_thd, arg)
 
 /////////////////////                 BLINKING PART                /////////////////////
 
-								///////POWER LED////////
+								///////BATTERY LED////////
 
-		//condition to blink the green led at the specified frequency when the target is in low power mode
-		if(low_power_state && (powerButtonGetPowerState() == POWER_ON)){
+		//condition to blink led at the specified frequency when the target is in low power mode
+		if(low_power_state){
 			if(time_low_power < chVTGetSystemTime()){
 				time_low_power = chVTGetSystemTime() + TIME_MS2I(BLINK_TIME);
 				toggleLed(STATUS_LED1, RED_LED, leds_values[STATUS_LED1][RED_LED]);
@@ -227,7 +211,7 @@ static THD_FUNCTION(leds_management_thd, arg)
 								///////GDB LED////////
 
 		//condition to blink the green led at the specified frequency when the target is in run mode
-		if(running_state && (powerButtonGetPowerState() == POWER_ON)){
+		if(running_state){
 			if(time_run < chVTGetSystemTime()){
 				time_run = chVTGetSystemTime() + TIME_MS2I(BLINK_TIME);
 				toggleLed(STATUS_LED3, GREEN_LED,leds_values[STATUS_LED3][GREEN_LED]);
@@ -237,7 +221,7 @@ static THD_FUNCTION(leds_management_thd, arg)
 								////////USB_LED///////////
 
 		//condition to blink the usb led at the specified frequency when a communication is active
-		if(communicating_state && (powerButtonGetPowerState() == POWER_ON)){
+		if(communicating_state){
 			if(time_communication < chVTGetSystemTime()){
 				time_communication = chVTGetSystemTime() + TIME_MS2I(COMMUNICATION_BLINK_TIME);
 				toggleLed(STATUS_LED2, RED_LED, leds_values[STATUS_LED2][RED_LED]);
@@ -245,7 +229,7 @@ static THD_FUNCTION(leds_management_thd, arg)
 				toggleLed(STATUS_LED2, BLUE_LED, leds_values[STATUS_LED2][BLUE_LED]);
 			}
 		}
-		//we put restore the led state after COMMUNICATION_BLINK_TIME if no more active communication
+		//we restore the led state after COMMUNICATION_BLINK_TIME if no more active communication
 		else{
 			if(time_communication < chVTGetSystemTime()){
 				setLed(STATUS_LED2, RED_LED, leds_values[STATUS_LED2][RED_LED]);
