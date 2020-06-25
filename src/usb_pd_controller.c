@@ -21,12 +21,12 @@
 /********************            CONFIGURATION VARIABLES           ********************/
 
 /*
- * I2C configuration object.
- * I2C2_TIMINGR: 1000 kHz with I2CCLK = 216 MHz, rise time = 100 ns,
- *               fall time = 10 ns (0x20A00E28)
- */
+* I2C configuration object.
+* I2C2_TIMINGR: 1000 kHz with I2CCLK = 96 MHz, rise time = 0 ns,
+*               fall time = 0 ns
+*/
 static const I2CConfig i2c2config = {
-    .timingr    = 0x0080091C,
+    .timingr    = 0x0040163A,
     .cr1        = 0,
     .cr2        = 0,
 };

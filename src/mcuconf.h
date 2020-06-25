@@ -89,7 +89,7 @@
 #define STM32_I2C1SEL                       STM32_I2C1SEL_PCLK1
 #define STM32_I2C2SEL                       STM32_I2C2SEL_PCLK1
 #define STM32_I2C3SEL                       STM32_I2C3SEL_PCLK1
-#define STM32_I2C4SEL                       STM32_I2C4SEL_PCLK1
+#define STM32_I2C4SEL                       STM32_I2C4SEL_SYSCLK
 #define STM32_LPTIM1SEL                     STM32_LPTIM1SEL_PCLK1
 #define STM32_CECSEL                        STM32_CECSEL_LSE
 #define STM32_CK48MSEL                      STM32_CK48MSEL_PLL
