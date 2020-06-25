@@ -9,6 +9,8 @@
 #include "hal.h"
 #include "USB3803.h"
 
+#define I2C_HUB_TIMEOUT_MS 						10
+
 /********************                   REGISTERS                  ********************/
 #define VID_LSB_REG								0x00
 #define VID_MSB_REG								0x01
@@ -107,21 +109,21 @@
 #define SET_HUB_CONNECT(x)			palSetLine((x)->hub_connect_line)
 #define CLEAR_HUB_CONNECT(x)		palClearLine((x)->hub_connect_line)
 
-static uint8_t _read_byte(USB3803_t* hub, uint8_t reg){
-	uint8_t rxbuf;
+// static uint8_t _read_byte(USB3803_t* hub, uint8_t reg){
+// 	uint8_t rxbuf;
 
-	i2cAcquireBus(hub->i2cp);
-	i2cMasterTransmit(hub->i2cp, hub->i2c_address_7bits, &reg, 1, &rxbuf, 1);
-	i2cReleaseBus(hub->i2cp);
+// 	i2cAcquireBus(hub->i2cp);
+// 	i2cMasterTransmitTimeout(hub->i2cp, hub->i2c_address_7bits, &reg, 1, &rxbuf, 1, I2C_HUB_TIMEOUT_MS);
+// 	i2cReleaseBus(hub->i2cp);;
 
-	return rxbuf;
-}
+// 	return rxbuf;
+// }
 
 static void _write_byte(USB3803_t* hub, uint8_t reg, uint8_t byte){
 	uint8_t txbuf[2] = {reg, byte};
 
 	i2cAcquireBus(hub->i2cp);
-	i2cMasterTransmit(hub->i2cp, hub->i2c_address_7bits, txbuf, 2, NULL, 0);
+	i2cMasterTransmitTimeout(hub->i2cp, hub->i2c_address_7bits, txbuf, 2, NULL, 0, I2C_HUB_TIMEOUT_MS);
 	i2cReleaseBus(hub->i2cp);
 }
 
@@ -136,7 +138,7 @@ static void _write_byte_multi(USB3803_t* hub, uint8_t reg, uint8_t *bytes, uint8
     }
 
 	i2cAcquireBus(hub->i2cp);
-	i2cMasterTransmit(hub->i2cp, hub->i2c_address_7bits, txbuf, len+1, NULL, 0);
+	i2cMasterTransmitTimeout(hub->i2cp, hub->i2c_address_7bits, txbuf, len+1, NULL, 0, I2C_HUB_TIMEOUT_MS);
 	i2cReleaseBus(hub->i2cp);
 }
 
@@ -144,19 +146,25 @@ static void _write_byte_multi(USB3803_t* hub, uint8_t reg, uint8_t *bytes, uint8
 /********************               PUBLIC FUNCITONS               ********************/
 
 void USB3803_configure(USB3803_t* hub){
+
 	// we should not have HUB_CONNECT high when the hub is in reset state
 	CLEAR_HUB_CONNECT(hub);
 
 	// Tells the devices  VBUS is disconnected
 	DISABLE_VBUS_DEVICES(hub);
 
+	ENABLE_BYPASS_MODE(hub);
+
 	SET_RESET_HUB(hub);
-	DISABLE_BYPASS_MODE(hub);
-	chThdSleepMilliseconds(1);
+	chThdSleepMilliseconds(100);
 	UNSET_RESET_HUB(hub);
 
 	// Waits for the hub to be initialized (max 4ms in the datasheet)
-	chThdSleepMilliseconds(5);
+	chThdSleepMilliseconds(10);
+
+	DISABLE_BYPASS_MODE(hub);
+
+	chThdSleepMilliseconds(10);
 
 	// Puts the hub into config mode to let us configure it
 	_write_byte(hub, SERIAL_PORT_INTERLOCK_CONTROL_REG, CONFIG_MODE_ENABLED);
@@ -180,16 +188,21 @@ void USB3803_configure(USB3803_t* hub){
 	// Gives order to connect to USB
 	SET_HUB_CONNECT(hub);
 
-	chThdSleepMilliseconds(5);
-
 	// Tells the device VBUS is connected
 	ENABLE_VBUS_DEVICES(hub);
 
 }
 
+void USB3803_unconfigure(USB3803_t* hub){
 
+	// we should not have HUB_CONNECT high when the hub is in reset state
+	CLEAR_HUB_CONNECT(hub);
 
+	// Tells the devices  VBUS is disconnected
+	DISABLE_VBUS_DEVICES(hub);
 
-// First put SERIAL_PORT_INTERLOCK_CONTROL-config_n to 1 to put in config mode (keep connect_n to 1)
-// Then write what you want
-// Finally put SERIAL_PORT_INTERLOCK_CONTROL-config_n to 0 to resume normal operation (keep connect_n to 1)
+	ENABLE_BYPASS_MODE(hub);
+
+	SET_RESET_HUB(hub);
+
+}

@@ -33,33 +33,27 @@ static THD_FUNCTION(usb_hub_thd, arg)
 
 	bool hub_state = NOT_CONFIGURED;
 
-	//Vbus detection init. Used to configure the USB Hub when we detect an USB cable
-
-	/* Enabling events on both edges of the button line.*/
-	palEnableLineEvent(LINE_VBUS_HOST, PAL_EVENT_MODE_BOTH_EDGES);
-	//init the first time the hub if a usb cable is plugged
-	if(palReadLine(LINE_VBUS_HOST)){
-		USB3803_configure(&hub);
-		hub_state = CONFIGURED;
-	}
-
 	while(1){
-		//waiting until an event on the line is detected
-		palWaitLineTimeout(LINE_VBUS_HOST, TIME_INFINITE);
-		//wait a few moments to be sure the interruption was not triggered
-		//by a glitch and then test the GPIO
-		//also wait for the USB HUB to be running
-		chThdSleepMilliseconds(DEBOUNCE_TIME_VBUS_DET_MS);
+		// We can't use interrupts on the VBUS HOST pin because it is 
+		// already used by the PD controller library so we simply pool it regularly
 
+		// Enables and configures the HUB only if we have a USB connection
 		if(palReadLine(LINE_VBUS_HOST)){
-			if(hub_state == NOT_CONFIGURED){
+			chThdSleepMilliseconds(DEBOUNCE_TIME_VBUS_DET_MS);
+			if(palReadLine(LINE_VBUS_HOST) && hub_state == NOT_CONFIGURED){
 				USB3803_configure(&hub);
 				hub_state = CONFIGURED;
 			}
-		
+		// Shuts down the HUB (reset state)
 		}else{
-			hub_state = NOT_CONFIGURED;
+			chThdSleepMilliseconds(DEBOUNCE_TIME_VBUS_DET_MS);
+			if(!palReadLine(LINE_VBUS_HOST) && hub_state == CONFIGURED){
+				USB3803_unconfigure(&hub);
+				hub_state = NOT_CONFIGURED;
+			}
 		}
+
+		chThdSleepMilliseconds(500);
 	}
 }
 

@@ -29,6 +29,20 @@ typedef struct{
 
 /********************                PUBLIC FUNCITONS              ********************/
 
+/**
+ * @brief 		Turns ON and configures the USB Hub with custom parameters and enables
+ * 				Vbus for its devices.
+ * 				Note: The I2C should already be configured prior calling this function
+ * 
+ * @param hub 	The hub to configure. See USB3803_t.
+ */
 void USB3803_configure(USB3803_t* hub);
+
+/**
+ * @brief 		Turns OFF the USB Hub and disables Vbus for its devices.
+ * 
+ * @param hub 	The hub to configure. See USB3803_t.
+ */
+void USB3803_unconfigure(USB3803_t* hub);
 
 #endif /* USB3803_H*/
