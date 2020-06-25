@@ -145,10 +145,6 @@ int main(void) {
 	 */
 	voltageMesurementStart();
 	/*
-	 * Initializes two serial-over-USB CDC drivers and starts and connects the USB.
-	 */
-	usbSerialStart();
-	/*
 	 * Initializes the USB PD controller.
 	 */
 	usbPDControllerStart();
@@ -156,6 +152,11 @@ int main(void) {
 	 * Starts the thread managing the USB hub.
 	 */
 	usbHubStart();
+	/*
+	 * Initializes two serial-over-USB CDC drivers and starts and connects the USB.
+	 */
+	usbSerialStart();
+
 	/*
 	 * Starts the communication thread.
 	 */
