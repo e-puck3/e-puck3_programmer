@@ -28,42 +28,67 @@ static THD_FUNCTION(Blinker,arg) {
 	(void)arg;
 	chRegSetThreadName("blinker");
 	while(true){
+		// palClearLine(LINE_STATUS_LED1_R);
+		// chThdSleepMilliseconds(50);
+		// palClearLine(LINE_STATUS_LED2_R);
+		// chThdSleepMilliseconds(50);
+		// palClearLine(LINE_STATUS_LED3_R);
+		// chThdSleepMilliseconds(50);
+		// palClearLine(LINE_STATUS_LED1_G);
+		// chThdSleepMilliseconds(50);
+		// palClearLine(LINE_STATUS_LED2_G);
+		// chThdSleepMilliseconds(50);
+		// palClearLine(LINE_STATUS_LED3_G);
+		// chThdSleepMilliseconds(50);
+		// palClearLine(LINE_STATUS_LED1_B);
+		// chThdSleepMilliseconds(50);
+		// palClearLine(LINE_STATUS_LED2_B);
+		// chThdSleepMilliseconds(50);
+		// palClearLine(LINE_STATUS_LED3_B);
+		// chThdSleepMilliseconds(50);
+		// palSetLine(LINE_STATUS_LED1_R);
+		// chThdSleepMilliseconds(50);
+		// palSetLine(LINE_STATUS_LED2_R);
+		// chThdSleepMilliseconds(50);
+		// palSetLine(LINE_STATUS_LED3_R);
+		// chThdSleepMilliseconds(50);
+		// palSetLine(LINE_STATUS_LED1_G);
+		// chThdSleepMilliseconds(50);
+		// palSetLine(LINE_STATUS_LED2_G);
+		// chThdSleepMilliseconds(50);
+		// palSetLine(LINE_STATUS_LED3_G);
+		// chThdSleepMilliseconds(50);
+		// palSetLine(LINE_STATUS_LED1_B);
+		// chThdSleepMilliseconds(50);
+		// palSetLine(LINE_STATUS_LED2_B);
+		// chThdSleepMilliseconds(50);
+		// palSetLine(LINE_STATUS_LED3_B);
+		// chThdSleepMilliseconds(50);
+
 		palClearLine(LINE_STATUS_LED1_R);
-		chThdSleepMilliseconds(50);
 		palClearLine(LINE_STATUS_LED2_R);
-		chThdSleepMilliseconds(50);
 		palClearLine(LINE_STATUS_LED3_R);
-		chThdSleepMilliseconds(50);
-		palClearLine(LINE_STATUS_LED1_G);
-		chThdSleepMilliseconds(50);
-		palClearLine(LINE_STATUS_LED2_G);
-		chThdSleepMilliseconds(50);
-		palClearLine(LINE_STATUS_LED3_G);
-		chThdSleepMilliseconds(50);
-		palClearLine(LINE_STATUS_LED1_B);
-		chThdSleepMilliseconds(50);
-		palClearLine(LINE_STATUS_LED2_B);
-		chThdSleepMilliseconds(50);
-		palClearLine(LINE_STATUS_LED3_B);
-		chThdSleepMilliseconds(50);
+		chThdSleepMilliseconds(500);
 		palSetLine(LINE_STATUS_LED1_R);
-		chThdSleepMilliseconds(50);
 		palSetLine(LINE_STATUS_LED2_R);
-		chThdSleepMilliseconds(50);
 		palSetLine(LINE_STATUS_LED3_R);
-		chThdSleepMilliseconds(50);
+		chThdSleepMilliseconds(500);
+		palClearLine(LINE_STATUS_LED1_G);
+		palClearLine(LINE_STATUS_LED2_G);
+		palClearLine(LINE_STATUS_LED3_G);
+		chThdSleepMilliseconds(500);
 		palSetLine(LINE_STATUS_LED1_G);
-		chThdSleepMilliseconds(50);
 		palSetLine(LINE_STATUS_LED2_G);
-		chThdSleepMilliseconds(50);
 		palSetLine(LINE_STATUS_LED3_G);
-		chThdSleepMilliseconds(50);
+		chThdSleepMilliseconds(500);
+		palClearLine(LINE_STATUS_LED1_B);
+		palClearLine(LINE_STATUS_LED2_B);
+		palClearLine(LINE_STATUS_LED3_B);
+		chThdSleepMilliseconds(500);
 		palSetLine(LINE_STATUS_LED1_B);
-		chThdSleepMilliseconds(50);
 		palSetLine(LINE_STATUS_LED2_B);
-		chThdSleepMilliseconds(50);
 		palSetLine(LINE_STATUS_LED3_B);
-		chThdSleepMilliseconds(50);
+		chThdSleepMilliseconds(500);
 	}
 }
 
@@ -98,12 +123,19 @@ int main(void) {
 	chEvtObjectInit(&battery_info_event);
 	chEvtObjectInit(&gdb_status_event);
 	chEvtObjectInit(&communications_event);
+	static const SerialConfig ser_cfg_esp = {
+	    .speed = 230400,
+	    .cr1 = 0,
+	    .cr2 = 0,
+	    .cr3 = 0,
+	};
+	sdStart(&UART_ESP, &ser_cfg_esp);
 
 	/*
 	 * Starts the leds states thread. Must be the first module to not miss events sent by
 	 * the others modules.
 	 */
-	ledsManagementStart();
+	// ledsManagementStart();
 	/*
 	 * Starts the handling of the power button.
 	 */
@@ -127,7 +159,8 @@ int main(void) {
 	/*
 	 * Starts the communication thread.
 	 */
-	communicationsStart();
+	// communicationsStart();
+	// communicationsSwitchModeTo(UART_ESP_PASSTHROUGH, false);
 	/*
 	 * Starts the GDB system.
 	 */
@@ -137,13 +170,37 @@ int main(void) {
 
 	chThdCreateStatic(waBlinker, sizeof(waBlinker), NORMALPRIO, Blinker, NULL);
 
-
+	// uint8_t reg[1];
+	// uint8_t rxbuf[1];
+	// chThdSleepMilliseconds(1000);
+	spawn_shell();
+	// voltage_measurement_t volt;
 	while (true){
 		if(isUSBConfigured()){
 			//spawns the shell if the usb is connected
-			spawn_shell();
+			// spawn_shell();
+			// voltageMesurementGet(&volt);
+			// chprintf((BaseSequentialStream *)&USB_SERIAL, "voltages :%fV, %fV, %f°C \r\n", volt.vbus, volt.battery, volt.temperature);
 		}
-		chThdSleepMilliseconds(500);
+
+
+		// voltageMesurementGet(&volt);
+		// chprintf((BaseSequentialStream *)&SD1, "voltages :%fV, %fV, %f°C \r\n", volt.vbus, volt.battery, volt.temperature);
+		// chprintf(&SD1, "VBUS HOST = %d\r\n", palReadLine(LINE_VBUS_HOST));
+		chThdSleepMilliseconds(100);
+		// reg[0] = 0x01;
+		// rxbuf[0] = 0;
+		// i2cAcquireBus(&I2CD4);
+		// msg_t result = i2cMasterTransmitTimeout(&I2CD4, 0x22, reg, 1, rxbuf, 1, 1000);
+		// i2cReleaseBus(&I2CD4);
+		// chprintf((BaseSequentialStream *)&SD1, "PD: reg = %x, msg = %d\r\n", rxbuf[0], result);
+		// reg[0] = 0xEA;
+		// rxbuf[0] = 0;
+		// i2cAcquireBus(&I2CD4);
+		// result = i2cMasterTransmitTimeout(&I2CD4, 0x08, reg, 1, rxbuf, 1, 1000);
+		// i2cReleaseBus(&I2CD4);
+		// chprintf((BaseSequentialStream *)&SD1, "HUB: reg = %x, msg = %d\r\n", rxbuf[0], result);
+
 	}
 
 }

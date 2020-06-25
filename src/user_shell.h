@@ -10,7 +10,7 @@
 #define USER_SHELL_H
 
 #include "usbcfg.h"
-#define SHELL_PORT		USB_GDB
+#define SHELL_PORT		SD1
 
 
 /**
