@@ -12,6 +12,8 @@
 #include "leds.h"
 
 static uint16_t leds_values[NB_RGB_LEDS][NB_LEDS] = {LED_NO_POWER};
+static BSEMAPHORE_DECL(pause_thread_sem, true);
+static bool pause_thread = false;
 
 /////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
@@ -88,6 +90,9 @@ static THD_FUNCTION(thLeds, arg) {
 			if(counter >= leds_values[STATUS_LED3][BLUE_LED]){
 				palSetLine(LINE_STATUS_LED3_B);
 			}
+			if(pause_thread){
+				chBSemWait(&pause_thread_sem);
+			}
     	}
 
     	chThdSleepMilliseconds(1);
@@ -98,7 +103,16 @@ static THD_FUNCTION(thLeds, arg) {
 
 void ledsInit(void){
 
-	chThdCreateStatic(waLeds, sizeof(waLeds), NORMALPRIO, thLeds, NULL);
+	chThdCreateStatic(waLeds, sizeof(waLeds), NORMALPRIO+10, thLeds, NULL);
+}
+
+void pauseLedsPWM(void){
+	pause_thread = true;
+}
+
+void resumeLedsPWM(void){
+	pause_thread = false;
+	chBSemSignal(&pause_thread_sem);
 }
 
 void toggleLed(rgb_led_name_t rgb_led, led_name_t led, uint8_t duty_cycle){

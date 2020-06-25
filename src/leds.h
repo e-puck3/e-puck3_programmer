@@ -40,6 +40,16 @@ typedef enum {
 void ledsInit(void);
 
 /**
+ * @brief Pauses the PWM managing the RGB LEDs. All the LEDs are OFF
+ */
+void pauseLedsPWM(void);
+
+/**
+ * @brief Resumes the PWM managing the RGB LEDs.
+ */
+void resumeLedsPWM(void);
+
+/**
  * @brief 			Toggles the selected led with the given value.
  * 
  * @param rgb_led 	RGB LED to update. See rgb_led_name_t

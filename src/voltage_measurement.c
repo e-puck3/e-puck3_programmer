@@ -158,7 +158,7 @@ void batteryStateMachine(void){
 	static uint8_t new_state = BATT_MAX_VOLTAGE_FLAG;
 
 	static systime_t time_state = 0;
-	static systime_t time_battery_low = 0;
+	static systime_t time_battery_low = BATTERY_LOW_TIME_MS;
 
 	if(battery_voltage <= BATT_MIN_VOLTAGE){
 		new_state = BATT_MIN_VOLTAGE_FLAG;
