@@ -69,12 +69,15 @@ static THD_FUNCTION(Blinker,arg) {
 
 
 int main(void) {
-	logNextCreatedThreadsTimestamps();
+	// logNextCreatedThreadsTimestamps();
 	/**
 	 * Special function to handle the turn on if we pressed the button without
 	 * the usb cable plugged. Called before everything to catch the button pressed.
 	 */
 	powerButtonStartSequence();
+	// DMA can't access correctly cached data
+	// Disabled for now
+	SCB_DisableDCache();
 	/*
 	 * System initializations.
 	 * - HAL initialization, this also initializes the configured device drivers
@@ -129,6 +132,8 @@ int main(void) {
 	 * Starts the GDB system.
 	 */
 	gdbStart();
+
+	palSetLine(LINE_RESET_UC);
 
 	chThdCreateStatic(waBlinker, sizeof(waBlinker), NORMALPRIO, Blinker, NULL);
 
