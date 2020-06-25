@@ -19,9 +19,9 @@
 //values used to control the Red, Green and Blue leds
 //Default values
 static uint16_t leds_values[NB_RGB_LEDS][NB_LEDS] = {	//    RED				GREEN				BLUE
-														{LED_NO_POWER, 		LED_QUARTER_POWER, 	LED_MAX_POWER},
+														{LED_NO_POWER, 		LED_QUARTER_POWER, 	LED_NO_POWER},
 														{LED_NO_POWER, 		LED_NO_POWER, 		LED_NO_POWER},
-														{LED_QUARTER_POWER, LED_NO_POWER, 		LED_NO_POWER}};
+														{LED_QUARTER_POWER, LED_QUARTER_POWER, 	LED_NO_POWER}};
 
 #define POWER_EVENT 			EVENT_MASK(0)
 #define VBUS_INFO_EVENT 		EVENT_MASK(1)
@@ -61,6 +61,9 @@ static THD_FUNCTION(leds_management_thd, arg)
 	chEvtRegisterMask(&power_event, &power_event_listener, POWER_EVENT);
 	chEvtRegisterMask(&gdb_status_event, &gdb_status_event_listener, GDB_STATUS_EVENT);
 	chEvtRegisterMask(&communications_event, &communications_event_listener, COMMUNICATIONS_EVENT);
+
+	// turns ON the GDB green led
+	setLed(STATUS_LED3, GREEN_LED, leds_values[STATUS_LED3][GREEN_LED]);
 
 	while (true) {
 

@@ -190,9 +190,9 @@ void batteryStateMachine(void){
 		time_state = chVTGetSystemTime() + CHANGE_STATE_TIME_MS;
 	}
 
-	//if the battery voltage is too low for TICK_BATTERY_LOW time
+	//if the battery voltage is too low for TICK_BATTERY_LOW time and we don't have power from USB
 	//we turn OFF the robot
-	if(actual_state == BATT_MIN_VOLTAGE_FLAG){
+	if(actual_state == BATT_MIN_VOLTAGE_FLAG && !palReadLine(LINE_VBUS_HOST)){
 		if(time_battery_low < chVTGetSystemTime()){
 			//shutdown robot
 			powerButtonTurnOnOff(POWER_OFF);
@@ -268,7 +268,7 @@ static THD_FUNCTION(volt_thd, arg)
 			//VBus state update
 			vbusStateMachine();
 			//Battery state update
-			// batteryStateMachine();
+			batteryStateMachine();
 		}
 
 		//sampling at 20Hz

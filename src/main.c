@@ -23,74 +23,74 @@
 #include "threads_utilities.h"
 
 
-static THD_WORKING_AREA(waBlinker,128);
-static THD_FUNCTION(Blinker,arg) {
-	(void)arg;
-	chRegSetThreadName("blinker");
-	while(true){
-		// palClearLine(LINE_STATUS_LED1_R);
-		// chThdSleepMilliseconds(50);
-		// palClearLine(LINE_STATUS_LED2_R);
-		// chThdSleepMilliseconds(50);
-		// palClearLine(LINE_STATUS_LED3_R);
-		// chThdSleepMilliseconds(50);
-		// palClearLine(LINE_STATUS_LED1_G);
-		// chThdSleepMilliseconds(50);
-		// palClearLine(LINE_STATUS_LED2_G);
-		// chThdSleepMilliseconds(50);
-		// palClearLine(LINE_STATUS_LED3_G);
-		// chThdSleepMilliseconds(50);
-		// palClearLine(LINE_STATUS_LED1_B);
-		// chThdSleepMilliseconds(50);
-		// palClearLine(LINE_STATUS_LED2_B);
-		// chThdSleepMilliseconds(50);
-		// palClearLine(LINE_STATUS_LED3_B);
-		// chThdSleepMilliseconds(50);
-		// palSetLine(LINE_STATUS_LED1_R);
-		// chThdSleepMilliseconds(50);
-		// palSetLine(LINE_STATUS_LED2_R);
-		// chThdSleepMilliseconds(50);
-		// palSetLine(LINE_STATUS_LED3_R);
-		// chThdSleepMilliseconds(50);
-		// palSetLine(LINE_STATUS_LED1_G);
-		// chThdSleepMilliseconds(50);
-		// palSetLine(LINE_STATUS_LED2_G);
-		// chThdSleepMilliseconds(50);
-		// palSetLine(LINE_STATUS_LED3_G);
-		// chThdSleepMilliseconds(50);
-		// palSetLine(LINE_STATUS_LED1_B);
-		// chThdSleepMilliseconds(50);
-		// palSetLine(LINE_STATUS_LED2_B);
-		// chThdSleepMilliseconds(50);
-		// palSetLine(LINE_STATUS_LED3_B);
-		// chThdSleepMilliseconds(50);
+// static THD_WORKING_AREA(waBlinker,128);
+// static THD_FUNCTION(Blinker,arg) {
+// 	(void)arg;
+// 	chRegSetThreadName("blinker");
+// 	while(true){
+// 		// palClearLine(LINE_STATUS_LED1_R);
+// 		// chThdSleepMilliseconds(50);
+// 		// palClearLine(LINE_STATUS_LED2_R);
+// 		// chThdSleepMilliseconds(50);
+// 		// palClearLine(LINE_STATUS_LED3_R);
+// 		// chThdSleepMilliseconds(50);
+// 		// palClearLine(LINE_STATUS_LED1_G);
+// 		// chThdSleepMilliseconds(50);
+// 		// palClearLine(LINE_STATUS_LED2_G);
+// 		// chThdSleepMilliseconds(50);
+// 		// palClearLine(LINE_STATUS_LED3_G);
+// 		// chThdSleepMilliseconds(50);
+// 		// palClearLine(LINE_STATUS_LED1_B);
+// 		// chThdSleepMilliseconds(50);
+// 		// palClearLine(LINE_STATUS_LED2_B);
+// 		// chThdSleepMilliseconds(50);
+// 		// palClearLine(LINE_STATUS_LED3_B);
+// 		// chThdSleepMilliseconds(50);
+// 		// palSetLine(LINE_STATUS_LED1_R);
+// 		// chThdSleepMilliseconds(50);
+// 		// palSetLine(LINE_STATUS_LED2_R);
+// 		// chThdSleepMilliseconds(50);
+// 		// palSetLine(LINE_STATUS_LED3_R);
+// 		// chThdSleepMilliseconds(50);
+// 		// palSetLine(LINE_STATUS_LED1_G);
+// 		// chThdSleepMilliseconds(50);
+// 		// palSetLine(LINE_STATUS_LED2_G);
+// 		// chThdSleepMilliseconds(50);
+// 		// palSetLine(LINE_STATUS_LED3_G);
+// 		// chThdSleepMilliseconds(50);
+// 		// palSetLine(LINE_STATUS_LED1_B);
+// 		// chThdSleepMilliseconds(50);
+// 		// palSetLine(LINE_STATUS_LED2_B);
+// 		// chThdSleepMilliseconds(50);
+// 		// palSetLine(LINE_STATUS_LED3_B);
+// 		// chThdSleepMilliseconds(50);
 
-		palClearLine(LINE_STATUS_LED1_R);
-		palClearLine(LINE_STATUS_LED2_R);
-		palClearLine(LINE_STATUS_LED3_R);
-		chThdSleepMilliseconds(500);
-		palSetLine(LINE_STATUS_LED1_R);
-		palSetLine(LINE_STATUS_LED2_R);
-		palSetLine(LINE_STATUS_LED3_R);
-		chThdSleepMilliseconds(500);
-		palClearLine(LINE_STATUS_LED1_G);
-		palClearLine(LINE_STATUS_LED2_G);
-		palClearLine(LINE_STATUS_LED3_G);
-		chThdSleepMilliseconds(500);
-		palSetLine(LINE_STATUS_LED1_G);
-		palSetLine(LINE_STATUS_LED2_G);
-		palSetLine(LINE_STATUS_LED3_G);
-		chThdSleepMilliseconds(500);
-		palClearLine(LINE_STATUS_LED1_B);
-		palClearLine(LINE_STATUS_LED2_B);
-		palClearLine(LINE_STATUS_LED3_B);
-		chThdSleepMilliseconds(500);
-		palSetLine(LINE_STATUS_LED1_B);
-		palSetLine(LINE_STATUS_LED2_B);
-		palSetLine(LINE_STATUS_LED3_B);
-		chThdSleepMilliseconds(500);
-	}
-}
+// 		palClearLine(LINE_STATUS_LED1_R);
+// 		palClearLine(LINE_STATUS_LED2_R);
+// 		palClearLine(LINE_STATUS_LED3_R);
+// 		chThdSleepMilliseconds(500);
+// 		palSetLine(LINE_STATUS_LED1_R);
+// 		palSetLine(LINE_STATUS_LED2_R);
+// 		palSetLine(LINE_STATUS_LED3_R);
+// 		chThdSleepMilliseconds(500);
+// 		palClearLine(LINE_STATUS_LED1_G);
+// 		palClearLine(LINE_STATUS_LED2_G);
+// 		palClearLine(LINE_STATUS_LED3_G);
+// 		chThdSleepMilliseconds(500);
+// 		palSetLine(LINE_STATUS_LED1_G);
+// 		palSetLine(LINE_STATUS_LED2_G);
+// 		palSetLine(LINE_STATUS_LED3_G);
+// 		chThdSleepMilliseconds(500);
+// 		palClearLine(LINE_STATUS_LED1_B);
+// 		palClearLine(LINE_STATUS_LED2_B);
+// 		palClearLine(LINE_STATUS_LED3_B);
+// 		chThdSleepMilliseconds(500);
+// 		palSetLine(LINE_STATUS_LED1_B);
+// 		palSetLine(LINE_STATUS_LED2_B);
+// 		palSetLine(LINE_STATUS_LED3_B);
+// 		chThdSleepMilliseconds(500);
+// 	}
+// }
 
 
 int main(void) {
@@ -135,7 +135,7 @@ int main(void) {
 	 * Starts the leds states thread. Must be the first module to not miss events sent by
 	 * the others modules.
 	 */
-	// ledsManagementStart();
+	ledsManagementStart();
 	/*
 	 * Starts the handling of the power button.
 	 */
@@ -169,7 +169,7 @@ int main(void) {
 
 	palSetLine(LINE_RESET_UC);
 
-	chThdCreateStatic(waBlinker, sizeof(waBlinker), NORMALPRIO, Blinker, NULL);
+	// chThdCreateStatic(waBlinker, sizeof(waBlinker), NORMALPRIO, Blinker, NULL);
 
 	// uint8_t reg[1];
 	// uint8_t rxbuf[1];
