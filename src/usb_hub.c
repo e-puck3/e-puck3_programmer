@@ -12,8 +12,20 @@
 #define CONFIGURED		true
 #define NOT_CONFIGURED	false
 
+/*
+* I2C configuration object.
+* I2C2_TIMINGR: 1000 kHz with I2CCLK = 96 MHz, rise time = 0 ns,
+*               fall time = 0 ns
+*/
+static I2CConfig i2c4config = {
+    .timingr    = 0x0040163A,
+    .cr1        = 0,
+    .cr2        = 0,
+};
+
 static USB3803_t hub ={
 	.i2cp 				= &I2CD4,
+	.i2c_config			= &i2c4config,
 	.i2c_address_7bits 	= USB3803_I2C_ADDRESS00_7BITS,
 	.vbus_host_line 	= LINE_VBUS_HOST,
 	.vbus_devices_line 	= LINE_VBUS_DEVICES,

@@ -25,7 +25,7 @@
 * I2C2_TIMINGR: 1000 kHz with I2CCLK = 96 MHz, rise time = 0 ns,
 *               fall time = 0 ns
 */
-static const I2CConfig i2c2config = {
+static const I2CConfig i2c4config = {
     .timingr    = 0x0040163A,
     .cr1        = 0,
     .cr2        = 0,
@@ -200,7 +200,7 @@ static void print_src_pdo(BaseSequentialStream *chp, uint32_t pdo, uint8_t index
 /********************                PUBLIC FUNCTIONS              ********************/
 
 void usbPDControllerStart(void){
-	i2cStart(pdb_config.fusb.i2cp, &i2c2config);
+	i2cStart(pdb_config.fusb.i2cp, &i2c4config);
 	pdb_init(&pdb_config);
 }
 

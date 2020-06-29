@@ -18,6 +18,7 @@
 
 typedef struct{
 	I2CDriver	*i2cp;
+	I2CConfig	*i2c_config;
 	uint8_t 	i2c_address_7bits;
 	ioline_t	vbus_host_line;
 	ioline_t	vbus_devices_line;

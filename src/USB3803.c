@@ -122,9 +122,7 @@
 static void _write_byte(USB3803_t* hub, uint8_t reg, uint8_t byte){
 	uint8_t txbuf[2] = {reg, byte};
 
-	i2cAcquireBus(hub->i2cp);
 	i2cMasterTransmitTimeout(hub->i2cp, hub->i2c_address_7bits, txbuf, 2, NULL, 0, I2C_HUB_TIMEOUT_MS);
-	i2cReleaseBus(hub->i2cp);
 }
 
 static void _write_byte_multi(USB3803_t* hub, uint8_t reg, uint8_t *bytes, uint8_t len){
@@ -137,15 +135,19 @@ static void _write_byte_multi(USB3803_t* hub, uint8_t reg, uint8_t *bytes, uint8
         txbuf[i + 1] = bytes[i];
     }
 
-	i2cAcquireBus(hub->i2cp);
 	i2cMasterTransmitTimeout(hub->i2cp, hub->i2c_address_7bits, txbuf, len+1, NULL, 0, I2C_HUB_TIMEOUT_MS);
-	i2cReleaseBus(hub->i2cp);
 }
 
 
 /********************               PUBLIC FUNCITONS               ********************/
 
 void USB3803_configure(USB3803_t* hub){
+
+	i2cAcquireBus(hub->i2cp);
+
+	if(hub->i2cp->state != I2C_READY){
+		i2cStart(hub->i2cp, hub->i2c_config);
+	}
 
 	// we should not have HUB_CONNECT high when the hub is in reset state
 	CLEAR_HUB_CONNECT(hub);
@@ -190,6 +192,12 @@ void USB3803_configure(USB3803_t* hub){
 
 	// Tells the device VBUS is connected
 	ENABLE_VBUS_DEVICES(hub);
+
+	if(hub->i2cp->state != I2C_READY){
+		i2cStart(hub->i2cp, hub->i2c_config);
+	}
+
+	i2cReleaseBus(hub->i2cp);
 
 }
 
