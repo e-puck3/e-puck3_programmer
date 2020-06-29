@@ -14,11 +14,11 @@
 
 /*
 * I2C configuration object.
-* I2C2_TIMINGR: 1000 kHz with I2CCLK = 96 MHz, rise time = 0 ns,
+* I2C2_TIMINGR: 1000 kHz with I2CCLK = 216 MHz, rise time = 0 ns,
 *               fall time = 0 ns
 */
 static I2CConfig i2c4config = {
-    .timingr    = 0x0040163A,
+    .timingr    = 0x00A02B91,
     .cr1        = 0,
     .cr2        = 0,
 };
