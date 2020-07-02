@@ -53,7 +53,11 @@ static THD_FUNCTION(usb_hub_thd, arg)
 		if(palReadLine(LINE_VBUS_HOST)){
 			chThdSleepMilliseconds(DEBOUNCE_TIME_VBUS_DET_MS);
 			if(palReadLine(LINE_VBUS_HOST) && hub_state == NOT_CONFIGURED){
-				USB3803_configure(&hub);
+				if(USB3803_configure(&hub)){
+					// If there was a problem configuring the hub, stop trying to
+					// configure it, there is probably a hardware bug
+					break;
+				}
 				hub_state = CONFIGURED;
 			}
 		// Shuts down the HUB (reset state)

@@ -119,13 +119,17 @@
 // 	return rxbuf;
 // }
 
-static void _write_byte(USB3803_t* hub, uint8_t reg, uint8_t byte){
+static bool _write_byte(USB3803_t* hub, uint8_t reg, uint8_t byte){
 	uint8_t txbuf[2] = {reg, byte};
 
-	i2cMasterTransmitTimeout(hub->i2cp, hub->i2c_address_7bits, txbuf, 2, NULL, 0, I2C_HUB_TIMEOUT_MS);
+	if(i2cMasterTransmitTimeout(hub->i2cp, hub->i2c_address_7bits, txbuf, 2, NULL, 0, I2C_HUB_TIMEOUT_MS) != MSG_OK){
+		return true;
+	}
+
+	return false;
 }
 
-static void _write_byte_multi(USB3803_t* hub, uint8_t reg, uint8_t *bytes, uint8_t len){
+static bool _write_byte_multi(USB3803_t* hub, uint8_t reg, uint8_t *bytes, uint8_t len){
 	
 	uint8_t txbuf[len + 1];
 
@@ -135,19 +139,19 @@ static void _write_byte_multi(USB3803_t* hub, uint8_t reg, uint8_t *bytes, uint8
         txbuf[i + 1] = bytes[i];
     }
 
-	i2cMasterTransmitTimeout(hub->i2cp, hub->i2c_address_7bits, txbuf, len+1, NULL, 0, I2C_HUB_TIMEOUT_MS);
+	if(i2cMasterTransmitTimeout(hub->i2cp, hub->i2c_address_7bits, txbuf, len+1, NULL, 0, I2C_HUB_TIMEOUT_MS) != MSG_OK){
+		return true;
+	}
+
+	return false;
 }
 
 
 /********************               PUBLIC FUNCITONS               ********************/
 
-void USB3803_configure(USB3803_t* hub){
+bool USB3803_configure(USB3803_t* hub){
 
-	i2cAcquireBus(hub->i2cp);
-
-	if(hub->i2cp->state != I2C_READY){
-		i2cStart(hub->i2cp, hub->i2c_config);
-	}
+	bool error = false;
 
 	// we should not have HUB_CONNECT high when the hub is in reset state
 	CLEAR_HUB_CONNECT(hub);
@@ -168,8 +172,12 @@ void USB3803_configure(USB3803_t* hub){
 
 	chThdSleepMilliseconds(10);
 
+	i2cAcquireBus(hub->i2cp);
+
+	i2cStart(hub->i2cp, hub->i2c_config);
+
 	// Puts the hub into config mode to let us configure it
-	_write_byte(hub, SERIAL_PORT_INTERLOCK_CONTROL_REG, CONFIG_MODE_ENABLED);
+	error = _write_byte(hub, SERIAL_PORT_INTERLOCK_CONTROL_REG, CONFIG_MODE_ENABLED);
 
 	uint8_t temp_buf[] = {
 							CONFIG_DATA_BYTE_1,
@@ -179,25 +187,39 @@ void USB3803_configure(USB3803_t* hub){
 	};
 
 	// Configures only the registers we need to change
-	_write_byte_multi(hub, CONFIG_DATA_BYTE_1_REG, temp_buf, sizeof(temp_buf));
-	_write_byte(hub, MAX_POWER_BUS_REG, MAX_POWER_BUS);
-	_write_byte(hub, POWER_ON_TIME_REG, POWER_ON_TIME);
-	_write_byte(hub, BATTERY_CHARGER_MODE_REG, BATTERY_CHARGER_MODE);
+	if(!error){
+		error = _write_byte_multi(hub, CONFIG_DATA_BYTE_1_REG, temp_buf, sizeof(temp_buf));
+	}
+	if(!error){
+		error = _write_byte(hub, MAX_POWER_BUS_REG, MAX_POWER_BUS);
+	}
+	if(!error){
+		error = _write_byte(hub, POWER_ON_TIME_REG, POWER_ON_TIME);
+	}
+	if(!error){
+		error = _write_byte(hub, BATTERY_CHARGER_MODE_REG, BATTERY_CHARGER_MODE);
+	}
 
-	// Puts the hub out of the config mode
-	_write_byte(hub, SERIAL_PORT_INTERLOCK_CONTROL_REG, CONFIG_MODE_DISABLED);
+	if(!error){
+		// Puts the hub out of the config mode
+		error = _write_byte(hub, SERIAL_PORT_INTERLOCK_CONTROL_REG, CONFIG_MODE_DISABLED);
+	}
 
-	// Gives order to connect to USB
-	SET_HUB_CONNECT(hub);
-
-	// Tells the device VBUS is connected
-	ENABLE_VBUS_DEVICES(hub);
-
-	if(hub->i2cp->state != I2C_READY){
+	if(error){
 		i2cStart(hub->i2cp, hub->i2c_config);
 	}
 
 	i2cReleaseBus(hub->i2cp);
+
+	if(!error){
+		// Gives order to connect to USB
+		SET_HUB_CONNECT(hub);
+
+		// Tells the device VBUS is connected
+		ENABLE_VBUS_DEVICES(hub);
+	}
+
+	return error;
 
 }
 

@@ -36,8 +36,10 @@ typedef struct{
  * 				Note: The I2C should already be configured prior calling this function
  * 
  * @param hub 	The hub to configure. See USB3803_t.
+ * 
+ * @return 		True if an error occured, false otherwise
  */
-void USB3803_configure(USB3803_t* hub);
+bool USB3803_configure(USB3803_t* hub);
 
 /**
  * @brief 		Turns OFF the USB Hub and disables Vbus for its devices.
