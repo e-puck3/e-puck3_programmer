@@ -72,7 +72,13 @@ static THD_FUNCTION(leds_management_thd, arg)
 		//the leds near the power button is STATUS_LED1
 		if(events & BATTERY_INFO_EVENT){
 			flags = chEvtGetAndClearFlags(&battery_info_event_listener);
-			if(flags & BATT_MIN_VOLTAGE_FLAG){
+			if(flags & BATT_NO_BATTERY_FLAG){
+				// turned off because no battery plugged in
+				low_power_state = false;
+				leds_values[STATUS_LED1][RED_LED] = LED_NO_POWER;
+				leds_values[STATUS_LED1][GREEN_LED] = LED_NO_POWER;
+			}
+			else if(flags & BATT_MIN_VOLTAGE_FLAG){
 				//red blinking
 				low_power_state = true;
 				leds_values[STATUS_LED1][RED_LED] = LED_QUARTER_POWER;

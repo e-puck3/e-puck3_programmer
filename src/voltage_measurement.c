@@ -160,7 +160,10 @@ void batteryStateMachine(void){
 	static systime_t time_state = 0;
 	static systime_t time_battery_low = BATTERY_LOW_TIME_MS;
 
-	if(battery_voltage <= BATT_MIN_VOLTAGE){
+	if(battery_voltage <= BATT_NO_BATTERY){
+		new_state = BATT_NO_BATTERY_FLAG;
+	}
+	else if(battery_voltage <= BATT_MIN_VOLTAGE){
 		new_state = BATT_MIN_VOLTAGE_FLAG;
 		
 	}else if(battery_voltage <= BATT_VERY_LOW_VOLTAGE){
