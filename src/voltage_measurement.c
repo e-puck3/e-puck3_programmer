@@ -18,7 +18,7 @@
 #define ADC1_CHANNEL_VBUS				ADC_CHANNEL_IN0
 #define ADC1_CHANNEL_BATTERY			ADC_CHANNEL_IN11
 
-#define VREF							3.0f	//corresponds to the voltage on the VREF+ pin [V]
+#define VREF							3.022f	//corresponds to the voltage on the VREF+ pin [V]
 #define ADC_RESOLUTION					4095	//maximum 12bits value from ADC
 
 // Voltage calculations
