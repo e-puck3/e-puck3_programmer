@@ -211,13 +211,13 @@ bool USB3803_configure(USB3803_t* hub){
 
 	i2cReleaseBus(hub->i2cp);
 
-	if(!error){
-		// Gives order to connect to USB
-		SET_HUB_CONNECT(hub);
 
-		// Tells the device VBUS is connected
-		ENABLE_VBUS_DEVICES(hub);
-	}
+	// Gives order to connect to USB
+	SET_HUB_CONNECT(hub);
+
+	// Tells the device VBUS is connected
+	ENABLE_VBUS_DEVICES(hub);
+	
 
 	return error;
 

@@ -47,7 +47,7 @@ static THD_FUNCTION(usb_hub_thd, arg)
 
 	while(1){
 		// We can't use interrupts on the VBUS HOST pin because it is 
-		// already used by the PD controller library so we simply pool it regularly
+		// already used by the PD controller library so we simply poll it regularly
 
 		// Enables and configures the HUB only if we have a USB connection
 		if(palReadLine(LINE_VBUS_HOST)){
