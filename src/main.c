@@ -21,6 +21,7 @@
 #include "communications.h"
 #include "leds_management.h"
 #include "threads_utilities.h"
+#include "mpu_functions.h"
 
 int main(void) {
 	// logNextCreatedThreadsTimestamps();
@@ -31,7 +32,7 @@ int main(void) {
 	powerButtonStartSequence();
 	// DMA can't access correctly cached data
 	// Disabled for now
-	SCB_DisableDCache();
+	mpuDisableSRAMCacheF746();
 	/*
 	 * System initializations.
 	 * - HAL initialization, this also initializes the configured device drivers
@@ -51,13 +52,6 @@ int main(void) {
 	chEvtObjectInit(&battery_info_event);
 	chEvtObjectInit(&gdb_status_event);
 	chEvtObjectInit(&communications_event);
-	static const SerialConfig ser_cfg_esp = {
-	    .speed = 230400,
-	    .cr1 = 0,
-	    .cr2 = 0,
-	    .cr3 = 0,
-	};
-	sdStart(&UART_ESP, &ser_cfg_esp);
 
 	/*
 	 * Starts the leds states thread. Must be the first module to not miss events sent by
@@ -83,13 +77,13 @@ int main(void) {
 	/*
 	 * Initializes two serial-over-USB CDC drivers and starts and connects the USB.
 	 */
+	// sleep otherwise it bugs -> should connect a debugger to see why
+	chThdSleepMilliseconds(100);
 	usbSerialStart();
-
 	/*
 	 * Starts the communication thread.
 	 */
-	// communicationsStart();
-	// communicationsSwitchModeTo(UART_ESP_PASSTHROUGH, false);
+	communicationsStart();
 	/*
 	 * Starts the GDB system.
 	 */
