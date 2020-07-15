@@ -22,77 +22,6 @@
 #include "leds_management.h"
 #include "threads_utilities.h"
 
-
-// static THD_WORKING_AREA(waBlinker,128);
-// static THD_FUNCTION(Blinker,arg) {
-// 	(void)arg;
-// 	chRegSetThreadName("blinker");
-// 	while(true){
-// 		// palClearLine(LINE_STATUS_LED1_R);
-// 		// chThdSleepMilliseconds(50);
-// 		// palClearLine(LINE_STATUS_LED2_R);
-// 		// chThdSleepMilliseconds(50);
-// 		// palClearLine(LINE_STATUS_LED3_R);
-// 		// chThdSleepMilliseconds(50);
-// 		// palClearLine(LINE_STATUS_LED1_G);
-// 		// chThdSleepMilliseconds(50);
-// 		// palClearLine(LINE_STATUS_LED2_G);
-// 		// chThdSleepMilliseconds(50);
-// 		// palClearLine(LINE_STATUS_LED3_G);
-// 		// chThdSleepMilliseconds(50);
-// 		// palClearLine(LINE_STATUS_LED1_B);
-// 		// chThdSleepMilliseconds(50);
-// 		// palClearLine(LINE_STATUS_LED2_B);
-// 		// chThdSleepMilliseconds(50);
-// 		// palClearLine(LINE_STATUS_LED3_B);
-// 		// chThdSleepMilliseconds(50);
-// 		// palSetLine(LINE_STATUS_LED1_R);
-// 		// chThdSleepMilliseconds(50);
-// 		// palSetLine(LINE_STATUS_LED2_R);
-// 		// chThdSleepMilliseconds(50);
-// 		// palSetLine(LINE_STATUS_LED3_R);
-// 		// chThdSleepMilliseconds(50);
-// 		// palSetLine(LINE_STATUS_LED1_G);
-// 		// chThdSleepMilliseconds(50);
-// 		// palSetLine(LINE_STATUS_LED2_G);
-// 		// chThdSleepMilliseconds(50);
-// 		// palSetLine(LINE_STATUS_LED3_G);
-// 		// chThdSleepMilliseconds(50);
-// 		// palSetLine(LINE_STATUS_LED1_B);
-// 		// chThdSleepMilliseconds(50);
-// 		// palSetLine(LINE_STATUS_LED2_B);
-// 		// chThdSleepMilliseconds(50);
-// 		// palSetLine(LINE_STATUS_LED3_B);
-// 		// chThdSleepMilliseconds(50);
-
-// 		palClearLine(LINE_STATUS_LED1_R);
-// 		palClearLine(LINE_STATUS_LED2_R);
-// 		palClearLine(LINE_STATUS_LED3_R);
-// 		chThdSleepMilliseconds(500);
-// 		palSetLine(LINE_STATUS_LED1_R);
-// 		palSetLine(LINE_STATUS_LED2_R);
-// 		palSetLine(LINE_STATUS_LED3_R);
-// 		chThdSleepMilliseconds(500);
-// 		palClearLine(LINE_STATUS_LED1_G);
-// 		palClearLine(LINE_STATUS_LED2_G);
-// 		palClearLine(LINE_STATUS_LED3_G);
-// 		chThdSleepMilliseconds(500);
-// 		palSetLine(LINE_STATUS_LED1_G);
-// 		palSetLine(LINE_STATUS_LED2_G);
-// 		palSetLine(LINE_STATUS_LED3_G);
-// 		chThdSleepMilliseconds(500);
-// 		palClearLine(LINE_STATUS_LED1_B);
-// 		palClearLine(LINE_STATUS_LED2_B);
-// 		palClearLine(LINE_STATUS_LED3_B);
-// 		chThdSleepMilliseconds(500);
-// 		palSetLine(LINE_STATUS_LED1_B);
-// 		palSetLine(LINE_STATUS_LED2_B);
-// 		palSetLine(LINE_STATUS_LED3_B);
-// 		chThdSleepMilliseconds(500);
-// 	}
-// }
-
-
 int main(void) {
 	// logNextCreatedThreadsTimestamps();
 	/**
@@ -168,11 +97,6 @@ int main(void) {
 
 	palSetLine(LINE_RESET_UC);
 
-	// chThdCreateStatic(waBlinker, sizeof(waBlinker), NORMALPRIO, Blinker, NULL);
-
-	// uint8_t reg[1];
-	// uint8_t rxbuf[1];
-	// chThdSleepMilliseconds(1000);
 	spawn_shell();
 	// voltage_measurement_t volt;
 	while (true){
@@ -183,23 +107,10 @@ int main(void) {
 			// chprintf((BaseSequentialStream *)&USB_SERIAL, "voltages :%fV, %fV, %f°C \r\n", volt.vbus, volt.battery, volt.temperature);
 		}
 
-
 		// voltageMesurementGet(&volt);
 		// chprintf((BaseSequentialStream *)&SD1, "voltages :%fV, %fV, %f°C \r\n", volt.vbus, volt.battery, volt.temperature);
 		// chprintf(&SD1, "VBUS HOST = %d\r\n", palReadLine(LINE_VBUS_HOST));
 		chThdSleepMilliseconds(100);
-		// reg[0] = 0x01;
-		// rxbuf[0] = 0;
-		// i2cAcquireBus(&I2CD4);
-		// msg_t result = i2cMasterTransmitTimeout(&I2CD4, 0x22, reg, 1, rxbuf, 1, 1000);
-		// i2cReleaseBus(&I2CD4);
-		// chprintf((BaseSequentialStream *)&SD1, "PD: reg = %x, msg = %d\r\n", rxbuf[0], result);
-		// reg[0] = 0xEA;
-		// rxbuf[0] = 0;
-		// i2cAcquireBus(&I2CD4);
-		// result = i2cMasterTransmitTimeout(&I2CD4, 0x08, reg, 1, rxbuf, 1, 1000);
-		// i2cReleaseBus(&I2CD4);
-		// chprintf((BaseSequentialStream *)&SD1, "HUB: reg = %x, msg = %d\r\n", rxbuf[0], result);
 
 	}
 
