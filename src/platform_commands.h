@@ -13,7 +13,8 @@
 /* Beginning of platform dedicated commands. */
 /********************************************/
 
-static bool cmd_example(target *t, int argc, const char **argv);
+static bool cmd_select_mode(target *t, int argc, const char **argv);
+static bool cmd_get_mode(target *t, int argc, const char **argv);
 
 /***************************************/
 /* End of platform dedicated commands. */
@@ -27,7 +28,8 @@ static bool cmd_example(target *t, int argc, const char **argv);
 /* IMPORTANT : Each line MUST finish with "\"       */
 /****************************************************/
 
-	{"example", (cmd_handler)cmd_example, "This is an example command to how how to add a custom command to GDB" }, \
+	{"select_mode", (cmd_handler)cmd_select_mode, "(1|2|3) Select the use of the second virtual com port over USB :\n\t\t1 = Serial monitor of the main processor and GDB over USB and Bluetooth,\n\t\t2 = Programming/serial monitor of the ESP and GDB over USB,\n\t\t3 = ASEBA CAN-USB translator and GDB over USB and Bluetooth"}, \
+	{"get_mode", (cmd_handler)cmd_get_mode, "Return the selected mode for the second virtual com port over USB"},\
 
 /***********************************************/
 /* End of List of platform dedicated commands. */
@@ -40,11 +42,41 @@ static bool cmd_example(target *t, int argc, const char **argv);
 /* Beginning of Code of platform dedicated commands. */
 /****************************************************/
 
-static bool cmd_example(target *t, int argc, const char **argv)
+static bool cmd_select_mode(target *t, int argc, const char **argv){
+	(void)t;
+	char error_message[] = "You must choose between mode 1, 2 or 3\n";
+	if (argc == 1)
+		gdb_outf("%s",error_message);
+	else if (strcmp(argv[1], "1") == 0){
+		communicationsSwitchModeTo(UART_779_PASSTHROUGH, true);
+		gdb_outf("Switched to mode 1 : UART_779_PASSTHROUGH\n");
+	}else if (strcmp(argv[1], "2") == 0){
+ 		communicationsSwitchModeTo(UART_ESP_PASSTHROUGH, true);
+		gdb_outf("Switched to mode 2 : UART_ESP_PASSTHROUGH\n");
+ 	}else if (strcmp(argv[1], "3") == 0){
+ 		communicationsSwitchModeTo(ASEBA_CAN_TRANSLATOR, true);
+		gdb_outf("Switched to mode 3 : ASEBA_CAN_TRANSLATOR\n");
+ 	}else{
+ 		gdb_outf("%s",error_message);
+ 	}
+ 	return true;
+}
+
+static bool cmd_get_mode(target *t, int argc, const char **argv)
 {
 	(void)t;
-	
-	gdb_outf("You entered %d args to the command\n", argc-1);
+	(void)argc;
+	(void)argv;
+	uint8_t mode = communicationGetActiveMode();
+	gdb_outf("Current mode : ");
+	if(mode == UART_779_PASSTHROUGH){
+		gdb_outf("mode 1 : UART_779_PASSTHROUGH\n");
+	}else if(mode == UART_ESP_PASSTHROUGH){
+		gdb_outf("mode 2 : UART_ESP_PASSTHROUGH\n");
+	}else if(mode == ASEBA_CAN_TRANSLATOR){
+		gdb_outf("mode 3 :ASEBA_CAN_TRANSLATOR\n");
+	}
+
 	return true;
 }
 
