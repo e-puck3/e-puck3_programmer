@@ -39,14 +39,12 @@ const char *platform_target_voltage(void)
 
 bool platform_is_second_gdb_interface_active(void){
 
-	//to be replaced by your own implementation or to be let like this if not used
-	return false;
+	return (communicationGetActiveMode() != UART_ESP_PASSTHROUGH);
 }
 
 bool platform_is_second_gdb_interface_connected(void){
 
-	//to be replaced by your own implementation or to be let like this if not used
-	return false;
+	return communicationIsBluetoothConnected();
 }
 
 #endif /* USE_SECOND_GDB_INTERFACE */

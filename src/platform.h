@@ -14,6 +14,7 @@
 #include <hal.h>
 
 #include "gdb.h"
+#include "communications.h"
 
 /**
  * Blackmagic wrappers
@@ -29,7 +30,7 @@
 the behavior is to try to read or write to the second interface provided if the USB
 isn't connected. It means the USB has always the priority*/
 
-//#define USE_SECOND_GDB_INTERFACE
+#define USE_SECOND_GDB_INTERFACE
 
 /* 	Uncomment if you want to turn on the target when a swdp_scan is done.
 	It is useless if you don't have a physical way to do it */
@@ -39,12 +40,12 @@ isn't connected. It means the USB has always the priority*/
 /*  Uncomment if you want to add custom commands to GDB. The commands are defined in the
 	platform_commands.h */
 
-//#define PLATFORM_HAS_CUSTOM_COMMANDS
+#define PLATFORM_HAS_CUSTOM_COMMANDS
 
 
 #ifdef USE_SECOND_GDB_INTERFACE
 //Replace with the Serial or USB Serial object you want to use (for example SD2 for UART2) 
-#define GDB_2ND_INTERFACE	TO_BE_FILLED
+#define GDB_2ND_INTERFACE	UART_ESP
 
 /* the two functions below are to be filled in platform.c */	
 
