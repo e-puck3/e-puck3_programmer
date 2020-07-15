@@ -95,8 +95,8 @@ int main(void) {
 	 */
 	gdbStart();
 
-	palSetLine(LINE_RESET_UC);
-
+	turnOnOffF779(POWER_ON);
+	turnOnOffESP32(POWER_ON);
 	spawn_shell();
 	// voltage_measurement_t volt;
 	while (true){

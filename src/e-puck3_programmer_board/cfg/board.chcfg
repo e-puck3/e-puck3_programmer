@@ -14,7 +14,7 @@ https://github.com/cburlacu/cube2chibi
   <board_id>EPUCK3_PROGRAMMER</board_id>
   <board_functions></board_functions>
   <subtype>STM32F746xx</subtype>
-  <clocks HSEFrequency="26000000" HSEBypass="true" LSEFrequency="32768" LSEBypass="false" VDD="300" LSEDrive="3 High Drive (default)"/>
+  <clocks HSEFrequency="19200000" HSEBypass="true" LSEFrequency="32768" LSEBypass="false" VDD="300" LSEDrive="3 High Drive (default)"/>
   <ports><GPIOA><pin0 ID="VBUS_SENSE" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
       <pin1 ID="BRUSHLESS_SENSE_MOT4A" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"></pin1>
       <pin2 ID="BRUSHLESS_SENSE_MOT4B" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
@@ -39,7 +39,7 @@ https://github.com/cburlacu/cube2chibi
       <pin5 ID="H_BRIDGE_MOT2CN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="2"/>
       <pin6 ID="UART_PROG_ESP_TX" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="7"></pin6>
       <pin7 ID="H_BRIDGE_MOT3BN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="2"/>
-      <pin8 ID="EN_ESP32" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
+      <pin8 ID="EN_ESP32" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin9 ID="GPIO0_ESP32" Type="OpenDrain" Level="High" Speed="Minimum" Resistor="PullUp" Mode="Output" Alternate="0"/>
       <pin10 ID="H_BRIDGE_MOT2BP" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="1"/>
       <pin11 ID="H_BRIDGE_MOT2BN" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Alternate" Alternate="1"/>

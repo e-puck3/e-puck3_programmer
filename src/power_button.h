@@ -54,4 +54,16 @@ uint8_t powerButtonGetPowerState(void);
  */
 void powerButtonTurnOnOff(uint8_t state);
 
+/**
+ * @brief Turns ON or OFF the stm32f779
+ * @param state POWER_ON or POWER_OFF
+ */
+void turnOnOffF779(uint8_t state);
+
+/**
+ * @brief Turns ON or OFF the ESP32
+ * @param state POWER_ON or POWER_OFF
+ */
+void turnOnOffESP32(uint8_t state);
+
 #endif  /* POWER_BUTTON_H */

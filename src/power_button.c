@@ -102,3 +102,11 @@ void powerButtonTurnOnOff(uint8_t state){
 		pauseLedsPWM();
 	}
 }
+
+void turnOnOffF779(uint8_t state){
+	palWriteLine(LINE_RESET_UC, state);
+}
+
+void turnOnOffESP32(uint8_t state){
+	palWriteLine(LINE_EN_ESP32, state);
+}

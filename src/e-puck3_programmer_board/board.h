@@ -612,7 +612,7 @@
                                      PIN_ODR_LOW(GPIOB_H_BRIDGE_MOT2CN) |   \
                                      PIN_ODR_LOW(GPIOB_UART_PROG_ESP_TX) |  \
                                      PIN_ODR_LOW(GPIOB_H_BRIDGE_MOT3BN) |   \
-                                     PIN_ODR_HIGH(GPIOB_EN_ESP32) |         \
+                                     PIN_ODR_LOW(GPIOB_EN_ESP32) |          \
                                      PIN_ODR_HIGH(GPIOB_GPIO0_ESP32) |      \
                                      PIN_ODR_LOW(GPIOB_H_BRIDGE_MOT2BP) |   \
                                      PIN_ODR_LOW(GPIOB_H_BRIDGE_MOT2BN) |   \
