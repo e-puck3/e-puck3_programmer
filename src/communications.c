@@ -15,6 +15,7 @@
 #include "aseba_bridge.h"
 #include "flash.h"
 #include "usbcfg.h"
+#include "chprintf.h"
 
 #define CONFIG_SECTOR	7			//corresponds to the last sector of the flash for the 746
 #define PATTERN_FLASH	0xABCDEC	//arbitrary patern to detect if the block has already been written
@@ -70,6 +71,7 @@ void writeModeToFlash(comm_modes_t choice){
 	if( (config_addr == 0) || (config_addr >= (config_end - sizeof(uint32_t)) ) ){
 		flash_erase_sector(CONFIG_SECTOR);
 		config_addr = config_start;
+		// chprintf((BaseSequentialStream *) &UART_ESP,"Erased\r\n");
 	}
 
 	//writes the choice and the pattern on the flash 
@@ -79,6 +81,9 @@ void writeModeToFlash(comm_modes_t choice){
 	config_addr += sizeof(uint32_t);
 
 	flash_lock();
+
+	// chprintf((BaseSequentialStream *) &UART_ESP,"Written = %x\r\n", PATTERN_FLASH | (uint32_t)choice);
+	// chprintf((BaseSequentialStream *) &UART_ESP,"Read = %x\r\n", *(uint32_t*)(config_addr-sizeof(uint32_t)));
 }
 
 /**
@@ -108,10 +113,11 @@ comm_modes_t findLastModeWrittenToFlash(void){
 
 	if(last == NULL){
 		config_addr = 0;
+		// chprintf((BaseSequentialStream *) &UART_ESP,"not found\r\n");
 	}else{
 		//we take only the 2 last bits => only 4 choices availables with this procedure (0,1,2,3)
 		choice = last_value & 0x03; //if we do this in the loop, it goes into an unhandled exception...
-		//chprintf((BaseSequentialStream *) &SDU2,"choice = %d\n", choice);
+		// chprintf((BaseSequentialStream *) &UART_ESP,"Found choice = %d at %x\r\n", choice, (uint32_t)last);
 		//sets the config_addr to the next writtable address
 		config_addr = (uint32_t)last + sizeof(uint32_t);
 	}
@@ -204,6 +210,8 @@ void communicationsStart(void){
 	/**
 	 * Configures the can for Aseba and the threads of the Aseba Bridge
 	 */
+	palClearLine(LINE_EN_CAN_PROG_n);
+	chThdSleepMilliseconds(10);
 	aseba_can_start(0);
 	aseba_bridge(&USB_SERIAL);
 
