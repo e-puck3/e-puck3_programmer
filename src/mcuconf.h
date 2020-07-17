@@ -151,11 +151,11 @@
 #define STM32_ADC_ADC3_DMA_STREAM           STM32_DMA_STREAM_ID(2, 1)
 #define STM32_ADC_ADC1_DMA_PRIORITY         2
 #define STM32_ADC_ADC2_DMA_PRIORITY         2
-#define STM32_ADC_ADC3_DMA_PRIORITY         2
+#define STM32_ADC_ADC3_DMA_PRIORITY         1
 #define STM32_ADC_IRQ_PRIORITY              6
 #define STM32_ADC_ADC1_DMA_IRQ_PRIORITY     6
 #define STM32_ADC_ADC2_DMA_IRQ_PRIORITY     6
-#define STM32_ADC_ADC3_DMA_IRQ_PRIORITY     6
+#define STM32_ADC_ADC3_DMA_IRQ_PRIORITY     2
 
 /*
  * CAN driver system settings.
@@ -215,11 +215,11 @@
 #define STM32_GPT_USE_TIM13                 FALSE
 #define STM32_GPT_USE_TIM14                 FALSE
 
-// #define STM32_TIM1_SUPPRESS_ISR
-// #define STM32_TIM2_SUPPRESS_ISR
-// #define STM32_TIM3_SUPPRESS_ISR
-// #define STM32_TIM4_SUPPRESS_ISR
-// #define STM32_TIM8_SUPPRESS_ISR
+#define STM32_TIM1_SUPPRESS_ISR
+#define STM32_TIM2_SUPPRESS_ISR
+#define STM32_TIM3_SUPPRESS_ISR
+#define STM32_TIM4_SUPPRESS_ISR
+#define STM32_TIM8_SUPPRESS_ISR
 
 /*
  * I2C driver system settings.

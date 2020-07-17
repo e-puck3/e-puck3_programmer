@@ -17,6 +17,7 @@
 #include "user_shell.h"
 #include "usb_pd_controller.h"
 #include "threads_utilities.h"
+#include "motors.h"
 
 
 static THD_WORKING_AREA(waShell,2048);
@@ -60,9 +61,40 @@ static void cmd_set_inrush_limit(BaseSequentialStream *chp, int argc, char *argv
 	}
 }
 
+static void cmd_motor_set_speed(BaseSequentialStream *chp, int argc, char *argv[])
+{
+  (void)argv;
+  if(argc == 2)
+  {
+    char *endptr;
+    uint8_t motNumber = strtol(argv[0], &endptr, 0);
+    float speed = strtol(argv[1], &endptr, 0);
+
+    brushless_motors_names_t motor_id;
+    if(motNumber == 1){
+      motor_id = 0;
+    }else if(motNumber == 2){
+      motor_id = 1;
+    }else if(motNumber == 3){
+      motor_id = 2;
+    }else if(motNumber == 4){
+      motor_id = 3;
+    }else{
+      return;
+    }
+    motorSetDutyCycle(motor_id, speed);
+
+  }
+  else
+  {
+      chprintf(chp, "motor_set_speed motNumber speed (0-100)" SHELL_NEWLINE_STR);
+  }
+}
+
 static const ShellCommand commands[] = {
 	{"set_vbus_priority", cmd_set_vbus_priority},
 	{"set_inrush_limit", cmd_set_inrush_limit},
+	{"motor_set_speed", cmd_motor_set_speed},
   USB_PD_CONTROLLER_SHELL_CMD
   THREADS_UTILITIES_SHELL_CMD
   {NULL, NULL}

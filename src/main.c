@@ -22,6 +22,7 @@
 #include "leds_management.h"
 #include "threads_utilities.h"
 #include "mpu_functions.h"
+#include "motors.h"
 
 int main(void) {
 	// logNextCreatedThreadsTimestamps();
@@ -91,6 +92,18 @@ int main(void) {
 
 	turnOnOffF779(POWER_ON);
 	turnOnOffESP32(POWER_ON);
+	palSetLine(LINE_EN_DRIVER_1);
+	palSetLine(LINE_EN_DRIVER_2);
+	palSetLine(LINE_EN_DRIVER_3);
+	palSetLine(LINE_EN_DRIVER_4);
+
+	motorsStart();
+
+	motorSetDutyCycle(BRUSHLESS_MOTOR_1, 10);
+	motorSetDutyCycle(BRUSHLESS_MOTOR_2, 10);
+	motorSetDutyCycle(BRUSHLESS_MOTOR_3, 10);
+	motorSetDutyCycle(BRUSHLESS_MOTOR_4, 10);
+
 	spawn_shell();
 	// voltage_measurement_t volt;
 	while (true){

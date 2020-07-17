@@ -33,6 +33,24 @@ typedef enum
     BRUSHLESS_MOTOR_4,
 }brushless_motors_names_t;
 
+/**
+ * Half Bridges list
+ */
+typedef enum{
+    HALF_BRIDGE_1 = 0,
+    HALF_BRIDGE_2,
+    HALF_BRIDGE_3,
+    HALF_BRIDGE_4,
+    HALF_BRIDGE_5,
+    HALF_BRIDGE_6,
+    HALF_BRIDGE_7,
+    HALF_BRIDGE_8,
+    HALF_BRIDGE_9,
+    HALF_BRIDGE_10,
+    HALF_BRIDGE_11,
+    HALF_BRIDGE_12,
+}half_bridges_names_t;
+
 #define MAX_NB_OF_HALF_BRIDGES      12
 
 #define MAX_NB_OF_BRUSHLESS_MOTOR   4
@@ -57,7 +75,7 @@ typedef enum{
 /**
  * @brief Does all the initializations related to the motor control module and starts it.
  * 
- * Uses Timers 1, 2, 3, 4, 8 and ADC 1 and 3.
+ * Uses Timers 1, 2, 3, 4, 8 and ADC 2 and 3.
  */
 void motorsStart(void);
 
