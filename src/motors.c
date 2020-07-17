@@ -9,14 +9,10 @@
 #include "ch.h"
 #include "hal.h"
 #include "motors.h"
-#include "main.h"
-
-#include "custom_io.h"
-#include "adc_tx.h"
 
 #define ADC3_BUFFER_DEPTH				2		//2 sequences of MAX_NB_OF_BRUSHLESS_MOTOR samples
-#define ADC1_BUFFER_DEPTH				2		//2 sequences of MAX_NB_OF_BRUSHLESS_MOTOR samples
-#define ADC1_NB_ELEMENT_SEQ				3		/* with 52KHz, we can do approx 24 measurements by PWM cycle 
+#define ADC2_BUFFER_DEPTH				2		//2 sequences of MAX_NB_OF_BRUSHLESS_MOTOR samples
+#define ADC2_NB_ELEMENT_SEQ				3		/* with 52KHz, we can do approx 24 measurements by PWM cycle 
 												so we need to do 2 sequences of 12 elements (3 * 4 motors)*/
 #define ADC3_OFF_SAMPLE_TIME			0.20f	//we sample the OFF time at 20% of the PWM cycle
 #define ADC3_ON_SAMPLE_TIME				0.75f	//we sample the ON time at 75% of the PWM cycle
@@ -294,7 +290,7 @@ typedef struct {
 	tim_channel_t	PWM_p_channel;
 	tim_channel_t	PWM_n_channel;
 	uint8_t			ADC3FloatingMeasureChannel;
-	uint8_t			ADC1ConductingMeasureChannel;
+	uint8_t			ADC2ConductingMeasureChannel;
 } half_bridge_t;
 
 /**
@@ -339,8 +335,8 @@ void _set_running(brushless_motor_t *motor);
 void _set_free_wheeling(brushless_motor_t *motor);
 void _set_tied_to_ground(brushless_motor_t *motor);
 void _rpm_counter_update(brushless_motor_t *motor);
-void _adc1_current_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n);
-void _adc3_voltage_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n);
+void _adc2_current_cb(ADCDriver *adcp);
+void _adc3_voltage_cb(ADCDriver *adcp);
 void _update_duty_cycle(brushless_motor_t *motor);
 void _set_duty_cycle(brushless_motor_t *motor, float duty_cycle);
 void _put_all_half_bridges_floating(void);
@@ -441,7 +437,7 @@ static const half_bridge_t half_bridges[NB_OF_HALF_BRIDGES] = {
 		.PWM_p_channel					= PWM_P_CHANNEL_1,
 		.PWM_n_channel					= PWM_N_CHANNEL_1,
 		.ADC3FloatingMeasureChannel		= ADC3_VOLTAGE_CHANNEL_1,
-		.ADC1ConductingMeasureChannel	= ADC1_CURRENT_CHANNEL_1
+		.ADC2ConductingMeasureChannel	= ADC2_CURRENT_CHANNEL_1
 	},
 #if (NB_OF_HALF_BRIDGES > 1)
 	{
@@ -451,7 +447,7 @@ static const half_bridge_t half_bridges[NB_OF_HALF_BRIDGES] = {
 		.PWM_p_channel					= PWM_P_CHANNEL_2,
 		.PWM_n_channel					= PWM_N_CHANNEL_2,
 		.ADC3FloatingMeasureChannel		= ADC3_VOLTAGE_CHANNEL_2,
-		.ADC1ConductingMeasureChannel	= ADC1_CURRENT_CHANNEL_2
+		.ADC2ConductingMeasureChannel	= ADC2_CURRENT_CHANNEL_2
 	},
 #endif /* (NB_OF_HALF_BRIDGES > 1) */
 #if (NB_OF_HALF_BRIDGES > 2)
@@ -462,7 +458,7 @@ static const half_bridge_t half_bridges[NB_OF_HALF_BRIDGES] = {
 		.PWM_p_channel					= PWM_P_CHANNEL_3,
 		.PWM_n_channel					= PWM_N_CHANNEL_3,
 		.ADC3FloatingMeasureChannel		= ADC3_VOLTAGE_CHANNEL_3,
-		.ADC1ConductingMeasureChannel	= ADC1_CURRENT_CHANNEL_3
+		.ADC2ConductingMeasureChannel	= ADC2_CURRENT_CHANNEL_3
 	},
 #endif /* (NB_OF_HALF_BRIDGES > 2) */
 #if (NB_OF_HALF_BRIDGES > 3)
@@ -473,7 +469,7 @@ static const half_bridge_t half_bridges[NB_OF_HALF_BRIDGES] = {
 		.PWM_p_channel					= PWM_P_CHANNEL_4,
 		.PWM_n_channel					= PWM_N_CHANNEL_4,
 		.ADC3FloatingMeasureChannel		= ADC3_VOLTAGE_CHANNEL_4,
-		.ADC1ConductingMeasureChannel	= ADC1_CURRENT_CHANNEL_4
+		.ADC2ConductingMeasureChannel	= ADC2_CURRENT_CHANNEL_4
 	},
 #endif /* (NB_OF_HALF_BRIDGES > 3) */
 #if (NB_OF_HALF_BRIDGES > 4)
@@ -484,7 +480,7 @@ static const half_bridge_t half_bridges[NB_OF_HALF_BRIDGES] = {
 		.PWM_p_channel					= PWM_P_CHANNEL_5,
 		.PWM_n_channel					= PWM_N_CHANNEL_5,
 		.ADC3FloatingMeasureChannel		= ADC3_VOLTAGE_CHANNEL_5,
-		.ADC1ConductingMeasureChannel	= ADC1_CURRENT_CHANNEL_5
+		.ADC2ConductingMeasureChannel	= ADC2_CURRENT_CHANNEL_5
 	},
 #endif /* (NB_OF_HALF_BRIDGES > 4) */
 #if (NB_OF_HALF_BRIDGES > 5)
@@ -495,7 +491,7 @@ static const half_bridge_t half_bridges[NB_OF_HALF_BRIDGES] = {
 		.PWM_p_channel					= PWM_P_CHANNEL_6,
 		.PWM_n_channel					= PWM_N_CHANNEL_6,
 		.ADC3FloatingMeasureChannel		= ADC3_VOLTAGE_CHANNEL_6,
-		.ADC1ConductingMeasureChannel	= ADC1_CURRENT_CHANNEL_6
+		.ADC2ConductingMeasureChannel	= ADC2_CURRENT_CHANNEL_6
 	},
 #endif /* (NB_OF_HALF_BRIDGES > 5) */
 #if (NB_OF_HALF_BRIDGES > 6)
@@ -506,7 +502,7 @@ static const half_bridge_t half_bridges[NB_OF_HALF_BRIDGES] = {
 		.PWM_p_channel					= PWM_P_CHANNEL_7,
 		.PWM_n_channel					= PWM_N_CHANNEL_7,
 		.ADC3FloatingMeasureChannel		= ADC3_VOLTAGE_CHANNEL_7,
-		.ADC1ConductingMeasureChannel	= ADC1_CURRENT_CHANNEL_7
+		.ADC2ConductingMeasureChannel	= ADC2_CURRENT_CHANNEL_7
 	},
 #endif /* (NB_OF_HALF_BRIDGES > 6) */
 #if (NB_OF_HALF_BRIDGES > 7)
@@ -517,7 +513,7 @@ static const half_bridge_t half_bridges[NB_OF_HALF_BRIDGES] = {
 		.PWM_p_channel					= PWM_P_CHANNEL_8,
 		.PWM_n_channel					= PWM_N_CHANNEL_8,
 		.ADC3FloatingMeasureChannel		= ADC3_VOLTAGE_CHANNEL_8,
-		.ADC1ConductingMeasureChannel	= ADC1_CURRENT_CHANNEL_8
+		.ADC2ConductingMeasureChannel	= ADC2_CURRENT_CHANNEL_8
 	},
 #endif /* (NB_OF_HALF_BRIDGES > 7) */
 #if (NB_OF_HALF_BRIDGES > 8)
@@ -528,7 +524,7 @@ static const half_bridge_t half_bridges[NB_OF_HALF_BRIDGES] = {
 		.PWM_p_channel					= PWM_P_CHANNEL_9,
 		.PWM_n_channel					= PWM_N_CHANNEL_9,
 		.ADC3FloatingMeasureChannel		= ADC3_VOLTAGE_CHANNEL_9,
-		.ADC1ConductingMeasureChannel	= ADC1_CURRENT_CHANNEL_9
+		.ADC2ConductingMeasureChannel	= ADC2_CURRENT_CHANNEL_9
 	},
 #endif /* (NB_OF_HALF_BRIDGES > 8) */
 #if (NB_OF_HALF_BRIDGES > 9)
@@ -539,7 +535,7 @@ static const half_bridge_t half_bridges[NB_OF_HALF_BRIDGES] = {
 		.PWM_p_channel					= PWM_P_CHANNEL_10,
 		.PWM_n_channel					= PWM_N_CHANNEL_10,
 		.ADC3FloatingMeasureChannel		= ADC3_VOLTAGE_CHANNEL_10,
-		.ADC1ConductingMeasureChannel	= ADC1_CURRENT_CHANNEL_10
+		.ADC2ConductingMeasureChannel	= ADC2_CURRENT_CHANNEL_10
 	},
 #endif /* (NB_OF_HALF_BRIDGES > 9) */
 #if (NB_OF_HALF_BRIDGES > 10)
@@ -550,7 +546,7 @@ static const half_bridge_t half_bridges[NB_OF_HALF_BRIDGES] = {
 		.PWM_p_channel					= PWM_P_CHANNEL_11,
 		.PWM_n_channel					= PWM_N_CHANNEL_11,
 		.ADC3FloatingMeasureChannel		= ADC3_VOLTAGE_CHANNEL_11,
-		.ADC1ConductingMeasureChannel	= ADC1_CURRENT_CHANNEL_11
+		.ADC2ConductingMeasureChannel	= ADC2_CURRENT_CHANNEL_11
 	},
 #endif /* (NB_OF_HALF_BRIDGES > 10) */
 #if (NB_OF_HALF_BRIDGES > 11)
@@ -561,7 +557,7 @@ static const half_bridge_t half_bridges[NB_OF_HALF_BRIDGES] = {
 		.PWM_p_channel					= PWM_P_CHANNEL_12,
 		.PWM_n_channel					= PWM_N_CHANNEL_12,
 		.ADC3FloatingMeasureChannel		= ADC3_VOLTAGE_CHANNEL_12,
-		.ADC1ConductingMeasureChannel	= ADC1_CURRENT_CHANNEL_12
+		.ADC2ConductingMeasureChannel	= ADC2_CURRENT_CHANNEL_12
 	}
 #endif /* (NB_OF_HALF_BRIDGES > 11) */
 };
@@ -636,13 +632,13 @@ static brushless_motor_t brushless_motors[NB_OF_BRUSHLESS_MOTOR] = {
  */
 
 /* circular buffer */
-static adcsample_t adc1_buffer[ADC1_NB_ELEMENT_SEQ * MAX_NB_OF_BRUSHLESS_MOTOR * ADC1_BUFFER_DEPTH] = {0};
+static adcsample_t adc2_buffer[ADC2_NB_ELEMENT_SEQ * MAX_NB_OF_BRUSHLESS_MOTOR * ADC2_BUFFER_DEPTH] = {0};
 
 /* ADC 1 Configuration */
-static const ADCConversionGroup ADC1Config = {
+static const ADCConversionGroup ADC2Config = {
     .circular = true,
-    .num_channels = ADC1_NB_ELEMENT_SEQ * MAX_NB_OF_BRUSHLESS_MOTOR,
-    .end_cb = _adc1_current_cb,
+    .num_channels = ADC2_NB_ELEMENT_SEQ * MAX_NB_OF_BRUSHLESS_MOTOR,
+    .end_cb = _adc2_current_cb,
     .error_cb = NULL,
     .cr1 = 0,   /* No OVR int, 12 bit resolution, no AWDG/JAWDG*/
     .cr2 = 0,  	/* Manual start of regular channels, no OVR detect */                     
@@ -662,7 +658,7 @@ static const ADCConversionGroup ADC1Config = {
              ADC_SMPR1_SMP_AN11(ADC_SAMPLE_3),
     .sqr3 =  0,
     .sqr2 =  0,
-    .sqr1 =  ADC_SQR1_NUM_CH(ADC1_NB_ELEMENT_SEQ * MAX_NB_OF_BRUSHLESS_MOTOR),
+    .sqr1 =  ADC_SQR1_NUM_CH(ADC2_NB_ELEMENT_SEQ * MAX_NB_OF_BRUSHLESS_MOTOR),
 };
 
 /* circular buffer */
@@ -757,19 +753,19 @@ static PWMConfig tim_234_cfg = {
  */
 #define UPDATE_ADC3_SEQUENCE(reg) (ADCD3.adc->SQR3 = reg)
 /**
- * Changes the sequence of the ADC1
+ * Changes the sequence of the ADC2
  * 
- * @param reg1	Values to put to the SQR3 register of ADC1	
- * @param reg2	Values to put to the SQR2 register of ADC1	
+ * @param reg1	Values to put to the SQR3 register of ADC2	
+ * @param reg2	Values to put to the SQR2 register of ADC2	
  */
-#define UPDATE_ADC1_SEQUENCE(reg1, reg2) {\
-	ADCD1.adc->SQR3 = reg1; \
-	ADCD1.adc->SQR2 = reg2; \
+#define UPDATE_ADC2_SEQUENCE(reg1, reg2) {\
+	ADCD2.adc->SQR3 = reg1; \
+	ADCD2.adc->SQR2 = reg2; \
 }
 /**
- * Starts the ADC1 for one sequence
+ * Starts the ADC2 for one sequence
  */
-#define DO_ONE_ADC1_SEQUENCE()	(ADCD1.adc->CR2 |= ADC_CR2_SWSTART)
+#define DO_ONE_ADC2_SEQUENCE()	(ADCD2.adc->CR2 |= ADC_CR2_SWSTART)
 
 /**
  * Gives the floating phase 
@@ -784,11 +780,11 @@ static PWMConfig tim_234_cfg = {
  */
 #define GET_FLOATING_PHASE_CHANNEL(motor) ((motor)->phases[pwm_commutation_schemes[(motor)->commutation_scheme][(motor)->step_iterator].floating_phase]->ADC3FloatingMeasureChannel)
 /**
- * Gives the ADC1 channel to measure given the motor
+ * Gives the ADC2 channel to measure given the motor
  * 
  * @param motor	Pointer to the brushless_motor_t structure we want to use
  */
-#define GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(motor) ((motor)->phases[pwm_commutation_schemes[(motor)->commutation_scheme][(motor)->step_iterator].low_side_conducting_phase]->ADC1ConductingMeasureChannel)
+#define GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(motor) ((motor)->phases[pwm_commutation_schemes[(motor)->commutation_scheme][(motor)->step_iterator].low_side_conducting_phase]->ADC2ConductingMeasureChannel)
 
 /**
  * Sets the GPIO mode of the given line to Alternate
@@ -1239,23 +1235,24 @@ void _rpm_counter_update(brushless_motor_t *motor){
 }
 
 /**
- * @brief 			ADC1 callback. Used to gather the currents from the four motors
+ * @brief 			ADC2 callback. Used to gather the currents from the four motors
  * @param adcp 		Not used
  * @param buffer 	Buffer containing the new data
  * @param n 		Not used
  */
-void _adc1_current_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n){
-	(void) adcp;
-	(void) n;
+void _adc2_current_cb(ADCDriver *adcp){
 
-	static volatile uint8_t temp = 0;
+	static size_t half_index = (ADC2_NB_ELEMENT_SEQ * MAX_NB_OF_BRUSHLESS_MOTOR * ADC2_BUFFER_DEPTH)/2;
+	static adcsample_t* buffer = NULL;
 
-	palSetLine(DEBUG_INT_LINE);
-
-	temp = GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_1]);
+	if(adcIsBufferComplete(adcp)){
+		buffer = &adc2_buffer[half_index];
+	}else{
+		buffer = adc2_buffer;
+	}
 
 #if (NB_OF_BRUSHLESS_MOTOR > 0)
-	UPDATE_ADC1_SEQUENCE(
+	UPDATE_ADC2_SEQUENCE(
 		ADC_SQR3_SQ1_N (GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_1]))|
 #if (NB_OF_BRUSHLESS_MOTOR > 1)
 		ADC_SQR3_SQ2_N (GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_2]))|
@@ -1306,20 +1303,7 @@ void _adc1_current_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n){
 	0);
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 0) */
 	
-	DO_ONE_ADC1_SEQUENCE();
-
-	// if(0 == gADT.data_lock)
- //    { 
- //      Adt_Insert_Data(&gADT, &buffer[0], 0, 0);
- //    }
- //    if(0 == gADT.data_lock)
- //    { 
- //      Adt_Insert_Data(&gADT, &buffer[4], 0, 0);
- //    }
- //    if(0 == gADT.data_lock)
- //    { 
- //      Adt_Insert_Data(&gADT, &buffer[8], 0, 0);
- //    }
+	DO_ONE_ADC2_SEQUENCE();
 
 #if (NB_OF_BRUSHLESS_MOTOR > 0)
 	CURRENT_METER_UPDATE(&brushless_motors[BRUSHLESS_MOTOR_1], &buffer[BRUSHLESS_MOTOR_1]);
@@ -1334,8 +1318,6 @@ void _adc1_current_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n){
 	CURRENT_METER_UPDATE(&brushless_motors[BRUSHLESS_MOTOR_4], &buffer[BRUSHLESS_MOTOR_4]);
 
 
-	palClearLine(DEBUG_INT_LINE);
-
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */
 }
 
@@ -1346,13 +1328,17 @@ void _adc1_current_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n){
  * @param buffer 	Buffer containing the new data
  * @param n 		Not used
  */
-void _adc3_voltage_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n){
-	(void) adcp;
-	(void) n;
+void _adc3_voltage_cb(ADCDriver *adcp){
 
-	static volatile uint8_t temp = 0;
 
-	palSetLine(DEBUG_INT_LINE2);
+	static size_t half_index = (MAX_NB_OF_BRUSHLESS_MOTOR * ADC3_BUFFER_DEPTH)/2;
+	static adcsample_t* buffer = NULL;
+
+	if(adcIsBufferComplete(adcp)){
+		buffer = &adc3_buffer[half_index];
+	}else{
+		buffer = adc3_buffer;
+	}
 
 	static bool state = true;
 	if(state){
@@ -1372,11 +1358,6 @@ void _adc3_voltage_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n){
 		ADD_NEW_ZC_DATAOFF(&(brushless_motors[BRUSHLESS_MOTOR_4].zero_crossing), buffer[BRUSHLESS_MOTOR_4]);
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */
 
-		if(0 == gADT.data_lock)
-	    { 
-	      Adt_Insert_Data(&gADT, buffer, 0, 0);
-	    }
-
 #if (NB_OF_BRUSHLESS_MOTOR > 0)
 		_rpm_counter_update(&(brushless_motors[BRUSHLESS_MOTOR_1]));
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 0) */
@@ -1390,7 +1371,6 @@ void _adc3_voltage_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n){
 		_rpm_counter_update(&(brushless_motors[BRUSHLESS_MOTOR_4]));
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */
 	}else{
-		temp = GET_FLOATING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_1]);
 
 		//we sampled ON PWM
 		UPDATE_ADC3_TRIGGER(ADC3_OFF_SAMPLE_TIME);
@@ -1423,11 +1403,6 @@ void _adc3_voltage_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n){
 		ADD_NEW_ZC_DATAON(&(brushless_motors[BRUSHLESS_MOTOR_4].zero_crossing), buffer[BRUSHLESS_MOTOR_4]);
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */
 
-
-		// if(0 == gADT.data_lock)
-	 //    { 
-	 //      Adt_Insert_Data(&gADT, buffer, 0, 0);
-	 //    }
 	 
 #if (NB_OF_BRUSHLESS_MOTOR > 0)
 		_zero_crossing_cb(&(brushless_motors[BRUSHLESS_MOTOR_1]));
@@ -1445,8 +1420,6 @@ void _adc3_voltage_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n){
 	}
 	//switches the state
 	state = !state;
-
-	palClearLine(DEBUG_INT_LINE2);
 
 }
 
@@ -1554,17 +1527,17 @@ void _put_all_half_bridges_floating(void){
 }
 
 /**
- * @brief 	Configures and starts the ADCs used by the motors control (ADC1 and ADC3).
+ * @brief 	Configures and starts the ADCs used by the motors control (ADC2 and ADC3).
  */
 void _adcStart(void){
 
-	adcStart(&ADCD1, NULL);
+	adcStart(&ADCD2, NULL);
 	adcStart(&ADCD3, NULL);
 
 	/* We have one interrupt per sequence and we use a double buffer */
-	adcStartConversion(&ADCD1, &ADC1Config, adc1_buffer, ADC1_BUFFER_DEPTH);
+	adcStartConversion(&ADCD2, &ADC2Config, adc2_buffer, ADC2_BUFFER_DEPTH);
 	adcStartConversion(&ADCD3, &ADC3Config, adc3_buffer, ADC3_BUFFER_DEPTH);
-	DO_ONE_ADC1_SEQUENCE();
+	DO_ONE_ADC2_SEQUENCE();
 
 }
 
