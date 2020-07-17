@@ -21,9 +21,16 @@
  * RAM3 - Main Stack, Process Stack, NOCACHE, ETH.
  *
  * Notes:
- * BSS is placed in cached RAM, DMA buffers management is delegated to the
- * application code. This setup maximizes the linear RAM available to BSS and
- * Heap.
+ * By default, everything is placed into ram3 (DTCM)
+ * which is the fastest but has only 64k or space.
+ * 
+ * Then if the data exceed the 64k when compiling, it is neccesarry to
+ * put the data that are not time critical into ram0 (SRAM) with the keyword 
+ * below before the delcaration:
+ * 
+ * __attribute__((section(".ram0")))
+ *
+ * Data thare are used by the DMA should not be placed in ram0, because of the cache.
  */
 MEMORY
 {
@@ -88,7 +95,7 @@ REGION_ALIAS("DATA_RAM", ram0);
 REGION_ALIAS("DATA_RAM_LMA", flash0);
 
 /* RAM region to be used for BSS segment.*/
-REGION_ALIAS("BSS_RAM", ram0);
+REGION_ALIAS("BSS_RAM", ram3);
 
 /* RAM region to be used for the default heap.*/
 REGION_ALIAS("HEAP_RAM", ram0);

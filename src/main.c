@@ -21,8 +21,21 @@
 #include "communications.h"
 #include "leds_management.h"
 #include "threads_utilities.h"
-#include "mpu_functions.h"
 #include "motors.h"
+
+/* Special note concerning memory allocation :
+ * 
+ * By default, everything is placed into ram3 (DTCM)
+ * which is the fastest but has only 64k or space.
+ * 
+ * Then if the data exceed the 64k when compiling, it is neccesarry to
+ * put the data that are not time critical into ram0 (SRAM) with the keyword 
+ * below before the delcaration:
+ * 
+ * __attribute__((section(".ram0")))
+ * 
+ * Data thare are used by the DMA should not be placed in ram0, because of the cache.
+ */
 
 int main(void) {
 	// logNextCreatedThreadsTimestamps();
@@ -31,9 +44,6 @@ int main(void) {
 	 * the usb cable plugged. Called before everything to catch the button pressed.
 	 */
 	powerButtonStartSequence();
-	// DMA can't access correctly cached data
-	// Disabled for now
-	mpuDisableSRAMCacheF746();
 	/*
 	 * System initializations.
 	 * - HAL initialization, this also initializes the configured device drivers

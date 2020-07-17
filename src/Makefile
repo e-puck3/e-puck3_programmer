@@ -158,7 +158,6 @@ CSRC = $(ALLCSRC) \
        aseba_vm/vm.c \
        leds.c \
        leds_management.c \
-       mpu_functions.c \
        motors.c
 
 
