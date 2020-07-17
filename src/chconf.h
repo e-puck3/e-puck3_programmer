@@ -644,6 +644,7 @@
 
 #define TIMESTAMPS_INCLUDE
 #include "threads_utilities_chconf.h"
+#define THREADS_TIMESTAMP_CUSTOM_RAM_SECTION ".ram0"
 /**
  * @brief   Threads descriptor structure extension.
  * @details User fields added to the end of the @p thread_t structure.
