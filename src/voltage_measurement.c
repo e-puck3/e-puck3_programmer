@@ -292,7 +292,7 @@ void voltageMesurementStart(void){
 	/**
 	 * Starts the voltage measurement thread
 	 */
-	chThdCreateStatic(volt_thd_wa, sizeof(volt_thd_wa), NORMALPRIO, volt_thd, NULL);
+	chThdCreateStatic(volt_thd_wa, sizeof(volt_thd_wa), NORMALPRIO+5, volt_thd, NULL);
 }
 
 void voltageMesurementGet(voltage_measurement_t* measurements){
