@@ -38,7 +38,6 @@
  */
 
 int main(void) {
-	// logNextCreatedThreadsTimestamps();
 	/**
 	 * Special function to handle the turn on if we pressed the button without
 	 * the usb cable plugged. Called before everything to catch the button pressed.
@@ -78,18 +77,16 @@ int main(void) {
 	 */
 	voltageMesurementStart();
 	/*
+	 * Initializes two serial-over-USB CDC drivers and starts and connects the USB.
+	 */
+	usbHubStart();
+	/*
 	 * Initializes the USB PD controller.
 	 */
 	usbPDControllerStart();
 	/*
 	 * Starts the thread managing the USB hub.
 	 */
-	usbHubStart();
-	/*
-	 * Initializes two serial-over-USB CDC drivers and starts and connects the USB.
-	 */
-	// sleep otherwise it bugs -> should connect a debugger to see why
-	chThdSleepMilliseconds(100);
 	usbSerialStart();
 	/*
 	 * Starts the communication thread.

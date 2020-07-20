@@ -34,6 +34,8 @@ static USB3803_t hub ={
 	.hub_connect_line 	= LINE_HUB_CONNECT,
 };
 
+static bool hub_state = NOT_CONFIGURED;
+
 /////////////////////////////////////////PRIVATE FUNCTIONS/////////////////////////////////////////
 
 static THD_WORKING_AREA(usb_hub_thd_wa, 128);
@@ -42,8 +44,6 @@ static THD_FUNCTION(usb_hub_thd, arg)
 	(void) arg;
 
 	chRegSetThreadName("USB Hub Management");
-
-	bool hub_state = NOT_CONFIGURED;
 
 	while(1){
 		// We can't use interrupts on the VBUS HOST pin because it is 
@@ -76,6 +76,8 @@ static THD_FUNCTION(usb_hub_thd, arg)
 //////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 
 void usbHubStart(void){
-
-	chThdCreateStatic(usb_hub_thd_wa, sizeof(usb_hub_thd_wa), NORMALPRIO, usb_hub_thd, NULL);
+	if(!USB3803_configure(&hub)){
+		hub_state = CONFIGURED;
+		chThdCreateStatic(usb_hub_thd_wa, sizeof(usb_hub_thd_wa), NORMALPRIO, usb_hub_thd, NULL);
+	}
 }
