@@ -80,6 +80,13 @@ typedef enum{
 void motorsStart(void);
 
 /**
+ * @brief Stops the motors module.
+ * 
+ * Uses Timers 1, 2, 3, 4, 8 and ADC 2 and 3.
+ */
+void motorsStop(void);
+
+/**
  * @brief               Changes the duty cycle of the given motor. The duty cycle is internally
  *                      changed with a ramp.
  * 

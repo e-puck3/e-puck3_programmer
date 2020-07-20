@@ -720,6 +720,8 @@ static PWMConfig tim_234_cfg = {
   .dier = 0
 };
 
+static bool _motor_module_configured = false;
+
 /********************          PRIVATE MACROS AND FUNCTIONS         ********************/
 
 /**
@@ -1524,6 +1526,16 @@ void _adcStart(void){
 }
 
 /**
+ * @brief 	Stops the ADCs used by the motors control (ADC2 and ADC3).
+ */
+void _adcStop(void){
+	adcStopConversion(&ADCD2);
+	adcStopConversion(&ADCD3);
+	adcStop(&ADCD2);
+	adcStop(&ADCD3);
+}
+
+/**
  * @brief 	Configures and starts the timers used by the motors control 
  * 			(timers 1, 2, 3, 4, 8).
  */
@@ -1571,6 +1583,18 @@ void _timersStart(void){
 }
 
 /**
+ * @brief 	Stops the timers used by the motors control 
+ * 			(timers 1, 2, 3, 4, 8).
+ */
+void _timersStop(void){
+	pwmStop(&PWMD1);
+	pwmStop(&PWMD8);
+	pwmStop(&PWMD2);
+	pwmStop(&PWMD3);
+	pwmStop(&PWMD4);
+}
+
+/**
  * @brief 	Motors inits
  */
 void _motorsInit(void){
@@ -1594,9 +1618,21 @@ void _motorsInit(void){
 
 /********************               PUBLIC FUNCTIONS                ********************/
 void motorsStart(void){
-	_motorsInit();
-	_adcStart();
-	_timersStart();
+	if(!_motor_module_configured){
+		_motorsInit();
+		_adcStart();
+		_timersStart();
+		_motor_module_configured = true;
+	}
+}
+
+void motorsStop(void){
+	if(_motor_module_configured){
+		_put_all_half_bridges_floating();
+		_timersStop();
+		_adcStop();
+		_motor_module_configured = false;
+	}
 }
 
 void motorSetDutyCycle(brushless_motors_names_t motor_name, uint8_t duty_cycle){

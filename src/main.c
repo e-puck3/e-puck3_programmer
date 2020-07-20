@@ -117,10 +117,10 @@ int main(void) {
 		if(isUSBConfigured()){
 			//spawns the shell if the usb is connected
 			// spawn_shell();
+			motorsStop();
 			// voltageMesurementGet(&volt);
 			// chprintf((BaseSequentialStream *)&USB_SERIAL, "voltages :%fV, %fV, %f°C \r\n", volt.vbus, volt.battery, volt.temperature);
 		}
-
 		// voltageMesurementGet(&volt);
 		// chprintf((BaseSequentialStream *)&SD1, "voltages :%fV, %fV, %f°C \r\n", volt.vbus, volt.battery, volt.temperature);
 		// chprintf(&SD1, "VBUS HOST = %d\r\n", palReadLine(LINE_VBUS_HOST));
