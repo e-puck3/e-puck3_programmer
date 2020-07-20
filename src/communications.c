@@ -172,13 +172,19 @@ static THD_FUNCTION(usb_to_uart_thd, arg)
 		if(uart_usb_should_pause){
 			chBSemWait(&usb_to_uart_pause);
 		}else{
-			nb_read = chnReadTimeout((BaseChannel*)&USB_SERIAL, c, 1, TIME_MS2I(10));
-			if(nb_read){
-				chEvtBroadcastFlags(&communications_event, ACTIVE_COMMUNICATION_FLAG);
-				chnWriteTimeout((BaseChannel*)uart_used, c, 1, TIME_INFINITE);
+			if(isUSBConfigured()){
+				nb_read = chnReadTimeout((BaseChannel*)&USB_SERIAL, c, 1, TIME_MS2I(10));
+				if(nb_read){
+					chEvtBroadcastFlags(&communications_event, ACTIVE_COMMUNICATION_FLAG);
+					chnWriteTimeout((BaseChannel*)uart_used, c, 1, TIME_INFINITE);
+				}else{
+					chEvtBroadcastFlags(&communications_event, NO_COMMUNICATION_FLAG);
+				}
 			}else{
-				chEvtBroadcastFlags(&communications_event, NO_COMMUNICATION_FLAG);
+				// USB not connected
+				chThdSleepMilliseconds(100);
 			}
+			
 		}
 	}
 }
