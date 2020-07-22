@@ -1541,6 +1541,11 @@ void _adcStop(void){
  */
 void _timersStart(void){
 
+	// Clock and outputs of timers are disabled when the core is halted
+	// Phases are floating in this case -> No damage on the motors
+	DBGMCU->APB2FZ |= DBGMCU_APB2_FZ_DBG_TIM1_STOP | DBGMCU_APB2_FZ_DBG_TIM8_STOP;
+  	DBGMCU->APB1FZ |= DBGMCU_APB1_FZ_DBG_TIM2_STOP | DBGMCU_APB1_FZ_DBG_TIM3_STOP | DBGMCU_APB1_FZ_DBG_TIM4_STOP;
+
 	pwmStart(&PWMD1, &tim_1_cfg);
 	/* additionnal config */
 	PWMD1.tim->CR1 		&= ~STM32_TIM_CR1_CEN;     	// Disables the counter until correct configuration
