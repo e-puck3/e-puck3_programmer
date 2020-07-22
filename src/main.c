@@ -123,6 +123,8 @@ int main(void) {
 		}
 		// voltageMesurementGet(&volt);
 		// chprintf((BaseSequentialStream *)&SD1, "voltages :%fV, %fV, %f°C \r\n", volt.vbus, volt.battery, volt.temperature);
+		// chprintf((BaseSequentialStream *)&SD1, "RPMs : %f, %f, %f, %f\r\n", motorsGetRPM(BRUSHLESS_MOTOR_1), motorsGetRPM(BRUSHLESS_MOTOR_2), motorsGetRPM(BRUSHLESS_MOTOR_3), motorsGetRPM(BRUSHLESS_MOTOR_4));
+		// chprintf((BaseSequentialStream *)&SD1, "I : %f, %f, %f, %f\r\n", motorsGetCurrent(BRUSHLESS_MOTOR_1), motorsGetCurrent(BRUSHLESS_MOTOR_2), motorsGetCurrent(BRUSHLESS_MOTOR_3), motorsGetCurrent(BRUSHLESS_MOTOR_4));
 		// chprintf(&SD1, "VBUS HOST = %d\r\n", palReadLine(LINE_VBUS_HOST));
 		chThdSleepMilliseconds(100);
 
