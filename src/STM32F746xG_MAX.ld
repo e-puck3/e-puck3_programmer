@@ -17,12 +17,12 @@
 /*
  * STM32F746xG maximum RAM setup.
  * 
- * RAM0 - Data, BSS, Heap.
- * RAM3 - Main Stack, Process Stack, NOCACHE, ETH.
+ * RAM0 - Data, Heap.
+ * RAM3 - Main Stack, Process Stack, BSS, NOCACHE, ETH.
  *
  * Notes:
  * By default, everything is placed into ram3 (DTCM)
- * which is the fastest but has only 64k or space.
+ * which is the fastest but has only 64k of space.
  * 
  * Then if the data exceed the 64k when compiling, it is neccesarry to
  * put the data that are not time critical into ram0 (SRAM) with the keyword 
