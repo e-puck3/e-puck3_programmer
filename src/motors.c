@@ -16,7 +16,7 @@
 												so we need to do 2 sequences of 12 elements (3 * 4 motors)*/
 #define ADC3_OFF_SAMPLE_TIME			0.20f	//we sample the OFF time at 20% of the PWM cycle
 #define ADC3_ON_SAMPLE_TIME				0.75f	//we sample the ON time at 75% of the PWM cycle
-#define ZC_DETECT_METHOD_THESHOLD		40		//we use the ZC_DETECT_ON method above 40% duty cycle
+#define ZC_DETECT_METHOD_THESHOLD		30		//we use the ZC_DETECT_ON method above 40% duty cycle
 
 #define NB_SAMPLE_OFFSET_CALIBRATION	1000
 
@@ -1192,10 +1192,12 @@ void _set_tied_to_ground(brushless_motor_t *motor){
  */
 
 #define CURRENT_METER_UPDATE(motor, buffer) {\
+if(pwm_commutation_schemes[(motor)->commutation_scheme][(motor)->step_iterator].low_side_conducting_phase != PHASE3){\
 	LOW_PASS_FILTER((motor)->current_meter.low_pass_1, (buffer)[0 * MAX_NB_OF_BRUSHLESS_MOTOR], LP_FILTER_COEFF_CURRENT);\
 	LOW_PASS_FILTER((motor)->current_meter.low_pass_1, (buffer)[1 * MAX_NB_OF_BRUSHLESS_MOTOR], LP_FILTER_COEFF_CURRENT);\
 	LOW_PASS_FILTER((motor)->current_meter.low_pass_1, (buffer)[2 * MAX_NB_OF_BRUSHLESS_MOTOR], LP_FILTER_COEFF_CURRENT);\
 	LOW_PASS_FILTER((motor)->current_meter.current, (motor)->current_meter.low_pass_1, LP_FILTER_COEFF_CURRENT);\
+}\
 }
 
 /**
