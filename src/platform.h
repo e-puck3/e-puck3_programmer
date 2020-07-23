@@ -48,6 +48,8 @@ isn't connected. It means the USB has always the priority*/
 
 #define PLATFORM_HAS_CUSTOM_COMMANDS
 
+#define GDB_USB_INTERFACE_NB	GDB_INTERFACE	// USB interface number (interface_name_t)
+#define GDB_USB_INTERFACE		USB_GDB	// USB interface (SerialUSBDrivers)
 
 #ifdef USE_SECOND_GDB_INTERFACE
 //Replace with the Serial or USB Serial object you want to use (for example SD2 for UART2) 
