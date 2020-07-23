@@ -78,6 +78,9 @@ int main(void) {
 	voltageMesurementStart();
 	/*
 	 * Initializes two serial-over-USB CDC drivers and starts and connects the USB.
+	 *  
+	 *  !! If you want to debug the programmer with the 779, you need to comment the HUB start
+	 *  !! otherwise it will xonfigure it and you'll loose the USB connexion while debuging
 	 */
 	usbHubStart();
 	/*
