@@ -992,7 +992,7 @@
  * GPIOF setup:
  *
  * PF0  - GPIO13_ESP32              (output pushpull minimum).
- * PF1  - HUB_CONNECT               (output pushpull minimum).
+ * PF1  - HUB_CONNECT               (input floating).
  * PF2  - EN_DRIVER_2               (output pushpull minimum).
  * PF3  - BRUSHLESS_SENSE_MOT3C     (analog).
  * PF4  - BRUSHLESS_SENSE_MOT1B     (analog).
@@ -1009,7 +1009,7 @@
  * PF15 - EN_DRIVER_1               (output pushpull minimum).
  */
 #define VAL_GPIOF_MODER             (PIN_MODE_OUTPUT(GPIOF_GPIO13_ESP32) |  \
-                                     PIN_MODE_OUTPUT(GPIOF_HUB_CONNECT) |   \
+                                     PIN_MODE_INPUT(GPIOF_HUB_CONNECT) |    \
                                      PIN_MODE_OUTPUT(GPIOF_EN_DRIVER_2) |   \
                                      PIN_MODE_ANALOG(GPIOF_BRUSHLESS_SENSE_MOT3C) |\
                                      PIN_MODE_ANALOG(GPIOF_BRUSHLESS_SENSE_MOT1B) |\
@@ -1073,7 +1073,7 @@
                                      PIN_PUPDR_FLOATING(GPIOF_I2C_SCL_PD_CONTROLLER) |\
                                      PIN_PUPDR_FLOATING(GPIOF_EN_DRIVER_1))
 #define VAL_GPIOF_ODR               (PIN_ODR_LOW(GPIOF_GPIO13_ESP32) |      \
-                                     PIN_ODR_LOW(GPIOF_HUB_CONNECT) |       \
+                                     PIN_ODR_HIGH(GPIOF_HUB_CONNECT) |      \
                                      PIN_ODR_LOW(GPIOF_EN_DRIVER_2) |       \
                                      PIN_ODR_LOW(GPIOF_BRUSHLESS_SENSE_MOT3C) |\
                                      PIN_ODR_LOW(GPIOF_BRUSHLESS_SENSE_MOT1B) |\

@@ -96,7 +96,7 @@ https://github.com/cburlacu/cube2chibi
       <pin14 ID="CS_ENCODER3_N" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin15 ID="RESET_UC" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
     </GPIOE><GPIOF><pin0 ID="GPIO13_ESP32" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
-      <pin1 ID="HUB_CONNECT" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
+      <pin1 ID="HUB_CONNECT" Type="PushPull" Level="High" Speed="Minimum" Resistor="Floating" Mode="Input" Alternate="0"/>
       <pin2 ID="EN_DRIVER_2" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Output" Alternate="0"/>
       <pin3 ID="BRUSHLESS_SENSE_MOT3C" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
       <pin4 ID="BRUSHLESS_SENSE_MOT1B" Type="PushPull" Level="Low" Speed="Minimum" Resistor="Floating" Mode="Analog" Alternate="0"/>
