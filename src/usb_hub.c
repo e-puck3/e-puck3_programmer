@@ -76,8 +76,8 @@ static THD_FUNCTION(usb_hub_thd, arg)
 //////////////////////////////////////////PUBLIC FUNCTIONS/////////////////////////////////////////
 
 void usbHubStart(void){
-	if(!USB3803_configure(&hub)){
+	if(palReadLine(LINE_VBUS_HOST) && !USB3803_configure(&hub)){
 		hub_state = CONFIGURED;
-		chThdCreateStatic(usb_hub_thd_wa, sizeof(usb_hub_thd_wa), NORMALPRIO, usb_hub_thd, NULL);
 	}
+	chThdCreateStatic(usb_hub_thd_wa, sizeof(usb_hub_thd_wa), NORMALPRIO, usb_hub_thd, NULL);
 }
