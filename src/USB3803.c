@@ -155,6 +155,7 @@ bool USB3803_configure(USB3803_t* hub){
 
 	// we should not have HUB_CONNECT high when the hub is in reset state
 	CLEAR_HUB_CONNECT(hub);
+	palSetLineMode(hub->hub_connect_line, PAL_MODE_OUTPUT_PUSHPULL);
 
 	// Tells the devices  VBUS is disconnected
 	DISABLE_VBUS_DEVICES(hub);
