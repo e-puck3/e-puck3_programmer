@@ -91,6 +91,16 @@ static THD_FUNCTION(thLeds, arg) {
 				palSetLine(LINE_STATUS_LED3_B);
 			}
 			if(pause_thread){
+				// force OFF all leds
+				palSetLine(LINE_STATUS_LED1_R);
+				palSetLine(LINE_STATUS_LED1_G);
+				palSetLine(LINE_STATUS_LED1_B);
+				palSetLine(LINE_STATUS_LED2_R);
+				palSetLine(LINE_STATUS_LED2_G);
+				palSetLine(LINE_STATUS_LED2_B);
+				palSetLine(LINE_STATUS_LED3_R);
+				palSetLine(LINE_STATUS_LED3_G);
+				palSetLine(LINE_STATUS_LED3_B);
 				chBSemWait(&pause_thread_sem);
 			}
     	}
