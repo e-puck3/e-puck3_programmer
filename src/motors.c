@@ -381,6 +381,8 @@ static const zc_function_t brushless_zc_functions[NB_ZC_METHODS] = {
 /**
  * Coeffs of linear current aproximation functions based on collected data.
  * The linear approximation is different for each duty cycle.
+ * 
+ * Note: It was valid for the DRV8323.
  */
 static const current_approx_coeff_t current_approx_coeffs[22] = {
   {0, 0},				//	0%
