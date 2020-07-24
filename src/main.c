@@ -28,13 +28,13 @@
  * By default, everything is placed into ram3 (DTCM)
  * which is the fastest but has only 64k of space.
  * 
- * Then if the data exceed the 64k when compiling, it is neccesarry to
+ * Then if the data exceed the 64k when compiling, it is necessary to
  * put the data that are not time critical into ram0 (SRAM) with the keyword 
- * below before the delcaration:
+ * below before the declaration:
  * 
  * __attribute__((section(".ram0")))
  * 
- * Data thare are used by the DMA should not be placed in ram0, because of the cache.
+ * Data that are used by the DMA should not be placed in ram0, because of the cache.
  */
 
 int main(void) {
@@ -77,10 +77,10 @@ int main(void) {
 	 */
 	voltageMesurementStart();
 	/*
-	 * Initializes two serial-over-USB CDC drivers and starts and connects the USB.
+	 * 	Starts the thread managing the USB hub.
 	 *  
 	 *  !! If you want to debug the programmer with the 779, you need to comment the HUB start
-	 *  !! otherwise it will xonfigure it and you'll loose the USB connexion while debuging
+	 *  !! otherwise it will configure it and you'll loose the USB connection while debugging
 	 */
 	usbHubStart();
 	/*
@@ -88,7 +88,7 @@ int main(void) {
 	 */
 	usbPDControllerStart();
 	/*
-	 * Starts the thread managing the USB hub.
+	 * Initializes two serial-over-USB CDC drivers and starts and connects the USB.
 	 */
 	usbSerialStart();
 	/*
