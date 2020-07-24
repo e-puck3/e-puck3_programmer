@@ -25,6 +25,7 @@
 #include "timing.h"
 #include "timing_stm32.h"
 #include "debug.h"
+#include "usbcfg.h"
 
 /* Uncomment to define a custom section area in the ram to place
    the working area of the GDB thread. For example ".ram0" 
@@ -48,8 +49,14 @@ isn't connected. It means the USB has always the priority*/
 
 #define PLATFORM_HAS_CUSTOM_COMMANDS
 
-#define GDB_USB_INTERFACE_NB	GDB_INTERFACE	// USB interface number (interface_name_t)
-#define GDB_USB_INTERFACE		USB_GDB	// USB interface (SerialUSBDrivers)
+/* USB related settings. Go in pair with usbcfg.c/.h */
+#define GDB_USB_INTERFACE_NB	GDB_INTERFACE				// USB interface number (interface_name_t)
+#define GDB_USB_INTERFACE		USB_GDB						// USB interface (SerialUSBDrivers)
+#define GDB_DEVICE_NAME			USB_DEVICE_NAME				// Name of GDB device
+#define GDB_VENDOR_NAME			USB_VENDOR_NAME				// Name of vendor 
+#define GDB_USB_DATA_SIZE		USB_DATA_SIZE				// USB packet size
+#define gdbIsUSBConfigured		isUSBConfigured				// Wrapper to the function to tell if usb is configured
+#define gdbGetControlLineState	getControlLineState			// Wrapper to the functions to get control line state
 
 #ifdef USE_SECOND_GDB_INTERFACE
 //Replace with the Serial or USB Serial object you want to use (for example SD2 for UART2) 
