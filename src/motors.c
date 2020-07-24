@@ -9,6 +9,7 @@
 #include "ch.h"
 #include "hal.h"
 #include "motors.h"
+#include "adc_datalogger.h"
 
 #define ADC3_BUFFER_DEPTH				2		//2 sequences of MAX_NB_OF_BRUSHLESS_MOTOR samples
 #define ADC2_BUFFER_DEPTH				2		//2 sequences of MAX_NB_OF_BRUSHLESS_MOTOR samples
@@ -16,7 +17,7 @@
 												so we need to do 2 sequences of 12 elements (3 * 4 motors)*/
 #define ADC3_OFF_SAMPLE_TIME			0.20f	//we sample the OFF time at 20% of the PWM cycle
 #define ADC3_ON_SAMPLE_TIME				0.75f	//we sample the ON time at 75% of the PWM cycle
-#define ZC_DETECT_METHOD_THESHOLD		30		//we use the ZC_DETECT_ON method above 40% duty cycle
+#define ZC_DETECT_METHOD_THESHOLD		30		//we use the ZC_DETECT_ON method above 30% duty cycle
 
 #define NB_SAMPLE_OFFSET_CALIBRATION	1000
 
@@ -1293,6 +1294,19 @@ void _adc2_current_cb(ADCDriver *adcp){
 	
 	DO_ONE_ADC2_SEQUENCE();
 
+	// if(0 == gADT.data_lock)
+	// { 
+	//  Adt_Insert_Data(&buffer[0], 0, 0);
+	// }
+	// if(0 == gADT.data_lock)
+	// { 
+	//  Adt_Insert_Data(&buffer[4], 0, 0);
+	// }
+	// if(0 == gADT.data_lock)
+	// { 
+	//  Adt_Insert_Data(&buffer[8], 0, 0);
+	// }
+
 #if (NB_OF_BRUSHLESS_MOTOR > 0)
 	CURRENT_METER_UPDATE(&brushless_motors[BRUSHLESS_MOTOR_1], &buffer[BRUSHLESS_MOTOR_1]);
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 0) */	
@@ -1346,6 +1360,11 @@ void _adc3_voltage_cb(ADCDriver *adcp){
 		ADD_NEW_ZC_DATAOFF(&(brushless_motors[BRUSHLESS_MOTOR_4].zero_crossing), buffer[BRUSHLESS_MOTOR_4]);
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */
 
+		// if(0 == gADT.data_lock)
+		// { 
+		// 	Adt_Insert_Data(buffer, 0, 0);
+		// }
+
 #if (NB_OF_BRUSHLESS_MOTOR > 0)
 		_rpm_counter_update(&(brushless_motors[BRUSHLESS_MOTOR_1]));
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 0) */
@@ -1391,7 +1410,10 @@ void _adc3_voltage_cb(ADCDriver *adcp){
 		ADD_NEW_ZC_DATAON(&(brushless_motors[BRUSHLESS_MOTOR_4].zero_crossing), buffer[BRUSHLESS_MOTOR_4]);
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */
 
-	 
+		// if(0 == gADT.data_lock)
+		// { 
+		// 	Adt_Insert_Data(&gADT, buffer, 0, 0);
+		// }
 #if (NB_OF_BRUSHLESS_MOTOR > 0)
 		_zero_crossing_cb(&(brushless_motors[BRUSHLESS_MOTOR_1]));
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 0) */

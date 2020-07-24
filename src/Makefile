@@ -158,7 +158,8 @@ CSRC = $(ALLCSRC) \
        aseba_vm/vm.c \
        leds.c \
        leds_management.c \
-       motors.c
+       motors.c \
+       adc_datalogger.c
 
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global

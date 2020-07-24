@@ -22,6 +22,7 @@
 #include "leds_management.h"
 #include "threads_utilities.h"
 #include "motors.h"
+#include "adc_datalogger.h"
 
 /* Special note concerning memory allocation :
  * 
@@ -110,6 +111,7 @@ int main(void) {
 	 * !! Uses a lot of CPU time. Better to disable when USB connected to let the communication
 	 * !! work without timeout.
 	 */
+	Adt_start();
 	motorsStart();
 
 	motorSetDutyCycle(BRUSHLESS_MOTOR_1, 10);
