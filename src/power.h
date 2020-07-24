@@ -1,14 +1,14 @@
 /**
- * @file	power_button.h
- * @brief  	Controls the power button. Contains the functions to turn ON and OFF
- * 			the robot. Sends events when a power on or power off occurs.
+ * @file	power.h
+ * @brief  	Controls the power. Contains the functions to turn ON and OFF
+ * 			the the main parts of the robot. Sends events when a power on or power off occurs.
  * 
  * @written by  	Eliot Ferragni
  * @creation date	05.06.2020
  */
 
-#ifndef POWER_BUTTON_H
-#define POWER_BUTTON_H
+#ifndef POWER_H
+#define POWER_H
 
 #include "ch.h"
 #include "hal.h"
@@ -52,18 +52,18 @@ uint8_t powerButtonGetPowerState(void);
  * @brief Turns ON or OFF the robot
  * @param state POWER_ON or POWER_OFF
  */
-void powerButtonTurnOnOff(uint8_t state);
+void mainPowerTurnOnOff(uint8_t state);
 
 /**
  * @brief Turns ON or OFF the stm32f779
  * @param state POWER_ON or POWER_OFF
  */
-void turnOnOffF779(uint8_t state);
+void f779TurnOnOff(uint8_t state);
 
 /**
  * @brief Turns ON or OFF the ESP32
  * @param state POWER_ON or POWER_OFF
  */
-void turnOnOffESP32(uint8_t state);
+void esp32TurnOnOff(uint8_t state);
 
-#endif  /* POWER_BUTTON_H */
+#endif  /* POWER_H */

@@ -16,7 +16,7 @@
 #include "gdb.h"
 #include "usb_pd_controller.h"
 #include "usb_hub.h"
-#include "power_button.h"
+#include "power.h"
 #include "voltage_measurement.h"
 #include "communications.h"
 #include "leds_management.h"
@@ -100,8 +100,8 @@ int main(void) {
 	 */
 	gdbStart();
 
-	turnOnOffF779(POWER_ON);
-	turnOnOffESP32(POWER_ON);
+	f779TurnOnOff(POWER_ON);
+	esp32TurnOnOff(POWER_ON);
 	palSetLine(LINE_EN_DRIVER_1);
 	palSetLine(LINE_EN_DRIVER_2);
 	palSetLine(LINE_EN_DRIVER_3);

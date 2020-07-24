@@ -145,7 +145,7 @@ CSRC = $(ALLCSRC) \
        usb_pd_controller.c \
        USB3803.c \
        usb_hub.c \
-       power_button.c \
+       power.c \
        voltage_measurement.c \
        flash/flash.c \
        communications.c \

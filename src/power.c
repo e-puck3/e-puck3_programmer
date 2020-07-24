@@ -1,7 +1,7 @@
 /**
- * @file	power_button.c
- * @brief  	Controls the power button. Contains the functions to turn ON and OFF
- * 			the robot. Sends events when a power on or power off occurs.
+ * @file	power.c
+ * @brief  	Controls the power. Contains the functions to turn ON and OFF
+ * 			the the main parts of the robot. Sends events when a power on or power off occurs.
  * 
  * @written by  	Eliot Ferragni
  * @creation date	05.06.2020
@@ -9,7 +9,7 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "power_button.h"
+#include "power.h"
 #include "leds.h"
 
 static virtual_timer_t power_timer;
@@ -26,7 +26,7 @@ static uint8_t power_state = POWER_OFF;
 void powerButtonCb(void* par){
 	uint8_t choice = (uint32_t)par;
 
-	powerButtonTurnOnOff(choice);
+	mainPowerTurnOnOff(choice);
 }
 
 //Event source used to send events to other threads
@@ -77,7 +77,7 @@ void powerButtonStartSequence(void){
 		is called before the main */
 
 	if(isPowerButtonPressed()){
-		powerButtonTurnOnOff(POWER_ON);
+		mainPowerTurnOnOff(POWER_ON);
 	}
 }
 
@@ -89,7 +89,7 @@ uint8_t powerButtonGetPowerState(void){
 	return power_state;
 }
 
-void powerButtonTurnOnOff(uint8_t state){
+void mainPowerTurnOnOff(uint8_t state){
 	if(state == POWER_ON){
 		power_state = POWER_ON;
 		palSetLine(LINE_PWR_ON);
@@ -103,10 +103,10 @@ void powerButtonTurnOnOff(uint8_t state){
 	}
 }
 
-void turnOnOffF779(uint8_t state){
+void f779TurnOnOff(uint8_t state){
 	palWriteLine(LINE_RESET_UC, state);
 }
 
-void turnOnOffESP32(uint8_t state){
+void esp32TurnOnOff(uint8_t state){
 	palWriteLine(LINE_EN_ESP32, state);
 }

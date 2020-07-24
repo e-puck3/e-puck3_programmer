@@ -10,7 +10,7 @@
  */
 
 #include "leds_management.h"
-#include "power_button.h"
+#include "power.h"
 #include "voltage_measurement.h"
 #include "communications.h"
 #include "leds.h"

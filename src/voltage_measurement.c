@@ -10,7 +10,7 @@
 #include "ch.h"
 #include "hal.h"
 #include "voltage_measurement.h"
-#include "power_button.h"
+#include "power.h"
 
 #define ADC_NUM_CHANNELS				3	//VBus, Batt+ and Internal temp
 #define ADC_NUM_SAMPLES					32	//32 samples by channel
@@ -198,7 +198,7 @@ void batteryStateMachine(void){
 	if(actual_state == BATT_MIN_VOLTAGE_FLAG && !palReadLine(LINE_VBUS_HOST)){
 		if(time_battery_low < chVTGetSystemTime()){
 			//shutdown robot
-			powerButtonTurnOnOff(POWER_OFF);
+			mainPowerTurnOnOff(POWER_OFF);
 		}
 	}else{
 		time_battery_low = chVTGetSystemTime() + BATTERY_LOW_TIME_MS;
