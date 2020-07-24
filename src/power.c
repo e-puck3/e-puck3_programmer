@@ -26,7 +26,9 @@ static uint8_t power_state = POWER_OFF;
 void powerButtonCb(void* par){
 	uint8_t choice = (uint32_t)par;
 
-	mainPowerTurnOnOff(choice);
+	chSysLockFromISR();
+	mainPowerTurnOnOffI(choice);
+	chSysUnlockFromISR();
 }
 
 //Event source used to send events to other threads
@@ -95,6 +97,20 @@ void mainPowerTurnOnOff(uint8_t state){
 		palSetLine(LINE_PWR_ON);
 		// Turns ON the LEDs PWM in case it's paused
 		resumeLedsPWM();
+	}else{
+		power_state = POWER_OFF;
+		palClearLine(LINE_PWR_ON);
+		// Turns OFF the LEDs PWM to turn them all OFF
+		pauseLedsPWM();
+	}
+}
+
+void mainPowerTurnOnOffI(uint8_t state){
+	if(state == POWER_ON){
+		power_state = POWER_ON;
+		palSetLine(LINE_PWR_ON);
+		// Turns ON the LEDs PWM in case it's paused
+		resumeLedsPWMI();
 	}else{
 		power_state = POWER_OFF;
 		palClearLine(LINE_PWR_ON);

@@ -66,6 +66,12 @@ uint8_t powerButtonGetPowerState(void);
 void mainPowerTurnOnOff(uint8_t state);
 
 /**
+ * @brief Turns ON or OFF the robot from interrupt
+ * @param state POWER_ON or POWER_OFF
+ */
+void mainPowerTurnOnOffI(uint8_t state);
+
+/**
  * @brief Turns ON or OFF the stm32f779
  * @param state POWER_ON or POWER_OFF
  */

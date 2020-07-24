@@ -115,6 +115,11 @@ void resumeLedsPWM(void){
 	chBSemSignal(&pause_thread_sem);
 }
 
+void resumeLedsPWMI(void){
+	pause_thread = false;
+	chBSemSignalI(&pause_thread_sem);
+}
+
 void toggleLed(rgb_led_name_t rgb_led, led_name_t led, uint8_t duty_cycle){
 
 	if(rgb_led>=NB_RGB_LEDS){

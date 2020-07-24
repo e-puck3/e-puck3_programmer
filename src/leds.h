@@ -50,6 +50,11 @@ void pauseLedsPWM(void);
 void resumeLedsPWM(void);
 
 /**
+ * @brief Resumes the PWM managing the RGB LEDs from interrupt.
+ */
+void resumeLedsPWMI(void);
+
+/**
  * @brief 			Toggles the selected led with the given value.
  * 
  * @param rgb_led 	RGB LED to update. See rgb_led_name_t
