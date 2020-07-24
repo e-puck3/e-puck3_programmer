@@ -107,6 +107,12 @@ int main(void) {
 	palSetLine(LINE_EN_DRIVER_3);
 	palSetLine(LINE_EN_DRIVER_4);
 
+	/*
+	 * Starts the brushless motor controller.
+	 * 
+	 * !! Uses a lot of CPU time. Better to disable when USB connected to let the communication
+	 * !! work without timeout.
+	 */
 	motorsStart();
 
 	motorSetDutyCycle(BRUSHLESS_MOTOR_1, 10);
