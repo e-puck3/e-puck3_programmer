@@ -110,3 +110,30 @@ void f779TurnOnOff(uint8_t state){
 void esp32TurnOnOff(uint8_t state){
 	palWriteLine(LINE_EN_ESP32, state);
 }
+
+void gateDriverTurnOnOff(gateDriver_id id, uint8_t state){
+	switch (id){
+		case GATE_DRIVER_1:
+			palWriteLine(LINE_EN_DRIVER_1, state);
+			break;
+		case GATE_DRIVER_2:
+			palWriteLine(LINE_EN_DRIVER_2, state);
+			break;
+		case GATE_DRIVER_3:
+			palWriteLine(LINE_EN_DRIVER_3, state);
+			break;
+		case GATE_DRIVER_4:
+			palWriteLine(LINE_EN_DRIVER_4, state);
+			break;
+		default:
+			break;
+	}
+}
+
+void gateDriversTurnOnOff(uint8_t state){
+
+	palWriteLine(LINE_EN_DRIVER_1, state);
+	palWriteLine(LINE_EN_DRIVER_2, state);
+	palWriteLine(LINE_EN_DRIVER_3, state);
+	palWriteLine(LINE_EN_DRIVER_4, state);
+}

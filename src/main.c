@@ -102,10 +102,7 @@ int main(void) {
 
 	f779TurnOnOff(POWER_ON);
 	esp32TurnOnOff(POWER_ON);
-	palSetLine(LINE_EN_DRIVER_1);
-	palSetLine(LINE_EN_DRIVER_2);
-	palSetLine(LINE_EN_DRIVER_3);
-	palSetLine(LINE_EN_DRIVER_4);
+	gateDriversTurnOnOff(POWER_ON);
 
 	/*
 	 * Starts the brushless motor controller.

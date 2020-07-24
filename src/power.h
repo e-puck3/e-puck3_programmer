@@ -20,6 +20,17 @@
 #define POWER_BUTTON_DURATION_MS_TO_TURN_OFF	500
 
 /**
+ * Gate drivers
+ */
+typedef enum {
+	GATE_DRIVER_1 = 0,
+	GATE_DRIVER_2,
+	GATE_DRIVER_3,
+	GATE_DRIVER_4,
+	NB_OF_GATE_DRIVERS,
+} gateDriver_id;
+
+/**
  * @brief 	Function used to turn ON the robot if the button is pressed
  * 			and if the USB connexion is not plugged->when we want to turn on the robot, without the USB.
  * 			
@@ -65,5 +76,17 @@ void f779TurnOnOff(uint8_t state);
  * @param state POWER_ON or POWER_OFF
  */
 void esp32TurnOnOff(uint8_t state);
+
+/**
+ * @brief Turns ON or OFF the gate driver chosen
+ * @param state POWER_ON or POWER_OFF
+ */
+void gateDriverTurnOnOff(gateDriver_id id, uint8_t state);
+
+/**
+ * @brief Turns ON or OFF all the gate drivers
+ * @param state POWER_ON or POWER_OFF
+ */
+void gateDriversTurnOnOff(uint8_t state);
 
 #endif  /* POWER_H */
