@@ -14,7 +14,7 @@
 
 /*  DATA TX  */
 #define DTX_SIZE_1K             1024
-#define DTX_NB_POINTS           6 * DTX_SIZE_1K
+#define DTX_NB_POINTS           6 * DTX_SIZE_1K	// mjst be a multiple of 4
 
 #define DTX_PORT 				SDU2
 
@@ -25,9 +25,7 @@ typedef struct
   // MGT
   const uint16_t nb_channels;
   const uint16_t nb_points;
-  uint16_t data_left;
   uint16_t data_idx;
-  uint8_t data_full;
   uint8_t data_lock;
 }AdcDataTx;
 
@@ -35,11 +33,5 @@ typedef struct
 /* Data Transmission */
 void Adt_start(void);
 void Adt_Insert_Data(uint16_t* input_data,size_t size,uint8_t zc);
-
-/*===========================================================================*/
-/* Export global variable                                                    */
-/*===========================================================================*/
-extern binary_semaphore_t dtx_ready;
-
 
 #endif /* ADC_DATALOGGER_H */

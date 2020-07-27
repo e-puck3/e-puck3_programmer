@@ -1294,18 +1294,11 @@ void _adc2_current_cb(ADCDriver *adcp){
 	
 	DO_ONE_ADC2_SEQUENCE();
 
-	// if(0 == gADT.data_lock)
-	// { 
-	//  Adt_Insert_Data(&buffer[0], 0, 0);
-	// }
-	// if(0 == gADT.data_lock)
-	// { 
-	//  Adt_Insert_Data(&buffer[4], 0, 0);
-	// }
-	// if(0 == gADT.data_lock)
-	// { 
-	//  Adt_Insert_Data(&buffer[8], 0, 0);
-	// }
+#ifdef LOG_ADC_CURRENT
+		Adt_Insert_Data(&buffer[0], 0, 0);
+		Adt_Insert_Data(&buffer[4], 0, 0);
+		Adt_Insert_Data(&buffer[8], 0, 0);
+#endif /* LOG_ADC_CURRENT */
 
 #if (NB_OF_BRUSHLESS_MOTOR > 0)
 	CURRENT_METER_UPDATE(&brushless_motors[BRUSHLESS_MOTOR_1], &buffer[BRUSHLESS_MOTOR_1]);
@@ -1360,10 +1353,9 @@ void _adc3_voltage_cb(ADCDriver *adcp){
 		ADD_NEW_ZC_DATAOFF(&(brushless_motors[BRUSHLESS_MOTOR_4].zero_crossing), buffer[BRUSHLESS_MOTOR_4]);
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */
 
-		// if(0 == gADT.data_lock)
-		// { 
-		// 	Adt_Insert_Data(buffer, 0, 0);
-		// }
+#ifdef LOG_ADC_VOLTAGE_OFF
+		Adt_Insert_Data(buffer, 0, 0);
+#endif /* LOG_ADC_VOLTAGE_OFF */
 
 #if (NB_OF_BRUSHLESS_MOTOR > 0)
 		_rpm_counter_update(&(brushless_motors[BRUSHLESS_MOTOR_1]));
@@ -1410,10 +1402,10 @@ void _adc3_voltage_cb(ADCDriver *adcp){
 		ADD_NEW_ZC_DATAON(&(brushless_motors[BRUSHLESS_MOTOR_4].zero_crossing), buffer[BRUSHLESS_MOTOR_4]);
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */
 
-		// if(0 == gADT.data_lock)
-		// { 
-		// 	Adt_Insert_Data(&gADT, buffer, 0, 0);
-		// }
+#ifdef LOG_ADC_VOLTAGE_ON
+		Adt_Insert_Data(buffer, 0, 0);
+#endif /* LOG_ADC_VOLTAGE_ON */
+		
 #if (NB_OF_BRUSHLESS_MOTOR > 0)
 		_zero_crossing_cb(&(brushless_motors[BRUSHLESS_MOTOR_1]));
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 0) */

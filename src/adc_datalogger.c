@@ -7,15 +7,13 @@
 
 #include "adc_datalogger.h"
 
-BSEMAPHORE_DECL(dtx_ready, true);
+static BSEMAPHORE_DECL(dtx_ready, true);
 
 
 static AdcDataTx gADT= {
    // VAR
-   .data_full = 0,
    .data_idx  = 0,
    .data_lock = 0,
-   .data_left = DTX_NB_POINTS,
    // CST
    .nb_channels = 4,
    .nb_points   = DTX_NB_POINTS,
@@ -23,9 +21,7 @@ static AdcDataTx gADT= {
 
 static void Adt_Reset_Struct(AdcDataTx* adt)
 {
-  adt->data_full = 0;
   adt->data_idx  = 0;
-  adt->data_left = adt->nb_points;
   adt->data_lock = 0;
 }
 
@@ -77,7 +73,7 @@ void Adt_Insert_Data(uint16_t* input_data,size_t size,uint8_t zc)
   (void) zc; // COULD BE USED FOR DEBUGGING PURPOSE
   (void) size;
   //
-  if(0==gADT.data_full)
+  if(gADT.data_idx < DTX_NB_POINTS)
   {
 
     gADT.data[0][gADT.data_idx] = input_data[0];
@@ -86,14 +82,11 @@ void Adt_Insert_Data(uint16_t* input_data,size_t size,uint8_t zc)
     gADT.data[3][gADT.data_idx] = input_data[3];
    
     gADT.data_idx += 1;
-    gADT.data_left -=1;
-
   }
 
   // Check if full
-  if(0 == gADT.data_left || 1 == gADT.data_full)
+  if(!gADT.data_lock && gADT.data_idx >= DTX_NB_POINTS)
   {
-    gADT.data_full = 1;
     gADT.data_lock = 1;
     chSysLockFromISR();
     chBSemSignalI(&dtx_ready);
