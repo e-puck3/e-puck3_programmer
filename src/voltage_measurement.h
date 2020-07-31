@@ -22,6 +22,9 @@
                		     GND
 */
 
+#define VREF							3.022f	//corresponds to the voltage on the VREF+ pin [V]
+#define ADC_RESOLUTION					4095	//maximum 12bits value from ADC
+
 #define ADC_VOLTAGE 				ADCD1
 
 ////////////////////////////////////////////BATTERY ZONE///////////////////////////////////////////

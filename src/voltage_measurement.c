@@ -11,15 +11,13 @@
 #include "hal.h"
 #include "voltage_measurement.h"
 #include "power.h"
+#include "motors.h"
 
 #define ADC_NUM_CHANNELS				3	//VBus, Batt+ and Internal temp
 #define ADC_NUM_SAMPLES					32	//32 samples by channel
 
 #define ADC1_CHANNEL_VBUS				ADC_CHANNEL_IN0
 #define ADC1_CHANNEL_BATTERY			ADC_CHANNEL_IN11
-
-#define VREF							3.022f	//corresponds to the voltage on the VREF+ pin [V]
-#define ADC_RESOLUTION					4095	//maximum 12bits value from ADC
 
 // Voltage calculations
 #define RESISTOR_R1						3900	//[kohm]
@@ -263,6 +261,9 @@ static THD_FUNCTION(volt_thd, arg)
 			//low-pass filter on temperature measurement
 			LOW_PASS_FILTER(temperature_raw, temperature_value);
 			ADC_12BITS_TO_CELSIUS(temperature_value, temperature_celsius);
+
+			// Updates the bus voltage for the motors
+			motorSetBusVoltage(vbus_voltage);
 
 			// chprintf((BaseSequentialStream *)&USB_SERIAL, "raw :%d, %d, %d \r\n", vbus_raw, battery_raw, temperature_raw);
 			// chprintf((BaseSequentialStream *)&USB_SERIAL, "values :%d, %d, %d \r\n", vbus_value, battery_value, temperature_value);

@@ -102,6 +102,15 @@ void motorsStop(void);
 void motorSetDutyCycle(brushless_motors_names_t motor_name, uint8_t duty_cycle);
 
 /**
+ * @brief               Sets the bus voltage
+ * 
+ * @param bus_voltage   Voltage powering the motors. Used to compute the half bus voltage to detect
+ *                      properly the zero crossing event
+ * 
+ */
+void motorSetBusVoltage(float bus_voltage);
+
+/**
  * @brief               Gets the actual duty cycle of the given motor
  * 
  * @param motor_name    Motor from which to get the duty cycle. See brushless_motors_names_t

@@ -10,6 +10,7 @@
 #include "hal.h"
 #include "motors.h"
 #include "adc_datalogger.h"
+#include "voltage_measurement.h"
 
 #define ADC3_BUFFER_DEPTH				2		//2 sequences of MAX_NB_OF_BRUSHLESS_MOTOR samples
 #define ADC2_BUFFER_DEPTH				2		//2 sequences of MAX_NB_OF_BRUSHLESS_MOTOR samples
@@ -21,8 +22,21 @@
 
 #define NB_SAMPLE_OFFSET_CALIBRATION	1000
 
+/* PHASE VOLTAGE ---[ R1 ]--*--- measure
+                	        |
+               		        |
+               		      [ R2 ]
+                	        |
+               		       GND
+*/
+
+#define RESISTOR_R1_MOT					4700	//[ohm]
+#define RESISTOR_R2_MOT					1000	//[ohm]
+// conversion from battery voltage to adc value for our voltage divider (not the same as the one which measures the battery voltage)
+#define HALF_BATT_V_TO_ADC_VALUE		((RESISTOR_R1_MOT * ADC_RESOLUTION)/(2 * VREF * (RESISTOR_R1_MOT + RESISTOR_R2_MOT)))
+
 #define DEGAUSS_TICKS_ZC_OFF			1
-#define HALF_BUS_VOLTAGE				962
+// #define HALF_BUS_ADC_VALUE				962
 
 #define PERIOD_PWM_52_KHZ_APB2  		4154	// STM32_TIMCLK2/52000 rounded to an even number to be divisible by 2
 #define PERIOD_PWM_52_KHZ_APB1 			PERIOD_PWM_52_KHZ_APB2/2
@@ -34,7 +48,7 @@
 #define LP_FILTER_COEFF_ZC				0.4f
 
 #define TICKS_52_KHZ_TO_100HZ 			520		//number of tick at 52kHz to achieve 100Hz
-#define RP10MS_TO_RPM 					6000	//rounds per 10 milisecond to rounds per minute
+#define RP10MS_TO_RPM 					6000	//rounds per 10 millisecond to rounds per minute
 
 
 /**
@@ -380,7 +394,7 @@ static const zc_function_t brushless_zc_functions[NB_ZC_METHODS] = {
 };
 
 /**
- * Coeffs of linear current aproximation functions based on collected data.
+ * Coeffs of linear current approximation functions based on collected data.
  * The linear approximation is different for each duty cycle.
  * 
  * Note: It was valid for the DRV8323.
@@ -724,6 +738,7 @@ static PWMConfig tim_234_cfg = {
 };
 
 static bool _motor_module_configured = false;
+static uint16_t _half_bus_adc_value = 0;
 
 /********************          PRIVATE MACROS AND FUNCTIONS         ********************/
 
@@ -861,7 +876,7 @@ static bool _motor_module_configured = false;
 
 /**
  * Condensed form of a discrete first order low pass filter y = (1-a)y + ax, 
- * x beeing the new value, y the filtered one and a being the filter coefficient
+ * x being the new value, y the filtered one and a being the filter coefficient
  * 
  * @param actual		Filtered value to update
  * @param new_value		New value to add to the filtered one
@@ -941,7 +956,7 @@ bool _zero_crossing_detect_on(brushless_motor_t *motor){
 
 	if(!IS_ZC_FLAG(zc)){
 		//True if sign has changed
-		zc_found = ((((int32_t)zc->dataOn - HALF_BUS_VOLTAGE) ^ ((int32_t)zc->previous_dataOn - HALF_BUS_VOLTAGE)) < 0);
+		zc_found = ((((int32_t)zc->dataOn - _half_bus_adc_value) ^ ((int32_t)zc->previous_dataOn - _half_bus_adc_value)) < 0);
 
 		if(zc_found){
 			_compute_next_commutation(zc);
@@ -1190,7 +1205,7 @@ void _set_tied_to_ground(brushless_motor_t *motor){
  * 					Intended to be called at each adc current callback
  * 				
  * @param motor 	Motor to update the current. It is a pointer. See brushless_motor_t
- * @param buffer 	buffer containing the ADC raw values. Be carefull. The address
+ * @param buffer 	buffer containing the ADC raw values. Be careful. The address
  * 					of the first element should be given.
  */
 
@@ -1465,7 +1480,7 @@ void _update_duty_cycle(brushless_motor_t *motor){
 
 /**
  * @brief  				Sets the given duty cycle to the given motor.
- * 						The duty cycle given is immediatly applied without check.
+ * 						The duty cycle given is immediately applied without check.
  * 						!! A huge change can lead in really big currents and destroy the motor
  * 						or the H-bridges !!
  * 						
@@ -1565,7 +1580,7 @@ void _timersStart(void){
   	DBGMCU->APB1FZ |= DBGMCU_APB1_FZ_DBG_TIM2_STOP | DBGMCU_APB1_FZ_DBG_TIM3_STOP | DBGMCU_APB1_FZ_DBG_TIM4_STOP;
 
 	pwmStart(&PWMD1, &tim_1_cfg);
-	/* additionnal config */
+	/* additional config */
 	PWMD1.tim->CR1 		&= ~STM32_TIM_CR1_CEN;     	// Disables the counter until correct configuration
 	PWMD1.tim->CCMR1 	|= STM32_TIM_CCMR1_OC1M(OC_PWM_MODE_2) | STM32_TIM_CCMR1_OC2M(OC_PWM_MODE_2);	// Sets channels 1 and 2 to PWM mode 2
 	PWMD1.tim->CCMR2 	|= STM32_TIM_CCMR2_OC3M(OC_PWM_MODE_2) | STM32_TIM_CCMR2_OC4M(OC_PWM_MODE_2);  // Sets channels 3 and 4 to PWM mode 2
@@ -1573,7 +1588,7 @@ void _timersStart(void){
 	PWMD1.tim->CNT 		 = 0;							// Resets the counter to zero
 
 	pwmStart(&PWMD8, &tim_8_cfg);
-	/* additionnal config */
+	/* additional config */
 	PWMD8.tim->CR1 		&= ~STM32_TIM_CR1_CEN;     	// Disables the counter until correct configuration
 	PWMD8.tim->SMCR   	 = STM32_TIM_SMCR_SMS(SMS_TRIGGER_MODE) | STM32_TIM_SMCR_TS(TS_ITR0); //external trigger mode and TIM1 master
 	PWMD8.tim->CCMR1 	|= STM32_TIM_CCMR1_OC1M(OC_PWM_MODE_2) | STM32_TIM_CCMR1_OC2M(OC_PWM_MODE_2);	// Sets channels 1 and 2 to PWM mode 2
@@ -1670,6 +1685,11 @@ void motorSetDutyCycle(brushless_motors_names_t motor_name, uint8_t duty_cycle){
 	brushless_motors[motor_name].duty_cycle_goal = duty_cycle;
 }
 
+void motorSetBusVoltage(float bus_voltage){
+
+	_half_bus_adc_value = (uint16_t)bus_voltage * HALF_BATT_V_TO_ADC_VALUE;
+}
+
 float motorGetDutyCycle(brushless_motors_names_t motor_name){
 	if(motor_name >= NB_OF_BRUSHLESS_MOTOR){
 		return 0;
@@ -1699,7 +1719,7 @@ float motorsGetCurrent(brushless_motors_names_t motor_name){
 
     /*
     *	We do an interpolation of the coeffs of the two approximation functions
-    *	arround the duty cycle we have becasue we have an approximation function only
+    *	around the duty cycle we have because we have an approximation function only
     *	for each 5% step.
     */
 
@@ -1708,7 +1728,7 @@ float motorsGetCurrent(brushless_motors_names_t motor_name){
     //this is the percentage of the index coeff we will use
     a_part = 1 - b_part;
 
-    //computes the coeff a by taking a percentage of the two coeffs arround the duty_cycle we have
+    //computes the coeff a by taking a percentage of the two coeffs around the duty_cycle we have
     a_coeff = current_approx_coeffs[int_index].a * a_part + current_approx_coeffs[int_index+1].a * b_part;
     //same with coeff b
     b_coeff = current_approx_coeffs[int_index].b * a_part + current_approx_coeffs[int_index+1].b * b_part;
