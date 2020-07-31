@@ -119,6 +119,14 @@ void mainPowerTurnOnOffI(uint8_t state){
 	}
 }
 
+void setVbusPriority(uint8_t state){
+	palWriteLine(LINE_PRIORITY_TO_VBUS, state);
+}
+
+void setInrushCurrentLimit(uint8_t state){
+	palWriteLine(LINE_BAT_PLUS_INRUSH_LIMIT_n, state ? 0 : 1);
+}
+
 void f779TurnOnOff(uint8_t state){
 	palWriteLine(LINE_RESET_UC, state);
 }

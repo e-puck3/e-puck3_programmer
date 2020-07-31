@@ -72,6 +72,21 @@ void mainPowerTurnOnOff(uint8_t state);
 void mainPowerTurnOnOffI(uint8_t state);
 
 /**
+ * @brief 	Sets or clears VBus priority over the battery
+ * 			for the main 3V.
+ * 
+ * @param 	state true or false
+ */
+void setVbusPriority(uint8_t state);
+
+/**
+ * @brief 	Sets or clears the battery inrush limiter
+ * 
+ * @param 	state true or false
+ */
+void setInrushCurrentLimit(uint8_t state);
+
+/**
  * @brief Turns ON or OFF the stm32f779
  * @param state POWER_ON or POWER_OFF
  */
