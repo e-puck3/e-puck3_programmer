@@ -114,11 +114,6 @@ int main(void) {
 	Adt_start();
 	motorsStart();
 
-	motorSetDutyCycle(BRUSHLESS_MOTOR_1, 10);
-	motorSetDutyCycle(BRUSHLESS_MOTOR_2, 10);
-	motorSetDutyCycle(BRUSHLESS_MOTOR_3, 10);
-	motorSetDutyCycle(BRUSHLESS_MOTOR_4, 10);
-
 	spawn_shell();
 	// voltage_measurement_t volt;
 	while (true){
