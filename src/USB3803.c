@@ -65,10 +65,53 @@
 #define RESERVED7_REG							0xFE
 #define I2C_STATUS_COMMAND_REG					0xFF
 
+/********************     Bit definition for CONFIG_DATA_BYTE_1    ********************/
+
+#define CFG1_SELF_BUS_PWR						(1 << 7)
+#define CFG1_HS_DISABLE							(1 << 5)
+#define CFG1_MTT_ENABLE							(1 << 4)
+#define CFG1_EOP_DISABLE						(1 << 3)
+#define CFG1_CURRENT_SNS(x)						((x & 0x03) << 1)
+#define CFG1_PORT_PWR							(1 << 0)
+
+/********************     Bit definition for CONFIG_DATA_BYTE_2    ********************/
+
+#define CFG2_COMPOUND							(1 << 3)
+
+/********************     Bit definition for CONFIG_DATA_BYTE_3    ********************/
+
+#define CFG3_PRTMAP_EN							(1 << 3)
+#define CFG3_STRING_EN							(1 << 0)
+
+/******************** Bit definition for NON_REMOVABLE_DEVICES_REG ********************/
+
+#define NRD_NR_DEVICE_PORT1						(1 << 1)
+#define NRD_NR_DEVICE_PORT2						(1 << 2)
+#define NRD_NR_DEVICE_PORT3						(1 << 3)
+
+/********************     Bit definition for MAX_POWER_BUS_REG     ********************/
+
+#define MAXPB_MAX_PWR_BP(x)						((x & 0xFF) << 0)
+
+/********************     Bit definition for POWER_ON_TIME_REG     ********************/
+
+#define PWRT_POWER_ON_TIME(x) 					((x & 0xFF) << 0)
+
+
+/******************** Bit definition for BATTERY_CHARGER_MODE_REG  ********************/
+
+#define BCHGMODE_ENABLE_CHRGDET					(1 << 4)
+#define BCHGMODE_ENHANCEDCHRGDET				(1 << 2)
+
+/**************** Bit definition for SERIAL_PORT_INTERLOCK_CONTROL_REG ****************/
+
+#define SP_ILOCK_CONNECT_N						(1 << 1)
+#define SP_ILOCK_CONFIG_N						(1 << 0)
+
 /********************                 CONFIGURATION                ********************/
 // default = 0x9B, Self-powered, High_speed, MTT, EOP disable, individual sensing, individual switching
 // modified = 0x1B, Bus-powered, High_speed, MTT, EOP disable, individual sensing, individual switching
-#define CONFIG_DATA_BYTE_1						0x1B
+#define CONFIG_DATA_BYTE_1						(CFG1_MTT_ENABLE | CFG1_CURRENT_SNS(1) | CFG1_PORT_PWR)
 // default = ?
 // modified = 0x00, No compound
 #define CONFIG_DATA_BYTE_2						0x00
@@ -81,10 +124,10 @@
 
 // default = ?
 // modified = 0xFA, 500mA
-#define MAX_POWER_BUS							0xFA
+#define MAX_POWER_BUS							MAXPB_MAX_PWR_BP(0xFA)
 // default = ?
 // modified = 0x32, 100ms until a port has power
-#define POWER_ON_TIME							0x32
+#define POWER_ON_TIME							PWRT_POWER_ON_TIME(0x32)
 
 // default = 0x14, Charge detection enabled for SDP, CDP, and DCP
 // modified = 0x00, Charge detection completely disabled
@@ -93,9 +136,9 @@
 
 /********************   SERIAL_PORT_INTERLOCK_CONTROL_REG CONFIG   ********************/
 // config_n = 1, connect_n = 1
-#define CONFIG_MODE_ENABLED 		 			0x03
+#define CONFIG_MODE_ENABLED 		 			(SP_ILOCK_CONFIG_N | SP_ILOCK_CONNECT_N)
 // config_n = 0, connect_n = 1
-#define CONFIG_MODE_DISABLED 		 			0x02
+#define CONFIG_MODE_DISABLED 		 			(SP_ILOCK_CONNECT_N)
 
 
 /********************               PRIVATE FUNCITONS              ********************/
