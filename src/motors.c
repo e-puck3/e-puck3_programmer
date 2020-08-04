@@ -5,6 +5,63 @@
  * @written by  	Eliot Ferragni
  * @creation date	29.07.2019
  */
+
+/**
+ * How it works:
+ * 
+ * Since we want to control 4 brushless motors at the same time, at a high frequency (52kHz) and independently, we must insure
+ * that the control of a motor doesn't impact the control of another motor. We also have the limitation of having only three ADC units.
+ * To respect all of these "limits", the driver works as followed: 
+ * 
+ * The ADC3 is used to sample the floating phases to detect the zero crossing event, the PWM frequency of the half bridges control is set
+ * at 52kHz to limit the voltage spikes on the battery and the control algorithm is executed at each PWM tick.
+ * The ADC2 is used to sample continuously the current on the phases with conduct on the low side.
+ * 
+ * The timers are configured to perform a hardware complementary PWM mode 2 and are synchronized together and the TIMER1 also triggers at two different
+ * times the ADC3 sampling, thus we sample at approx. 104kHz. 
+ * We sample a floating phase when it is OFF and then when it is ON. Because of the time the ADC takes to sample one line, we use approximatively 20-25% of 
+ * a PWM cycle to sample four lines (we have four motors). We also need to wait for the line to degauss correctly. That's why the sampling is made 
+ * at 20% and 75% for respectively the OFF and ON measures.
+ * 
+ *             PWM mode 2
+ *                 |¯¯¯¯¯¯¯¯¯¯¯¯¯|
+ *                 |             |
+ *                 |             |			Becomes active when the timer reaches the CCR value
+ *  _______________|             |          -> To have 25% duty cycle, we must put 75% in CCR
+ * ↑               ↑             ↑
+ * 0%           TIM CCR         100%
+ *       ↑                  ↑   
+ * ADC OFF SAMPLING   ADC ON SAMPLING
+ * 
+ * 
+ * When we want to go to the next step of the PWM table, we simply change the output mode of the concerned GPIOs (Alternate, Output High or Output Low).
+ * There are two PWM tables implemented, Double PWM and Simple PWM.
+ *
+ * As mentioned before, we sample only one phase per motor per PWM cycle. We don't have the time to sample two or three phases per motor and it appears
+ * that we don't care to sample the phases that are conducting. For each ADC3 interrupt, we reconfigure the phases to sample for the next ADC interrupt and 
+ * we execute the zero crossing detection when we have the two samples (OFF and ON time).
+ * 
+ * There are two zero crossing detection functions implemented. One for the OFF time and one for the ON time. The ON time gives better results in general but
+ * needs a duty cycle of at least around 25% because of the time the sampling takes. That's why at low duty cycle, the OFF time is used. Then from a given duty cycle,
+ * the control uses the ON time instead of the OFF time.
+ * 
+ * For the current measurement, we sample continuously the current on the low side conducting phases.
+ * 
+ * Finally it is possible to reconfigure each half bridge in the motor_conf.h file.
+ * 
+ * Even if it works, there are a lot of things to improve to make this code reliable.
+ * 
+ * TODO :
+ * 1) 	Add stall detection. Currently if a motor is stuck, the PWM is either stuck too, which means we will burn a phase of the motor, either performs 
+ * 		commutations really quickly because it thinks the motor is turning really fast, which makes an annoying noise and is wrong.
+ * 2) 	Add a dynamic advance related to the speed of the motor. Currently there is no advance, even if the variable exists.
+ * 3)	The current measurement is really noisy and need to be interpreted. The linear approximation made was correct for the DRV8323 drivers but is wrong for 
+ * 		the MP6542 drivers.
+ * 4)	Add more control strategies. Actually, we only control the duty-cycle to control the motors. We can add a speed controller and a current limiter.
+ * 5) 	The maximum commutation speed is limited to 52000 commutations per seconds because the control loop is made at the PWM frequency. 
+ * 		It's more a limitation to be aware than a thing to improve since we already are at the limits of the system in order to control four motors.
+ * 
+ */
  
 #include "ch.h"
 #include "hal.h"
@@ -140,7 +197,7 @@ typedef enum{
 }tim_trigger_selection_list_t;
 
 /**
- *  Timer salve mode list for STM32F746
+ *  Timer slave mode list for STM32F746
  */
 typedef enum{
 	SMS_DISABLED = 0,
@@ -296,7 +353,7 @@ typedef struct {
 typedef struct {
 	const half_bridge_t*		phases[NB_BRUSHLESS_PHASES];
 	const commutation_schemes_t	commutation_scheme;
-	/* represents the number of step necessary to do one complete turn. Specific to each motor */
+	/* represents the number of steps necessary to do one complete turn. Specific to each motor */
 	uint8_t						nb_of_poles;	
 	rpm_counter_t 				rpm_counter;
 	current_meter_t 			current_meter;
@@ -633,7 +690,7 @@ static brushless_motor_t brushless_motors[NB_OF_BRUSHLESS_MOTOR] = {
 /* circular buffer */
 static adcsample_t adc2_buffer[ADC2_NB_ELEMENT_SEQ * MAX_NB_OF_BRUSHLESS_MOTOR * ADC2_BUFFER_DEPTH] = {0};
 
-/* ADC 1 Configuration */
+/* ADC 2 Configuration */
 static const ADCConversionGroup ADC2Config = {
     .circular = true,
     .num_channels = ADC2_NB_ELEMENT_SEQ * MAX_NB_OF_BRUSHLESS_MOTOR,
@@ -919,6 +976,19 @@ bool _zero_crossing_detect_off(brushless_motor_t *motor){
 
 	zc = &motor->zero_crossing;
 
+	/**
+	 *  This method looks for a voltage higher or lower than 0V (+offset in our case).
+	 *  
+	 *  When we sample the PWM OFF time on a floating phase and the motor is turning, we can find the
+	 *  zero crossing by searching when the voltage crosses 0V (can be an other value for our case because of ADC offset).
+	 *  -> For the positive bemf, we search when the voltage goes higher than the offset
+	 *  -> For the negative bemf, we simply search when the voltage is less or equal to the offset
+	 *  
+	 *  These waves have a really small amplitude, thus this method is really sensitive to noise and less robust.
+	 *  
+	 *  ____/¯\___/¯\___/¯\___/¯\___/¯\___/¯\___ 0V		Typical OFF time ADC sampling of a floating phase
+	 *  	↑ ↓   ↑ ↓   ↑ ↓   ↑ ↓   ↑ ↓   ↑ ↓			Where the zero crossing events occur
+	 */
 	if(!IS_ZC_FLAG(zc)){
 		if(zc->ticks_since_last_comm > DEGAUSS_TICKS_ZC_OFF){
 			if(IS_BEMF_SLOPE_POSITIVE(motor)){
@@ -953,6 +1023,21 @@ bool _zero_crossing_detect_on(brushless_motor_t *motor){
 	zc_found = false;
 
 	zc = &motor->zero_crossing;
+	/**
+	 * This method looks for a voltage crossing the half bus voltage
+	 * 
+	 * When we sample the PWM ON time on a floating phase and the motor is turning, we can find the
+	 * zero crossing by searching when the voltage crosses the half bus voltage.
+	 * -> For the positive bemf, we search when the voltage crosses the half bus from bottom to top
+	 * -> For the negative bemf, we search when the voltage crosses the half bus from top to bottom 
+	 * 
+	 * These waves have an amplitude from 0V to V+. Gives the best results but needs a minimum duty cycle to work.
+	 * 
+	 *       /¯\     /¯\     /¯\     /¯\     /¯\     /¯\      ¯  V+
+	 *      /   \   /   \   /   \   /   \   /   \   /   \     -  V/2	Typical ON time ADC sampling of a floating phase
+	 *    _/     \_/     \_/     \_/     \_/     \_/     \_   _  0V
+	 *      ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓				Where the zero crossing events occur
+	 */
 
 	if(!IS_ZC_FLAG(zc)){
 		//True if sign has changed
@@ -1007,7 +1092,7 @@ void _zero_crossing_cb(brushless_motor_t *motor){
 }
 
 /**
- * @brief 			It gathers the ADC OFF samples, performs an average and store them
+ * @brief 			It gathers the ADC OFF samples, performs an average and stores them
  * 					into the ADC_offset_off field of the motor.
  * 					
  * 					At the end, the motor is restored into its normal state
@@ -1261,17 +1346,17 @@ void _adc2_current_cb(ADCDriver *adcp){
 #if (NB_OF_BRUSHLESS_MOTOR > 1)
 		ADC_SQR3_SQ2_N (GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_2]))|
 #else
-		ADC_SQR3_SQ2_N (ADC_CHANNEL_VREFINT)|	//dummy sampling
+		ADC_SQR3_SQ2_N (GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_1]))|	//dummy sampling
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 1) */
 #if (NB_OF_BRUSHLESS_MOTOR > 2)
 		ADC_SQR3_SQ3_N (GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_3]))|
 #else
-		ADC_SQR3_SQ3_N (ADC_CHANNEL_VREFINT)|	//dummy sampling
+		ADC_SQR3_SQ3_N (GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_1]))|	//dummy sampling
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 2) */
 #if (NB_OF_BRUSHLESS_MOTOR > 3)
 		ADC_SQR3_SQ4_N (GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_4]))|
 #else
-		ADC_SQR3_SQ4_N (ADC_CHANNEL_VREFINT)|	//dummy sampling
+		ADC_SQR3_SQ4_N (GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_1]))|	//dummy sampling
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */
 		ADC_SQR3_SQ5_N (GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_1]))|
 #if (NB_OF_BRUSHLESS_MOTOR > 1)
@@ -1281,28 +1366,28 @@ void _adc2_current_cb(ADCDriver *adcp){
 #if (NB_OF_BRUSHLESS_MOTOR > 2)
 		ADC_SQR2_SQ7_N (GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_3]))|
 #else
-		ADC_SQR2_SQ7_N (ADC_CHANNEL_VREFINT)|	//dummy sampling
+		ADC_SQR2_SQ7_N (GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_1]))|	//dummy sampling
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 2) */	
 #if (NB_OF_BRUSHLESS_MOTOR > 3)
 		ADC_SQR2_SQ8_N (GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_4]))|
 #else
-		ADC_SQR2_SQ8_N (ADC_CHANNEL_VREFINT)|	//dummy sampling
+		ADC_SQR2_SQ8_N (GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_1]))|	//dummy sampling
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */	
 		ADC_SQR2_SQ9_N (GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_1]))|
 #if (NB_OF_BRUSHLESS_MOTOR > 1)
 		ADC_SQR2_SQ10_N(GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_2]))|
 #else
-		ADC_SQR2_SQ10_N(ADC_CHANNEL_VREFINT)|	//dummy sampling
+		ADC_SQR2_SQ10_N(GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_1]))|	//dummy sampling
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 1) */	
 #if (NB_OF_BRUSHLESS_MOTOR > 2)
 		ADC_SQR2_SQ11_N(GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_3]))|
 #else
-		ADC_SQR2_SQ11_N(ADC_CHANNEL_VREFINT)|	//dummy sampling
+		ADC_SQR2_SQ11_N(GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_1]))|	//dummy sampling
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 2) */	
 #if (NB_OF_BRUSHLESS_MOTOR > 3)
 		ADC_SQR2_SQ12_N(GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_4]))|
 #else
-		ADC_SQR2_SQ12_N(ADC_CHANNEL_VREFINT)|	//dummy sampling
+		ADC_SQR2_SQ12_N(GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_1]))|	//dummy sampling
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */	
 	0);
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 0) */
