@@ -90,7 +90,7 @@
 #define RESISTOR_R1_MOT					4700	//[ohm]
 #define RESISTOR_R2_MOT					1000	//[ohm]
 // conversion from battery voltage to adc value for our voltage divider (not the same as the one which measures the battery voltage)
-#define HALF_BATT_V_TO_ADC_VALUE		((RESISTOR_R1_MOT * ADC_RESOLUTION)/(2 * VREF * (RESISTOR_R1_MOT + RESISTOR_R2_MOT)))
+#define HALF_BATT_V_TO_ADC_VALUE		((RESISTOR_R2_MOT * ADC_RESOLUTION)/(2 * VREF * (RESISTOR_R1_MOT + RESISTOR_R2_MOT)))
 
 #define DEGAUSS_TICKS_ZC_OFF			1
 // #define HALF_BUS_ADC_VALUE				962
@@ -100,6 +100,7 @@
 
 #define RAMP_STEPS_DUTY_CYCLE 			0.001f
 
+#define LP_FILTER_COEFF_HALF_BUS		0.01f
 #define LP_FILTER_COEFF_CURRENT			0.0001f
 #define LP_FILTER_COEFF_RPM 			0.1f
 #define LP_FILTER_COEFF_ZC				0.4f
@@ -795,7 +796,7 @@ static PWMConfig tim_234_cfg = {
 };
 
 static bool _motor_module_configured = false;
-static uint16_t _half_bus_adc_value = 0;
+static float _half_bus_adc_value = BATT_MAX_VOLTAGE * HALF_BATT_V_TO_ADC_VALUE;
 
 /********************          PRIVATE MACROS AND FUNCTIONS         ********************/
 
@@ -1041,7 +1042,7 @@ bool _zero_crossing_detect_on(brushless_motor_t *motor){
 
 	if(!IS_ZC_FLAG(zc)){
 		//True if sign has changed
-		zc_found = ((((int32_t)zc->dataOn - _half_bus_adc_value) ^ ((int32_t)zc->previous_dataOn - _half_bus_adc_value)) < 0);
+		zc_found = ((((int32_t)zc->dataOn - (int16_t)_half_bus_adc_value) ^ ((int32_t)zc->previous_dataOn - (int16_t)_half_bus_adc_value)) < 0);
 
 		if(zc_found){
 			_compute_next_commutation(zc);
@@ -1771,8 +1772,9 @@ void motorSetDutyCycle(brushless_motors_names_t motor_name, uint8_t duty_cycle){
 }
 
 void motorSetBusVoltage(float bus_voltage){
+	float half_bus = bus_voltage * HALF_BATT_V_TO_ADC_VALUE;
 
-	_half_bus_adc_value = (uint16_t)bus_voltage * HALF_BATT_V_TO_ADC_VALUE;
+	LOW_PASS_FILTER(_half_bus_adc_value, half_bus, LP_FILTER_COEFF_HALF_BUS);
 }
 
 float motorGetDutyCycle(brushless_motors_names_t motor_name){

@@ -263,7 +263,7 @@ static THD_FUNCTION(volt_thd, arg)
 			ADC_12BITS_TO_CELSIUS(temperature_value, temperature_celsius);
 
 			// Updates the bus voltage for the motors
-			motorSetBusVoltage(vbus_voltage);
+			motorSetBusVoltage(battery_voltage);
 
 			// chprintf((BaseSequentialStream *)&USB_SERIAL, "raw :%d, %d, %d \r\n", vbus_raw, battery_raw, temperature_raw);
 			// chprintf((BaseSequentialStream *)&USB_SERIAL, "values :%d, %d, %d \r\n", vbus_value, battery_value, temperature_value);
