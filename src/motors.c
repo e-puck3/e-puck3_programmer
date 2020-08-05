@@ -54,11 +54,12 @@
  * TODO :
  * 1) 	Add stall detection. Currently if a motor is stuck, the PWM is either stuck too, which means we will burn a phase of the motor, either performs 
  * 		commutations really quickly because it thinks the motor is turning really fast, which makes an annoying noise and is wrong.
- * 2) 	Add a dynamic advance related to the speed of the motor. Currently there is no advance, even if the variable exists.
- * 3)	The current measurement is really noisy and need to be interpreted. The linear approximation made was correct for the DRV8323 drivers but is wrong for 
+ * 2)	Add a sequence to start a motor. Or some kind of strategy when the motor doesn't start to turn.
+ * 3) 	Add a dynamic advance related to the speed of the motor. Currently there is no advance, even if the variable exists.
+ * 4)	The current measurement is really noisy and need to be interpreted. The linear approximation made was correct for the DRV8323 drivers but is wrong for 
  * 		the MP6542 drivers.
- * 4)	Add more control strategies. Actually, we only control the duty-cycle to control the motors. We can add a speed controller and a current limiter.
- * 5) 	The maximum commutation speed is limited to 52000 commutations per seconds because the control loop is made at the PWM frequency. 
+ * 5)	Add more control strategies. Actually, we only control the duty-cycle to control the motors. We can add a speed controller and a current limiter.
+ * 6) 	The maximum commutation speed is limited to 52000 commutations per seconds because the control loop is made at the PWM frequency. 
  * 		It's more a limitation to be aware than a thing to improve since we already are at the limits of the system in order to control four motors.
  * 
  */
