@@ -159,7 +159,9 @@ CSRC = $(ALLCSRC) \
        leds.c \
        leds_management.c \
        motors.c \
-       adc_datalogger.c
+       adc_datalogger.c \
+       serial_datagram.c \
+       uart_cmd.c
 
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
