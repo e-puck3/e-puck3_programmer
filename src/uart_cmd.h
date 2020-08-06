@@ -9,5 +9,9 @@
 #ifndef UART_CMD_H
 #define UART_CMD_H
 
+#define UART_CMD_PORT 	SD8
+
+
+void uartCmdStart(void);
 
 #endif  /* UART_CMD_H */
