@@ -307,7 +307,10 @@ typedef struct{
     uint32_t			previous_detection_time;	/* previous zero-crossing event detection time */
     uint32_t			period;						/* time between the two last zero-crossing events */
     uint32_t			period_filtered;			/* filtered time between the two last zero-crossing events */
-    uint32_t			advance_timing;				/* variable telling which advance time to use */
+    float				advance_timing;				/* variable telling which advance time to use from -1 to 1, 
+    											     * which represents -30° to 30°. 30° means 30 degrees of advance
+    											     * -> a commutation 30 degrees sooner
+    											     */
     uint32_t			next_commutation_time;		/* time at which the next commutation should occur */
     uint32_t			ticks_since_last_comm;		/* nb of PWM cycles since the last commutation */
     uint32_t 			nb_commutations;			/* total nb of commutations */
@@ -1151,7 +1154,10 @@ void _compute_next_commutation(zero_crossing_t *zc)
 	zc->detection_time    		= zc->time;
 	zc->period 					= zc->detection_time - zc->previous_detection_time;
 	LOW_PASS_FILTER(zc->period_filtered, (float)zc->period, LP_FILTER_COEFF_ZC);
-	zc->next_commutation_time 	= zc->time + zc->period_filtered/2 - zc->advance_timing;
+	/*
+	 * One period = 60 electrical degrees -> zc->period_filtered/2 = 30 degrees
+	 */
+	zc->next_commutation_time 	= zc->time + (zc->period_filtered * (1.0 - zc->advance_timing))/2; //time + 30 degrees - advance phase
 }
 
 /**
