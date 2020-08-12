@@ -1093,12 +1093,13 @@ void _zero_crossing_cb(brushless_motor_t *motor){
 		_update_duty_cycle(motor);
 	}
 	zc->time += GET_COMMUTATION_TIME();
+	// resets the counter to avoid overflow problem
+	RESET_COMMUTATION_TIMER();
 
 	CALL_ZC_FUNCTION(motor);
 
 	if(TIME_TO_COMMUTE(zc)){
 		RESET_ZC_FLAG(zc);
-		RESET_COMMUTATION_TIMER();
 		zc->time = 0;
 		_do_brushless_commutation(motor);
 	}
