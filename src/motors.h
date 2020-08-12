@@ -12,7 +12,7 @@
 
 // uncomment only one at a time to log what you want
 // Only for debug purpose. Works with adc_datalogger.c/.h
-#define LOG_ADC_VOLTAGE_ON
+// #define LOG_ADC_VOLTAGE_ON
 // #define LOG_ADC_VOLTAGE_OFF
 // #define LOG_ADC_CURRENT  
 

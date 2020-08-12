@@ -303,10 +303,8 @@ typedef struct {
 typedef struct{
     bool 				flag;						/* if set, indicates a zero-crossing event is pending */
     uint32_t			time;						/* time counter counting the PWM cycles */
-    uint32_t 			detection_time;				/* zero-crossing event detection time */
-    uint32_t			previous_detection_time;	/* previous zero-crossing event detection time */
-    uint32_t			period;						/* time between the two last zero-crossing events */
-    uint32_t			period_filtered;			/* filtered time between the two last zero-crossing events */
+    uint32_t			half_period;				/* time between the two last zero-crossing events */
+    uint32_t			half_period_filtered;		/* filtered time between the two last zero-crossing events */
     float				advance_timing;				/* variable telling which advance time to use from -1 to 1, 
     											     * which represents -30° to 30°. 30° means 30 degrees of advance
     											     * -> a commutation 30 degrees sooner
@@ -799,6 +797,13 @@ static PWMConfig tim_234_cfg = {
   .dier = 0
 };
 
+static GPTConfig tim_10_cfg = {
+	.frequency = 108000000,        /* 108MHz timer clock to measure commutation period.*/
+	.callback = NULL,
+	.cr2 = 0,
+	.dier = 0
+};
+
 static bool _motor_module_configured = false;
 static float _half_bus_adc_value = BATT_MAX_VOLTAGE * HALF_BATT_V_TO_ADC_VALUE;
 
@@ -869,6 +874,17 @@ static float _half_bus_adc_value = BATT_MAX_VOLTAGE * HALF_BATT_V_TO_ADC_VALUE;
 	PAL_PORT(line)->MODER &= ~(3 << (2 * PAL_PAD(line))); \
 	PAL_PORT(line)->MODER |= (1 << (2 * PAL_PAD(line))); \
 }
+
+/**
+ * @brief 	Returns the counter value of the timer used to measure the time between commutations
+ * @return 	Time in ticks of 108MHz
+ */
+#define GET_COMMUTATION_TIME() (GPTD10.tim->CNT)
+
+/**
+ * @brief 	Resets to 0 the counter value of the timer used to measure the time between commutations
+ */
+#define RESET_COMMUTATION_TIMER() (GPTD10.tim->CNT = 0)
 
 /**
  * Adds the new zero crossing data to the correct fields of the zero_crossing
@@ -958,10 +974,8 @@ void _zero_crossing_reset(brushless_motor_t *motor){
 
 	zc->flag 					= false;
 	zc->time 					= 0;
-	zc->detection_time 			= 0;
-	zc->previous_detection_time	= 0;
-	zc->period 					= 0;
-	zc->period_filtered 		= 0;
+	zc->half_period 			= 0;
+	zc->half_period_filtered 	= 0;
 	zc->next_commutation_time 	= 0;
 	zc->ticks_since_last_comm 	= 0;
 
@@ -1078,13 +1092,14 @@ void _zero_crossing_cb(brushless_motor_t *motor){
 
 		_update_duty_cycle(motor);
 	}
+	zc->time += GET_COMMUTATION_TIME();
 
 	CALL_ZC_FUNCTION(motor);
 
-	zc->time++;
-
 	if(TIME_TO_COMMUTE(zc)){
 		RESET_ZC_FLAG(zc);
+		RESET_COMMUTATION_TIMER();
+		zc->time = 0;
 		_do_brushless_commutation(motor);
 	}
 
@@ -1150,14 +1165,12 @@ bool _zero_crossing_calibration_off(brushless_motor_t *motor){
  */
 void _compute_next_commutation(zero_crossing_t *zc)
 {
-	zc->previous_detection_time = zc->detection_time;
-	zc->detection_time    		= zc->time;
-	zc->period 					= zc->detection_time - zc->previous_detection_time;
-	LOW_PASS_FILTER(zc->period_filtered, (float)zc->period, LP_FILTER_COEFF_ZC);
+	zc->half_period 					= zc->time;
+	LOW_PASS_FILTER(zc->half_period_filtered, (float)zc->half_period, LP_FILTER_COEFF_ZC);
 	/*
-	 * One period = 60 electrical degrees -> zc->period_filtered/2 = 30 degrees
+	 * One period = 60 electrical degrees -> zc->half_period_filtered = 30 degrees
 	 */
-	zc->next_commutation_time 	= zc->time + (zc->period_filtered * (1.0 - zc->advance_timing))/2; //time + 30 degrees - advance phase
+	zc->next_commutation_time 	= zc->time + (zc->half_period_filtered * (1.0 - zc->advance_timing)); //time + 30 degrees - advance phase (max +- 30)
 }
 
 void motorSetAdvance(brushless_motors_names_t motor_name, float advance){
@@ -1689,6 +1702,12 @@ void _adcStop(void){
  * 			(timers 1, 2, 3, 4, 8).
  */
 void _timersStart(void){
+
+	// timer used to count the period between commutation
+	// Independent from the PWM timers below
+	gptStart(&GPTD10, &tim_10_cfg);
+    //let the timer count to max value
+    gptStartContinuous(&GPTD10, 0xFFFF);
 
 	// Clock and outputs of timers are disabled when the core is halted
 	// Phases are floating in this case -> No damage on the motors
