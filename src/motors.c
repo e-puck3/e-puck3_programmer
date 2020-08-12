@@ -1160,6 +1160,29 @@ void _compute_next_commutation(zero_crossing_t *zc)
 	zc->next_commutation_time 	= zc->time + (zc->period_filtered * (1.0 - zc->advance_timing))/2; //time + 30 degrees - advance phase
 }
 
+void motorSetAdvance(brushless_motors_names_t motor_name, float advance){
+
+	if(motor_name > NB_OF_BRUSHLESS_MOTOR){
+		return;
+	}
+
+	if(advance > 1){
+		advance = 1;
+	}else if(advance < -1){
+		advance = -1;
+	}
+
+	brushless_motors[motor_name].zero_crossing.advance_timing = advance;
+
+}
+float motorGetAdvance(brushless_motors_names_t motor_name){
+	if(motor_name > NB_OF_BRUSHLESS_MOTOR){
+		return -100;
+	}
+
+	return brushless_motors[motor_name].zero_crossing.advance_timing;
+}
+
 /**
  * @brief 			Updates the given line to the given state
  * 

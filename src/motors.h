@@ -101,6 +101,9 @@ void motorsStop(void);
  */
 void motorSetDutyCycle(brushless_motors_names_t motor_name, uint8_t duty_cycle);
 
+void motorSetAdvance(brushless_motors_names_t motor_name, float advance);
+float motorGetAdvance(brushless_motors_names_t motor_name);
+
 /**
  * @brief               Sets the bus voltage
  * 

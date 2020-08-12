@@ -91,10 +91,47 @@ static void cmd_motor_set_speed(BaseSequentialStream *chp, int argc, char *argv[
   }
 }
 
+static void cmd_motor_set_advance(BaseSequentialStream *chp, int argc, char *argv[]){
+{
+  (void)argv;
+  if(argc == 2)
+  {
+    char *endptr;
+
+    uint8_t motNumber = strtol(argv[0], &endptr, 0);
+    float advance = strtol(argv[1], &endptr, 0);
+
+    brushless_motors_names_t motor_id;
+    if(motNumber == 1){
+      motor_id = 0;
+    }else if(motNumber == 2){
+      motor_id = 1;
+    }else if(motNumber == 3){
+      motor_id = 2;
+    }else if(motNumber == 4){
+      motor_id = 3;
+    }else{
+      return;
+    }
+
+    advance /= 30;
+    motorSetAdvance(motor_id, advance);
+
+
+  }
+  else
+  {
+      shellUsage(chp, "motor_set_advance motNumber advance (-30 to 30)");
+      chprintf(chp, "actual advances : %f° %f° %f° %f° \r\n", 30*motorGetAdvance(0), 30*motorGetAdvance(1), 30*motorGetAdvance(2), 30*motorGetAdvance(3));
+  }
+}
+}
+
 static const ShellCommand commands[] = {
 	{"set_vbus_priority", cmd_set_vbus_priority},
 	{"set_inrush_limit", cmd_set_inrush_limit},
 	{"motor_set_speed", cmd_motor_set_speed},
+  {"motor_set_advance", cmd_motor_set_advance},
   USB_PD_CONTROLLER_SHELL_CMD
   THREADS_UTILITIES_SHELL_CMD
   {NULL, NULL}
