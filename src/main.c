@@ -23,6 +23,7 @@
 #include "threads_utilities.h"
 #include "motors.h"
 #include "adc_datalogger.h"
+#include "uart_cmd.h"
 
 /* Special note concerning memory allocation :
  * 
@@ -96,6 +97,8 @@ int main(void) {
 	 * Starts the communication thread.
 	 */
 	communicationsStart();
+
+	uartCmdStart();
 	/*
 	 * Starts the GDB system.
 	 */

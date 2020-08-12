@@ -11,7 +11,9 @@
 
 #define UART_CMD_PORT 	SD8
 
-
+/**
+ * @brief Starts the uart cmd threads
+ */
 void uartCmdStart(void);
 
 #endif  /* UART_CMD_H */
