@@ -103,7 +103,7 @@
 
 #define LP_FILTER_COEFF_HALF_BUS		0.01f
 #define LP_FILTER_COEFF_CURRENT			0.0001f
-#define LP_FILTER_COEFF_RPM 			0.1f
+#define LP_FILTER_COEFF_RPM 			0.5f
 #define LP_FILTER_COEFF_ZC				0.4f
 
 #define TICKS_52_KHZ_TO_100HZ 			520		//number of tick at 52kHz to achieve 100Hz
@@ -311,7 +311,7 @@ typedef struct{
     											     */
     uint32_t			next_commutation_time;		/* time at which the next commutation should occur */
     uint32_t			ticks_since_last_comm;		/* nb of PWM cycles since the last commutation */
-    uint32_t 			nb_commutations;			/* total nb of commutations */
+    uint32_t 			nb_commutations;			/* total nb of commutations between two rpm computations */
     zc_det_methods_t 	zc_method;					/* used to set which zc_method to call */
     uint16_t 			dataOn;						/* ADC value of the PWM ON time */
     uint16_t			dataOff;					/* ADC value of the PWM OFF time */
@@ -323,8 +323,7 @@ typedef struct{
  * RPM counter variables
  */
 typedef struct{
-	uint32_t nb_comms;								/* total nb of commutations */
-	uint32_t previous_nb_comms;						/* previous total nb of commutations */
+	uint32_t nb_comms;								/* total nb of commutations between rpm measurements*/
 	uint32_t count;									/* nb of PWM cycles between nb_comms and previous_nb_comms */
 	uint32_t rpm;									/* the filtered actual RPM */
 }rpm_counter_t;
@@ -943,7 +942,7 @@ static float _half_bus_adc_value = BATT_MAX_VOLTAGE * HALF_BATT_V_TO_ADC_VALUE;
  * 
  * @param zc Pointer to the zero_crossing_t structure we want to use
  */
-#define TIME_TO_COMMUTE(zc)	((((zc)->time >= (zc)->next_commutation_time) && (zc)->flag))
+#define TIME_TO_COMMUTE(zc)	(((zc)->time >= (zc)->next_commutation_time))
 
 /**
  * Returns true if the slope of the actual step of the given motor is positive, false otherwise
@@ -1098,7 +1097,7 @@ void _zero_crossing_cb(brushless_motor_t *motor){
 
 	CALL_ZC_FUNCTION(motor);
 
-	if(TIME_TO_COMMUTE(zc)){
+	if(motor->state == RUNNING && TIME_TO_COMMUTE(zc) && IS_ZC_FLAG(zc)){
 		RESET_ZC_FLAG(zc);
 		zc->time = 0;
 		_do_brushless_commutation(motor);
@@ -1149,12 +1148,7 @@ bool _zero_crossing_calibration_off(brushless_motor_t *motor){
 		}
 	}
 
-	/* We force the commutations at a arbitrary number of steps
-	 * to gather adc sample of each phase.
-	 */
-	if((motor->zero_crossing.time % 50) == 0){
-		_do_brushless_commutation(motor);
-	}
+	_do_brushless_commutation(motor);
 
 	return 0;
 }
@@ -1361,9 +1355,9 @@ void _rpm_counter_update(brushless_motor_t *motor){
 
 	rpm->count++;
 	if(rpm->count >= TICKS_52_KHZ_TO_100HZ){
-		rpm->previous_nb_comms = rpm->nb_comms;
 		rpm->nb_comms = motor->zero_crossing.nb_commutations;
-		LOW_PASS_FILTER(rpm->rpm, ((float)(rpm->nb_comms - rpm->previous_nb_comms) * RP10MS_TO_RPM) / motor->nb_of_poles, LP_FILTER_COEFF_RPM);
+		motor->zero_crossing.nb_commutations = 0;
+		LOW_PASS_FILTER(rpm->rpm, ((float)rpm->nb_comms * RP10MS_TO_RPM) / motor->nb_of_poles, LP_FILTER_COEFF_RPM);
 		rpm->count = 0;
 	}
 }
