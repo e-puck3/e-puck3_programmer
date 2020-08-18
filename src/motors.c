@@ -109,8 +109,8 @@
 
 #define TICKS_52_KHZ_TO_100HZ 			520		//number of tick at 52kHz to achieve 100Hz
 #define RP10MS_TO_RPM 					6000	//rounds per 10 millisecond to rounds per minute
-#define STARTUP_TIMEOUT_TIME 			TIME_MS2I(200)	//timeout to detect when we have a bad startup
-#define STARTUP_TIMEOUT_THRESHOLD		6				//number of times a startup timeout can occur before stopping
+#define STARTUP_TIMEOUT_TIME 			TIME_MS2I(100)	//timeout to detect when we have a bad startup
+#define STARTUP_TIMEOUT_THRESHOLD		12				//number of times a startup timeout can occur before stopping
 #define SPINNING_SPEED_THRESHOLD		3000    //rpm to reach to consider the motor spinning (not beginning to spin)
 #define GOOD_SPINNING_THRESHOLD			50		//number of time we need to be above SPINNING_SPEED_THRESHOLD to tell the motor
 												//is correctly spinning. 50 times at 100Hz -> 500ms
@@ -1117,7 +1117,8 @@ void _zero_crossing_cb(brushless_motor_t *motor){
 	}
 	// Condition to tell if we missed a zc. Even a really big deceleration should not trigger this
 	else if(motor->spinning && zc->time > zc->timeout_time && !IS_ZC_FLAG(zc)){
-		motor->duty_cycle_goal = 0;
+		//fallback into the startup sequence
+		_set_running(motor);
 	}
 }
 
@@ -1313,6 +1314,7 @@ void _set_running(brushless_motor_t *motor){
 	_update_brushless_phases(motor);
 	motor->spinning = false;
 	motor->good_spin_cnt = 0;
+	motor->startup_timeout_cnt = 0;
 	motor->startup_timeout = (chVTGetSystemTimeX() + STARTUP_TIMEOUT_TIME);
 }
 
@@ -1384,7 +1386,6 @@ void _rpm_counter_update(brushless_motor_t *motor){
 				motor->good_spin_cnt++;
 				if(motor->good_spin_cnt > GOOD_SPINNING_THRESHOLD){
 					motor->spinning = true;
-					motor->startup_timeout_cnt = 0;
 				}
 			}else{
 				motor->good_spin_cnt = 0;
