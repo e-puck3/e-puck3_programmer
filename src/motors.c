@@ -77,6 +77,7 @@
 #define ADC3_OFF_SAMPLE_TIME			0.20f	//we sample the OFF time at 20% of the PWM cycle
 #define ADC3_ON_SAMPLE_TIME				0.75f	//we sample the ON time at 75% of the PWM cycle
 #define ZC_DETECT_METHOD_THESHOLD		30		//we use the ZC_DETECT_ON method above 30% duty cycle
+#define ZC_TIMEOUT_FACTOR 				10		//number of zc we would have had if the speed was constant and each zc was found
 
 #define NB_SAMPLE_OFFSET_CALIBRATION	1000
 
@@ -108,6 +109,11 @@
 
 #define TICKS_52_KHZ_TO_100HZ 			520		//number of tick at 52kHz to achieve 100Hz
 #define RP10MS_TO_RPM 					6000	//rounds per 10 millisecond to rounds per minute
+#define STARTUP_TIMEOUT_TIME 			TIME_MS2I(200)	//timeout to detect when we have a bad startup
+#define STARTUP_TIMEOUT_THRESHOLD		6				//number of times a startup timeout can occur before stopping
+#define SPINNING_SPEED_THRESHOLD		3000    //rpm to reach to consider the motor spinning (not beginning to spin)
+#define GOOD_SPINNING_THRESHOLD			50		//number of time we need to be above SPINNING_SPEED_THRESHOLD to tell the motor
+												//is correctly spinning. 50 times at 100Hz -> 500ms
 
 
 /**
@@ -310,6 +316,7 @@ typedef struct{
     											     * -> a commutation 30 degrees sooner
     											     */
     uint32_t			next_commutation_time;		/* time at which the next commutation should occur */
+    uint32_t			timeout_time;				/* time at which we missed a zc */
     uint32_t			ticks_since_last_comm;		/* nb of PWM cycles since the last commutation */
     uint32_t 			nb_commutations;			/* total nb of commutations between two rpm computations */
     zc_det_methods_t 	zc_method;					/* used to set which zc_method to call */
@@ -358,7 +365,11 @@ typedef struct {
 	/* represents the number of steps necessary to do one complete turn. Specific to each motor */
 	uint8_t						nb_of_poles;	
 	rpm_counter_t 				rpm_counter;
-	current_meter_t 			current_meter;
+	uint32_t					startup_timeout;	/* time until which the motor should be spinning correctly */
+	uint16_t 					startup_timeout_cnt;/* counts how many times a startup timeout occurred */
+	bool 						spinning;			/* set when the motor reached SPINNING_SPEED_THRESHOLD */
+	uint16_t					good_spin_cnt;		/* used to count how many time the speed is above the threshold for the spinning variable */		
+	current_meter_t 			current_meter;		/* current meter object */
 	int8_t 						step_iterator;		/* 6 steps iterator */
 	float						duty_cycle_now;		/* actual duty cycle */
 	float 						duty_cycle_goal;	/* desired duty cycle */
@@ -366,8 +377,7 @@ typedef struct {
 	rotation_dir_t				direction;			/* direction of rotation of the motor */
 	motor_states_t				state;				/* motor's state */
 	zero_crossing_t				zero_crossing;		
-	/* array containing the ADC offset for the PWM OFF time */
-	uint32_t					ADC_offset_off[NB_BRUSHLESS_PHASES];
+	uint32_t					ADC_offset_off[NB_BRUSHLESS_PHASES]; /* array containing the ADC offset for the PWM OFF time */
 	uint16_t					nb_offset_sample;	/* nb of samples taken to compute the offset */
 } brushless_motor_t;
 
@@ -977,7 +987,7 @@ void _zero_crossing_reset(brushless_motor_t *motor){
 	zc->half_period_filtered 	= 0;
 	zc->next_commutation_time 	= 0;
 	zc->ticks_since_last_comm 	= 0;
-
+	RESET_COMMUTATION_TIMER();
 }
 
 /**
@@ -1091,24 +1101,24 @@ void _zero_crossing_cb(brushless_motor_t *motor){
 
 		_update_duty_cycle(motor);
 	}
-	zc->time += GET_COMMUTATION_TIME();
-	// resets the counter to avoid overflow problem
-	RESET_COMMUTATION_TIMER();
-
+	if(motor->state == RUNNING){
+		zc->time += GET_COMMUTATION_TIME();
+		// resets the counter to avoid overflow problem
+		RESET_COMMUTATION_TIMER();
+	}
+	
 	CALL_ZC_FUNCTION(motor);
 
 	if(motor->state == RUNNING && TIME_TO_COMMUTE(zc) && IS_ZC_FLAG(zc)){
 		RESET_ZC_FLAG(zc);
+		// By reseting zc->time here, it will directly give the half period (time between a commutation and a zc event)
 		zc->time = 0;
 		_do_brushless_commutation(motor);
 	}
-
-	// if(zc->time > 150){
-	// 	RESET_ZC_FLAG(zc);
-	// 	_do_brushless_commutation(motor);
-	// 	zc->time = 0;
-	// }
-	
+	// Condition to tell if we missed a zc. Even a really big deceleration should not trigger this
+	else if(motor->spinning && zc->time > zc->timeout_time && !IS_ZC_FLAG(zc)){
+		motor->duty_cycle_goal = 0;
+	}
 }
 
 /**
@@ -1166,6 +1176,7 @@ void _compute_next_commutation(zero_crossing_t *zc)
 	 * One period = 60 electrical degrees -> zc->half_period_filtered = 30 degrees
 	 */
 	zc->next_commutation_time 	= zc->time + (zc->half_period_filtered * (1.0 - zc->advance_timing)); //time + 30 degrees - advance phase (max +- 30)
+	zc->timeout_time 			= ZC_TIMEOUT_FACTOR * zc->next_commutation_time;
 }
 
 void motorSetAdvance(brushless_motors_names_t motor_name, float advance){
@@ -1300,6 +1311,9 @@ void _set_running(brushless_motor_t *motor){
 	_zero_crossing_reset(motor);
 	motor->state = RUNNING;
 	_update_brushless_phases(motor);
+	motor->spinning = false;
+	motor->good_spin_cnt = 0;
+	motor->startup_timeout = (chVTGetSystemTimeX() + STARTUP_TIMEOUT_TIME);
 }
 
 /**
@@ -1311,6 +1325,8 @@ void _set_running(brushless_motor_t *motor){
 void _set_free_wheeling(brushless_motor_t *motor){
 	motor->state = FREE_WHELLING;
 	_update_brushless_phases(motor);
+	motor->spinning = false;
+	motor->good_spin_cnt = 0;
 }
 
 /**
@@ -1322,6 +1338,8 @@ void _set_free_wheeling(brushless_motor_t *motor){
 void _set_tied_to_ground(brushless_motor_t *motor){
 	motor->state = TIED_TO_GROUND;
 	_update_brushless_phases(motor);
+	motor->spinning = false;
+	motor->good_spin_cnt = 0;
 }
 
 /**
@@ -1359,6 +1377,27 @@ void _rpm_counter_update(brushless_motor_t *motor){
 		motor->zero_crossing.nb_commutations = 0;
 		LOW_PASS_FILTER(rpm->rpm, ((float)rpm->nb_comms * RP10MS_TO_RPM) / motor->nb_of_poles, LP_FILTER_COEFF_RPM);
 		rpm->count = 0;
+
+		// Conditions to tell if the motor made a correct startup or is stuck.
+		if(motor->spinning == false && motor->state == RUNNING){
+			if(rpm->rpm >= SPINNING_SPEED_THRESHOLD){
+				motor->good_spin_cnt++;
+				if(motor->good_spin_cnt > GOOD_SPINNING_THRESHOLD){
+					motor->spinning = true;
+					motor->startup_timeout_cnt = 0;
+				}
+			}else{
+				motor->good_spin_cnt = 0;
+				if(chVTGetSystemTimeX() > motor->startup_timeout){
+					_do_brushless_commutation(motor);
+					motor->startup_timeout_cnt++;
+					motor->startup_timeout = (chVTGetSystemTimeX() + STARTUP_TIMEOUT_TIME);
+					if(motor->startup_timeout_cnt > STARTUP_TIMEOUT_THRESHOLD){
+						motor->duty_cycle_goal = 0;
+					}
+				}
+			}
+		}
 	}
 }
 
