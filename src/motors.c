@@ -370,6 +370,7 @@ typedef struct {
 	int8_t 						step_iterator;		/* 6 steps iterator */
 	float						duty_cycle_now;		/* actual duty cycle */
 	float 						duty_cycle_goal;	/* desired duty cycle */
+	bool						emergency_stop;		/* if set, the motor is stopped. Need to set duty cycle to 0 to reset the condition */
 	float 						ramp_steps;			/* increment used for the duty cycle */
 	rotation_dir_t				direction;			/* direction of rotation of the motor */
 	motor_states_t				state;				/* motor's state */
@@ -644,7 +645,10 @@ static brushless_motor_t brushless_motors[NB_OF_BRUSHLESS_MOTOR] = {
 		.commutation_scheme = BRUSHLESS_MOTOR_1_COMMUTATION,
 		.direction 			= BRUSHLESS_MOTOR_1_DIRECTION,
 		.ramp_steps 		= RAMP_STEPS_DUTY_CYCLE,
-		.nb_of_poles 		= 14
+		.nb_of_poles 		= BRUSHLESS_MOTOR_1_NB_POLES,
+		.zero_crossing 		= {
+			.advance_timing = (BRUSHLESS_MOTOR_1_ADVANCE_DEG/30)
+		}
 	},
 #if (NB_OF_BRUSHLESS_MOTOR > 1)
 #if (NB_OF_HALF_BRIDGES < 6)
@@ -657,7 +661,10 @@ static brushless_motor_t brushless_motors[NB_OF_BRUSHLESS_MOTOR] = {
 		.commutation_scheme = BRUSHLESS_MOTOR_2_COMMUTATION,
 		.direction 			= BRUSHLESS_MOTOR_2_DIRECTION,
 		.ramp_steps 		= RAMP_STEPS_DUTY_CYCLE,
-		.nb_of_poles 		= 14
+		.nb_of_poles 		= BRUSHLESS_MOTOR_2_NB_POLES,
+		.zero_crossing 		= {
+			.advance_timing = (BRUSHLESS_MOTOR_2_ADVANCE_DEG/30)
+		}
 	},
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 1) */
 #if (NB_OF_BRUSHLESS_MOTOR > 2)
@@ -671,7 +678,10 @@ static brushless_motor_t brushless_motors[NB_OF_BRUSHLESS_MOTOR] = {
 		.commutation_scheme = BRUSHLESS_MOTOR_3_COMMUTATION,
 		.direction 			= BRUSHLESS_MOTOR_3_DIRECTION,
 		.ramp_steps 		= RAMP_STEPS_DUTY_CYCLE,
-		.nb_of_poles 		= 14
+		.nb_of_poles 		= BRUSHLESS_MOTOR_3_NB_POLES,
+		.zero_crossing 		= {
+			.advance_timing = (BRUSHLESS_MOTOR_3_ADVANCE_DEG/30)
+		}
 	},
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 2) */
 #if (NB_OF_BRUSHLESS_MOTOR > 3)
@@ -685,7 +695,10 @@ static brushless_motor_t brushless_motors[NB_OF_BRUSHLESS_MOTOR] = {
 		.commutation_scheme = BRUSHLESS_MOTOR_4_COMMUTATION,
 		.direction 			= BRUSHLESS_MOTOR_4_DIRECTION,
 		.ramp_steps 		= RAMP_STEPS_DUTY_CYCLE,
-		.nb_of_poles 		= 14
+		.nb_of_poles 		= BRUSHLESS_MOTOR_4_NB_POLES,
+		.zero_crossing 		= {
+			.advance_timing = (BRUSHLESS_MOTOR_4_ADVANCE_DEG/30)
+		}
 	},
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */
 };
@@ -1108,7 +1121,7 @@ void _zero_crossing_cb(brushless_motor_t *motor){
 			SET_ZC_FLAG(zc);
 			zc->next_commutation_time = STARTUP_COMMUTATION_PERIOD;
 			if(chVTGetSystemTimeX() > motor->startup_timeout){
-				motor->duty_cycle_goal = 0;
+				motor->emergency_stop = true;
 			}
 		}
 	}
@@ -1635,6 +1648,14 @@ void _update_duty_cycle(brushless_motor_t *motor){
 	}else if(duty_cycle < 0){
 		duty_cycle = 0;
 	}
+
+	if(duty_cycle == 0){
+		motor->emergency_stop = false;
+	}
+
+	// if there is an emergency stop, set duty cycle to 0
+	duty_cycle *= !motor->emergency_stop;
+
 	if(duty_cycle != motor->duty_cycle_now){
 		_set_duty_cycle(motor, duty_cycle);
 	}
