@@ -52,14 +52,11 @@
  * Even if it works, there are a lot of things to improve to make this code reliable.
  * 
  * TODO :
- * 1) 	Add stall detection. Currently if a motor is stuck, the PWM is either stuck too, which means we will burn a phase of the motor, either performs 
- * 		commutations really quickly because it thinks the motor is turning really fast, which makes an annoying noise and is wrong.
- * 2)	Add a sequence to start a motor. Or some kind of strategy when the motor doesn't start to turn.
- * 3) 	Add a dynamic advance related to the speed of the motor. Currently there is no advance, even if the variable exists.
- * 4)	The current measurement is really noisy and need to be interpreted. The linear approximation made was correct for the DRV8323 drivers but is wrong for 
- * 		the MP6542 drivers.
- * 5)	Add more control strategies. Actually, we only control the duty-cycle to control the motors. We can add a speed controller and a current limiter.
- * 6) 	The maximum commutation speed is limited to 52000 commutations per seconds because the control loop is made at the PWM frequency. 
+ * 1) 	Add a dynamic advance related to the speed of the motor. Currently there is no advance, even if the variable exists.
+ * 2)	The current measurement is really noisy and need to be interpreted. The linear approximation made was correct for the DRV8323 drivers but is wrong for 
+ * 		the MP6542 drivers. Also for now the measures are taken continuously at regardless of the PWM duty cycle, which is wrong.
+ * 3)	Add more control strategies. Actually, we only control the duty-cycle to control the motors. We can add a speed controller and a current limiter.
+ * 4) 	The maximum commutation speed is limited to 52000 commutations per seconds because the control loop is made at the PWM frequency. 
  * 		It's more a limitation to be aware than a thing to improve since we already are at the limits of the system in order to control four motors.
  * 
  */
@@ -109,8 +106,9 @@
 
 #define TICKS_52_KHZ_TO_100HZ 			520		//number of tick at 52kHz to achieve 100Hz
 #define RP10MS_TO_RPM 					6000	//rounds per 10 millisecond to rounds per minute
-#define STARTUP_TIMEOUT_TIME 			TIME_MS2I(100)	//timeout to detect when we have a bad startup
-#define STARTUP_TIMEOUT_THRESHOLD		12				//number of times a startup timeout can occur before stopping
+#define STARTUP_TIMEOUT_TIME 			TIME_MS2I(1500)	//timeout to detect when we have a bad startup and stop trying
+#define STARTUP_COMMUTATION_FREQ_HZ		135		//forced commutation frequency for the startup sequence while no ZC is found until STARTUP_TIMEOUT_TIME
+#define STARTUP_COMMUTATION_PERIOD		(STM32_TIMCLK1/STARTUP_COMMUTATION_FREQ_HZ)
 #define SPINNING_SPEED_THRESHOLD		3000    //rpm to reach to consider the motor spinning (not beginning to spin)
 #define GOOD_SPINNING_THRESHOLD			50		//number of time we need to be above SPINNING_SPEED_THRESHOLD to tell the motor
 												//is correctly spinning. 50 times at 100Hz -> 500ms
@@ -366,7 +364,6 @@ typedef struct {
 	uint8_t						nb_of_poles;	
 	rpm_counter_t 				rpm_counter;
 	uint32_t					startup_timeout;	/* time until which the motor should be spinning correctly */
-	uint16_t 					startup_timeout_cnt;/* counts how many times a startup timeout occurred */
 	bool 						spinning;			/* set when the motor reached SPINNING_SPEED_THRESHOLD */
 	uint16_t					good_spin_cnt;		/* used to count how many time the speed is above the threshold for the spinning variable */		
 	current_meter_t 			current_meter;		/* current meter object */
@@ -807,7 +804,7 @@ static PWMConfig tim_234_cfg = {
 };
 
 static GPTConfig tim_10_cfg = {
-	.frequency = 108000000,        /* 108MHz timer clock to measure commutation period.*/
+	.frequency = STM32_TIMCLK1,        /* 108MHz timer clock to measure commutation period.*/
 	.callback = NULL,
 	.cr2 = 0,
 	.dier = 0
@@ -1105,6 +1102,15 @@ void _zero_crossing_cb(brushless_motor_t *motor){
 		zc->time += GET_COMMUTATION_TIME();
 		// resets the counter to avoid overflow problem
 		RESET_COMMUTATION_TIMER();
+
+		// forced commutations to start the motor if no zc found (kind of startup sequence)
+		if(motor->spinning == false && zc->time > STARTUP_COMMUTATION_PERIOD){
+			SET_ZC_FLAG(zc);
+			zc->next_commutation_time = STARTUP_COMMUTATION_PERIOD;
+			if(chVTGetSystemTimeX() > motor->startup_timeout){
+				motor->duty_cycle_goal = 0;
+			}
+		}
 	}
 	
 	CALL_ZC_FUNCTION(motor);
@@ -1314,7 +1320,6 @@ void _set_running(brushless_motor_t *motor){
 	_update_brushless_phases(motor);
 	motor->spinning = false;
 	motor->good_spin_cnt = 0;
-	motor->startup_timeout_cnt = 0;
 	motor->startup_timeout = (chVTGetSystemTimeX() + STARTUP_TIMEOUT_TIME);
 }
 
@@ -1380,23 +1385,16 @@ void _rpm_counter_update(brushless_motor_t *motor){
 		LOW_PASS_FILTER(rpm->rpm, ((float)rpm->nb_comms * RP10MS_TO_RPM) / motor->nb_of_poles, LP_FILTER_COEFF_RPM);
 		rpm->count = 0;
 
-		// Conditions to tell if the motor made a correct startup or is stuck.
+		// Conditions to tell if the motor made a correct startup.
 		if(motor->spinning == false && motor->state == RUNNING){
 			if(rpm->rpm >= SPINNING_SPEED_THRESHOLD){
 				motor->good_spin_cnt++;
 				if(motor->good_spin_cnt > GOOD_SPINNING_THRESHOLD){
 					motor->spinning = true;
 				}
-			}else{
+			}
+			else{
 				motor->good_spin_cnt = 0;
-				if(chVTGetSystemTimeX() > motor->startup_timeout){
-					_do_brushless_commutation(motor);
-					motor->startup_timeout_cnt++;
-					motor->startup_timeout = (chVTGetSystemTimeX() + STARTUP_TIMEOUT_TIME);
-					if(motor->startup_timeout_cnt > STARTUP_TIMEOUT_THRESHOLD){
-						motor->duty_cycle_goal = 0;
-					}
-				}
 			}
 		}
 	}
