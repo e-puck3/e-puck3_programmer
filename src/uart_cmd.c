@@ -46,6 +46,7 @@ static void uart_cmd_cb(const void *message, size_t len, void *arg){
         // chprintf((BaseSequentialStream *)&SD1, "motor 2: %d dt\r\n", buffer_8bits[2]);
         // chprintf((BaseSequentialStream *)&SD1, "motor 3: %d dt\r\n", buffer_8bits[3]);
         // chprintf((BaseSequentialStream *)&SD1, "motor 4: %d dt\r\n\r\n", buffer_8bits[4]);
+        // chprintf((BaseSequentialStream *)&SD1, "time: %d dt\r\n\r\n", chVTGetSystemTimeX());
     }
 }
 
@@ -105,11 +106,11 @@ static THD_FUNCTION(uart_cmd_tx, arg)
     	send_float[0] = motorGetDutyCycle(BRUSHLESS_MOTOR_1);
     	send_float[1] = motorsGetRPM(BRUSHLESS_MOTOR_1);
     	send_float[2] = motorGetDutyCycle(BRUSHLESS_MOTOR_2);
-    	send_float[3] = motorsGetRPM(BRUSHLESS_MOTOR_1);
+    	send_float[3] = motorsGetRPM(BRUSHLESS_MOTOR_2);
     	send_float[4] = motorGetDutyCycle(BRUSHLESS_MOTOR_3);
-    	send_float[5] = motorsGetRPM(BRUSHLESS_MOTOR_1);
+    	send_float[5] = motorsGetRPM(BRUSHLESS_MOTOR_3);
     	send_float[6] = motorGetDutyCycle(BRUSHLESS_MOTOR_4);
-    	send_float[7] = motorsGetRPM(BRUSHLESS_MOTOR_1);
+    	send_float[7] = motorsGetRPM(BRUSHLESS_MOTOR_4);
     	serial_datagram_send(send_buf, TELEMETRY_MSG_LEN, _stream_values_sndfn, &UART_CMD_PORT);
 
     	// voltage measurements sending
@@ -137,5 +138,5 @@ void uartCmdStart(void){
 
 	chThdCreateStatic(uart_cmd_tx_wa, sizeof(uart_cmd_tx_wa), NORMALPRIO, uart_cmd_tx, NULL);
 
-	chThdCreateStatic(uart_cmd_rx_wa, sizeof(uart_cmd_rx_wa), NORMALPRIO, uart_cmd_rx, NULL);
+	chThdCreateStatic(uart_cmd_rx_wa, sizeof(uart_cmd_rx_wa), NORMALPRIO+10, uart_cmd_rx, NULL);
 }
