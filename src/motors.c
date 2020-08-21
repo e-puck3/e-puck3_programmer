@@ -55,8 +55,9 @@
  * 1) 	Add a dynamic advance related to the speed of the motor. Currently there is no advance, even if the variable exists.
  * 2)	The current measurement is really noisy and need to be interpreted. The linear approximation made was correct for the DRV8323 drivers but is wrong for 
  * 		the MP6542 drivers. Also for now the measures are taken continuously at regardless of the PWM duty cycle, which is wrong.
- * 3)	Add more control strategies. Actually, we only control the duty-cycle to control the motors. We can add a speed controller and a current limiter.
- * 4) 	The maximum commutation speed is limited to 52000 commutations per seconds because the control loop is made at the PWM frequency. 
+ * 3) 	Without current measure, it is still possible to have the motor stuck but which really high commutation speed so it's still possible to toast a motor.
+ * 4)	Add more control strategies. Actually, we only control the duty-cycle to control the motors. We can add a speed controller and a current limiter.
+ * 5) 	The maximum commutation speed is limited to 52000 commutations per seconds because the control loop is made at the PWM frequency. 
  * 		It's more a limitation to be aware than a thing to improve since we already are at the limits of the system in order to control four motors.
  * 
  */
@@ -106,6 +107,7 @@
 
 #define TICKS_52_KHZ_TO_100HZ 			520		//number of tick at 52kHz to achieve 100Hz
 #define RP10MS_TO_RPM 					6000	//rounds per 10 millisecond to rounds per minute
+#define STARTUP_DUTY_CYCLE 				10		//duty_cycle at which start the motor to not toast it
 #define STARTUP_TIMEOUT_TIME 			TIME_MS2I(1500)	//timeout to detect when we have a bad startup and stop trying
 #define STARTUP_COMMUTATION_FREQ_HZ		135		//forced commutation frequency for the startup sequence while no ZC is found until STARTUP_TIMEOUT_TIME
 #define STARTUP_COMMUTATION_PERIOD		(STM32_TIMCLK1/STARTUP_COMMUTATION_FREQ_HZ)
@@ -1118,6 +1120,11 @@ void _zero_crossing_cb(brushless_motor_t *motor){
 
 		// forced commutations to start the motor if no zc found (kind of startup sequence)
 		if(motor->spinning == false && zc->time > STARTUP_COMMUTATION_PERIOD){
+			// By putting this after _update_duty_cycle(), we bypass it to have to not toast the motor if stuck at his duty_cycle,
+			// then _update_duty_cycle() will do its job of increasing the duty_cycle smoothly again.
+			if(motor->duty_cycle_now > STARTUP_DUTY_CYCLE){
+				motor->duty_cycle_now = STARTUP_DUTY_CYCLE;
+			}
 			SET_ZC_FLAG(zc);
 			zc->next_commutation_time = STARTUP_COMMUTATION_PERIOD;
 			if(chVTGetSystemTimeX() > motor->startup_timeout){
