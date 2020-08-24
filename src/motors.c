@@ -1376,10 +1376,11 @@ void _set_tied_to_ground(brushless_motor_t *motor){
  * @param motor 	Motor to update the current. It is a pointer. See brushless_motor_t
  * @param buffer 	buffer containing the ADC raw values. Be careful. The address
  * 					of the first element should be given.
+ * @param step 		Step at which the measurement was taken
  */
 
-#define CURRENT_METER_UPDATE(motor, buffer) {\
-if(pwm_commutation_schemes[(motor)->commutation_scheme][(motor)->step_iterator].low_side_conducting_phase != PHASE3){\
+#define CURRENT_METER_UPDATE(motor, buffer, step) {\
+if(step != PHASE3){\
 	LOW_PASS_FILTER((motor)->current_meter.low_pass_1, (buffer)[0 * MAX_NB_OF_BRUSHLESS_MOTOR], LP_FILTER_COEFF_CURRENT);\
 	LOW_PASS_FILTER((motor)->current_meter.low_pass_1, (buffer)[1 * MAX_NB_OF_BRUSHLESS_MOTOR], LP_FILTER_COEFF_CURRENT);\
 	LOW_PASS_FILTER((motor)->current_meter.low_pass_1, (buffer)[2 * MAX_NB_OF_BRUSHLESS_MOTOR], LP_FILTER_COEFF_CURRENT);\
@@ -1430,6 +1431,7 @@ void _adc2_current_cb(ADCDriver *adcp){
 
 	static size_t half_index = (ADC2_NB_ELEMENT_SEQ * MAX_NB_OF_BRUSHLESS_MOTOR * ADC2_BUFFER_DEPTH)/2;
 	static adcsample_t* buffer = NULL;
+	static uint8_t last_step[MAX_NB_OF_BRUSHLESS_MOTOR];
 
 	if(adcIsBufferComplete(adcp)){
 		buffer = &adc2_buffer[half_index];
@@ -1498,18 +1500,29 @@ void _adc2_current_cb(ADCDriver *adcp){
 #endif /* LOG_ADC_CURRENT */
 
 #if (NB_OF_BRUSHLESS_MOTOR > 0)
-	CURRENT_METER_UPDATE(&brushless_motors[BRUSHLESS_MOTOR_1], &buffer[BRUSHLESS_MOTOR_1]);
+	CURRENT_METER_UPDATE(&brushless_motors[BRUSHLESS_MOTOR_1], &buffer[BRUSHLESS_MOTOR_1], last_step[BRUSHLESS_MOTOR_1]);
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 0) */	
 #if (NB_OF_BRUSHLESS_MOTOR > 1)
-	CURRENT_METER_UPDATE(&brushless_motors[BRUSHLESS_MOTOR_2], &buffer[BRUSHLESS_MOTOR_2]);
+	CURRENT_METER_UPDATE(&brushless_motors[BRUSHLESS_MOTOR_2], &buffer[BRUSHLESS_MOTOR_2], last_step[BRUSHLESS_MOTOR_2]);
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 1) */
 #if (NB_OF_BRUSHLESS_MOTOR > 2)
-	CURRENT_METER_UPDATE(&brushless_motors[BRUSHLESS_MOTOR_3], &buffer[BRUSHLESS_MOTOR_3]);
+	CURRENT_METER_UPDATE(&brushless_motors[BRUSHLESS_MOTOR_3], &buffer[BRUSHLESS_MOTOR_3], last_step[BRUSHLESS_MOTOR_3]);
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 2) */
 #if (NB_OF_BRUSHLESS_MOTOR > 3)
-	CURRENT_METER_UPDATE(&brushless_motors[BRUSHLESS_MOTOR_4], &buffer[BRUSHLESS_MOTOR_4]);
-
-
+	CURRENT_METER_UPDATE(&brushless_motors[BRUSHLESS_MOTOR_4], &buffer[BRUSHLESS_MOTOR_4], last_step[BRUSHLESS_MOTOR_4]);
+#endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */
+	
+#if (NB_OF_BRUSHLESS_MOTOR > 0)
+	last_step[BRUSHLESS_MOTOR_1] = GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_1]);
+#endif /* (NB_OF_BRUSHLESS_MOTOR > 0) */
+#if (NB_OF_BRUSHLESS_MOTOR > 1)
+	last_step[BRUSHLESS_MOTOR_2] = GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_2]);
+#endif /* (NB_OF_BRUSHLESS_MOTOR > 1) */
+#if (NB_OF_BRUSHLESS_MOTOR > 2)
+	last_step[BRUSHLESS_MOTOR_3] = GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_3]);
+#endif /* (NB_OF_BRUSHLESS_MOTOR > 2) */
+#if (NB_OF_BRUSHLESS_MOTOR > 3)
+	last_step[BRUSHLESS_MOTOR_4] = GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_4]);
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */
 }
 
