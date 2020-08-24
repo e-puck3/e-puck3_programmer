@@ -864,6 +864,12 @@ static float _half_bus_adc_value = BATT_MAX_VOLTAGE * HALF_BATT_V_TO_ADC_VALUE;
  */
 #define GET_FLOATING_PHASE(motor) (pwm_commutation_schemes[(motor)->commutation_scheme][(motor)->step_iterator].floating_phase)
 /**
+ * Gives the low lide conducting phase 
+ * 
+ * @param motor	Pointer to the brushless_motor_t structure we want to use
+ */
+#define GET_LOW_SIDE_CONDUCTING_PHASE(motor) (pwm_commutation_schemes[(motor)->commutation_scheme][(motor)->step_iterator].low_side_conducting_phase)
+/**
  * Gives the ADC3 channel to measure given the motor 
  * 
  * @param motor	Pointer to the brushless_motor_t structure we want to use
@@ -1513,16 +1519,16 @@ void _adc2_current_cb(ADCDriver *adcp){
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */
 	
 #if (NB_OF_BRUSHLESS_MOTOR > 0)
-	last_step[BRUSHLESS_MOTOR_1] = GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_1]);
+	last_step[BRUSHLESS_MOTOR_1] = GET_LOW_SIDE_CONDUCTING_PHASE(&brushless_motors[BRUSHLESS_MOTOR_1]);
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 0) */
 #if (NB_OF_BRUSHLESS_MOTOR > 1)
-	last_step[BRUSHLESS_MOTOR_2] = GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_2]);
+	last_step[BRUSHLESS_MOTOR_2] = GET_LOW_SIDE_CONDUCTING_PHASE(&brushless_motors[BRUSHLESS_MOTOR_2]);
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 1) */
 #if (NB_OF_BRUSHLESS_MOTOR > 2)
-	last_step[BRUSHLESS_MOTOR_3] = GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_3]);
+	last_step[BRUSHLESS_MOTOR_3] = GET_LOW_SIDE_CONDUCTING_PHASE(&brushless_motors[BRUSHLESS_MOTOR_3]);
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 2) */
 #if (NB_OF_BRUSHLESS_MOTOR > 3)
-	last_step[BRUSHLESS_MOTOR_4] = GET_LOW_SIDE_CONDUCTING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_4]);
+	last_step[BRUSHLESS_MOTOR_4] = GET_LOW_SIDE_CONDUCTING_PHASE(&brushless_motors[BRUSHLESS_MOTOR_4]);
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */
 }
 
@@ -1549,6 +1555,21 @@ void _adc3_voltage_cb(ADCDriver *adcp){
 	if(state){
 		//we sampled OFF PWM
 		UPDATE_ADC3_TRIGGER(ADC3_ON_SAMPLE_TIME);
+
+#if (NB_OF_BRUSHLESS_MOTOR > 0)
+		UPDATE_ADC3_SEQUENCE(
+			ADC_SQR3_SQ1_N(GET_FLOATING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_1]))|
+#if (NB_OF_BRUSHLESS_MOTOR > 1)
+    		ADC_SQR3_SQ2_N(GET_FLOATING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_2]))|
+#endif /* (NB_OF_BRUSHLESS_MOTOR > 1) */
+#if (NB_OF_BRUSHLESS_MOTOR > 2)
+    		ADC_SQR3_SQ3_N(GET_FLOATING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_3]))|
+#endif /* (NB_OF_BRUSHLESS_MOTOR > 2) */
+#if (NB_OF_BRUSHLESS_MOTOR > 3)
+    		ADC_SQR3_SQ4_N(GET_FLOATING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_4]))|
+#endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */
+    	0);
+#endif /* (NB_OF_BRUSHLESS_MOTOR > 0) */
 
 #if (NB_OF_BRUSHLESS_MOTOR > 0)
 		ADD_NEW_ZC_DATAOFF(&(brushless_motors[BRUSHLESS_MOTOR_1].zero_crossing), buffer[BRUSHLESS_MOTOR_1]);
@@ -1583,21 +1604,6 @@ void _adc3_voltage_cb(ADCDriver *adcp){
 
 		//we sampled ON PWM
 		UPDATE_ADC3_TRIGGER(ADC3_OFF_SAMPLE_TIME);
-#if (NB_OF_BRUSHLESS_MOTOR > 0)
-		UPDATE_ADC3_SEQUENCE(
-			ADC_SQR3_SQ1_N(GET_FLOATING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_1]))|
-#if (NB_OF_BRUSHLESS_MOTOR > 1)
-    		ADC_SQR3_SQ2_N(GET_FLOATING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_2]))|
-#endif /* (NB_OF_BRUSHLESS_MOTOR > 1) */
-#if (NB_OF_BRUSHLESS_MOTOR > 2)
-    		ADC_SQR3_SQ3_N(GET_FLOATING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_3]))|
-#endif /* (NB_OF_BRUSHLESS_MOTOR > 2) */
-#if (NB_OF_BRUSHLESS_MOTOR > 3)
-    		ADC_SQR3_SQ4_N(GET_FLOATING_PHASE_CHANNEL(&brushless_motors[BRUSHLESS_MOTOR_4]))|
-#endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */
-    	0);
-#endif /* (NB_OF_BRUSHLESS_MOTOR > 0) */
-
 
 #if (NB_OF_BRUSHLESS_MOTOR > 0)
 		ADD_NEW_ZC_DATAON(&(brushless_motors[BRUSHLESS_MOTOR_1].zero_crossing), buffer[BRUSHLESS_MOTOR_1]);
