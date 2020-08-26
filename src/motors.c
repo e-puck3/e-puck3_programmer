@@ -52,14 +52,14 @@
  * Even if it works, there are a lot of things to improve to make this code reliable.
  * 
  * TODO :
- * 1) 	Add a dynamic advance related to the speed of the motor. Currently there is no advance, even if the variable exists.
- * 2)	The current measurement is really noisy and need to be interpreted. The linear approximation made was correct for the DRV8323 drivers but is wrong for 
- * 		the MP6542 drivers. Also for now the measures are taken continuously at regardless of the PWM duty cycle, which is wrong.
- * 3) 	Without current measure, it is still possible to have the motor stuck but which really high commutation speed so it's still possible to toast a motor.
+ * 1) 	Add a dynamic advance related to the speed of the motor. Currently there is a fixed advance.
+ * 2)	The current measurement works but needs to be interpreted correctly. The linear approximation made was correct for the DRV8323 drivers but is wrong for 
+ * 		the MP6542 drivers.
+ * 3) 	Without a good current measurement, it is still possible to have the motor stuck but which really high commutation speed so it's still possible to toast a motor.
  * 4)	Add more control strategies. Actually, we only control the duty-cycle to control the motors. We can add a speed controller and a current limiter.
  * 5) 	The maximum commutation speed is limited to 52000 commutations per seconds because the control loop is made at the PWM frequency. 
  * 		It's more a limitation to be aware than a thing to improve since we already are at the limits of the system in order to control four motors.
- * 
+ * 		We still can achieve 100% on the small drone motor ~180000 rpm, which is good but the control is not clean at this speed -> consumes more than it should.
  */
  
 #include "ch.h"
@@ -93,7 +93,6 @@
 #define HALF_BATT_V_TO_ADC_VALUE		((RESISTOR_R2_MOT * ADC_RESOLUTION)/(2 * VREF * (RESISTOR_R1_MOT + RESISTOR_R2_MOT)))
 
 #define DEGAUSS_TICKS_ZC_OFF			1
-// #define HALF_BUS_ADC_VALUE				962
 
 #define PERIOD_PWM_52_KHZ_APB2  		4154	// STM32_TIMCLK2/52000 rounded to an even number to be divisible by 2
 #define PERIOD_PWM_52_KHZ_APB1 			PERIOD_PWM_52_KHZ_APB2/2
@@ -1430,8 +1429,6 @@ void _rpm_counter_update(brushless_motor_t *motor){
 /**
  * @brief 			ADC2 callback. Used to gather the currents from the four motors
  * @param adcp 		Not used
- * @param buffer 	Buffer containing the new data
- * @param n 		Not used
  */
 void _adc2_current_cb(ADCDriver *adcp){
 
@@ -1536,8 +1533,6 @@ void _adc2_current_cb(ADCDriver *adcp){
  * @brief 			ADC3 callback. Used to gather the voltages from the four motors.
  * 					Also runs the brushless zero crossing algorithms and commutations
  * @param adcp 		Not used
- * @param buffer 	Buffer containing the new data
- * @param n 		Not used
  */
 void _adc3_voltage_cb(ADCDriver *adcp){
 

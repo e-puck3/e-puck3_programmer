@@ -48,8 +48,8 @@
 #define BRUSHLESS_MOTOR_4_PHASE3			HALF_BRIDGE_12
 #define BRUSHLESS_MOTOR_4_COMMUTATION		DOUBLE_PWM
 #define BRUSHLESS_MOTOR_4_DIRECTION			CW
-#define BRUSHLESS_MOTOR_4_NB_POLES 			14
-#define BRUSHLESS_MOTOR_4_ADVANCE_DEG		30.0f
+#define BRUSHLESS_MOTOR_4_NB_POLES 			6
+#define BRUSHLESS_MOTOR_4_ADVANCE_DEG		15.0f		//example for the Align 430XL motor
 #endif
 
 /********************              BOARD SPECIFIC CONFIG            ********************/
