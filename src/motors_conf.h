@@ -18,7 +18,7 @@
 #define BRUSHLESS_MOTOR_1_PHASE3						HALF_BRIDGE_3
 #define BRUSHLESS_MOTOR_1_COMMUTATION					DOUBLE_PWM
 #define BRUSHLESS_MOTOR_1_DIRECTION						CW
-#define BRUSHLESS_MOTOR_1_NB_POLES 						14		//to find it, simply count how many steps you feel to complete one turn and divide it by 3
+#define BRUSHLESS_MOTOR_1_NB_POLES 						12		//to find it, simply count how many steps you feel to complete one turn and divide it by 3
 #define BRUSHLESS_MOTOR_1_ADVANCE_DEG					30.0f	//It is the advance angle for the commutation. Good for small motors, should be less for big motors
 #define BRUSHLESS_MOTOR_1_STARTUP_DUTY_CYCLE 			10		//duty_cycle to use to start the motor to not toast it
 #define BRUSHLESS_MOTOR_1_STARTUP_TIMEOUT_TIME 			TIME_MS2I(1500)	//timeout to detect when we have a bad startup and stop trying to start it
@@ -32,7 +32,7 @@
 #define BRUSHLESS_MOTOR_2_PHASE3						HALF_BRIDGE_6
 #define BRUSHLESS_MOTOR_2_COMMUTATION					DOUBLE_PWM
 #define BRUSHLESS_MOTOR_2_DIRECTION						CW
-#define BRUSHLESS_MOTOR_2_NB_POLES 						14
+#define BRUSHLESS_MOTOR_2_NB_POLES 						12
 #define BRUSHLESS_MOTOR_2_ADVANCE_DEG					30.0f
 #define BRUSHLESS_MOTOR_2_STARTUP_DUTY_CYCLE 			10
 #define BRUSHLESS_MOTOR_2_STARTUP_TIMEOUT_TIME 			TIME_MS2I(1500)
@@ -46,7 +46,7 @@
 #define BRUSHLESS_MOTOR_3_PHASE3						HALF_BRIDGE_9
 #define BRUSHLESS_MOTOR_3_COMMUTATION					DOUBLE_PWM
 #define BRUSHLESS_MOTOR_3_DIRECTION						CW
-#define BRUSHLESS_MOTOR_3_NB_POLES 						14
+#define BRUSHLESS_MOTOR_3_NB_POLES 						12
 #define BRUSHLESS_MOTOR_3_ADVANCE_DEG					30.0f
 #define BRUSHLESS_MOTOR_3_STARTUP_DUTY_CYCLE 			10
 #define BRUSHLESS_MOTOR_3_STARTUP_TIMEOUT_TIME 			TIME_MS2I(1500)

@@ -88,7 +88,7 @@ void motorsStart(void);
 /**
  * @brief Stops the motors module.
  * 
- * Uses Timers 1, 2, 3, 4, 8 and ADC 2 and 3.
+ * Uses Timers 1, 2, 3, 4, 8, 10 and ADC 2 and 3.
  */
 void motorsStop(void);
 
