@@ -106,11 +106,6 @@
 
 #define TICKS_52_KHZ_TO_100HZ 			520		//number of tick at 52kHz to achieve 100Hz
 #define RP10MS_TO_RPM 					6000	//rounds per 10 millisecond to rounds per minute
-#define STARTUP_DUTY_CYCLE 				10		//duty_cycle at which start the motor to not toast it
-#define STARTUP_TIMEOUT_TIME 			TIME_MS2I(1500)	//timeout to detect when we have a bad startup and stop trying
-#define STARTUP_COMMUTATION_FREQ_HZ		135		//forced commutation frequency for the startup sequence while no ZC is found until STARTUP_TIMEOUT_TIME
-#define STARTUP_COMMUTATION_PERIOD		(STM32_TIMCLK1/STARTUP_COMMUTATION_FREQ_HZ)
-#define SPINNING_SPEED_THRESHOLD		3000    //rpm to reach to consider the motor spinning (not beginning to spin)
 #define GOOD_SPINNING_THRESHOLD			50		//number of time we need to be above SPINNING_SPEED_THRESHOLD to tell the motor
 												//is correctly spinning. 50 times at 100Hz -> 500ms
 
@@ -364,20 +359,24 @@ typedef struct {
 	/* represents the number of steps necessary to do one complete turn. Specific to each motor */
 	uint8_t						nb_of_poles;	
 	rpm_counter_t 				rpm_counter;
-	uint32_t					startup_timeout;	/* time until which the motor should be spinning correctly */
-	bool 						spinning;			/* set when the motor reached SPINNING_SPEED_THRESHOLD */
-	uint16_t					good_spin_cnt;		/* used to count how many time the speed is above the threshold for the spinning variable */		
-	current_meter_t 			current_meter;		/* current meter object */
-	int8_t 						step_iterator;		/* 6 steps iterator */
-	float						duty_cycle_now;		/* actual duty cycle */
-	float 						duty_cycle_goal;	/* desired duty cycle */
-	bool						emergency_stop;		/* if set, the motor is stopped. Need to set duty cycle to 0 to reset the condition */
-	float 						ramp_steps;			/* increment used for the duty cycle */
-	rotation_dir_t				direction;			/* direction of rotation of the motor */
-	motor_states_t				state;				/* motor's state */
+	uint32_t					startup_timeout;			/* time until which the motor should be spinning correctly */
+	bool 						spinning;					/* set when the motor reached SPINNING_SPEED_THRESHOLD */
+	uint16_t					good_spin_cnt;				/* used to count how many time the speed is above the threshold for the spinning variable */	
+	uint8_t						startup_duty_cycle;			/* duty_cycle at which start the motor to not toast it */
+	uint16_t					startup_timeout_time;		/* timeout to detect when we have a bad startup and stop trying */
+	uint32_t					startup_commutation_period;	/* forced commutation frequency for the startup sequence while no ZC is found until STARTUP_TIMEOUT_TIME */
+	uint16_t					spinning_speed_threshold;	/* rpm to reach to consider the motor spinning (not beginning to spin) */
+	current_meter_t 			current_meter;				/* current meter object */
+	int8_t 						step_iterator;				/* 6 steps iterator */
+	float						duty_cycle_now;				/* actual duty cycle */
+	float 						duty_cycle_goal;			/* desired duty cycle */
+	bool						emergency_stop;				/* if set, the motor is stopped. Need to set duty cycle to 0 to reset the condition */
+	float 						ramp_steps;					/* increment used for the duty cycle */
+	rotation_dir_t				direction;					/* direction of rotation of the motor */
+	motor_states_t				state;						/* motor's state */
 	zero_crossing_t				zero_crossing;		
 	uint32_t					ADC_offset_off[NB_BRUSHLESS_PHASES]; /* array containing the ADC offset for the PWM OFF time */
-	uint16_t					nb_offset_sample;	/* nb of samples taken to compute the offset */
+	uint16_t					nb_offset_sample;			/* nb of samples taken to compute the offset */
 } brushless_motor_t;
 
 /**
@@ -640,32 +639,40 @@ static const half_bridge_t half_bridges[NB_OF_HALF_BRIDGES] = {
 #endif /* (NB_OF_HALF_BRIDGES < 3) */
 static brushless_motor_t brushless_motors[NB_OF_BRUSHLESS_MOTOR] = {
 	{
-		.phases[PHASE1] 	= &half_bridges[BRUSHLESS_MOTOR_1_PHASE1],
-		.phases[PHASE2] 	= &half_bridges[BRUSHLESS_MOTOR_1_PHASE2],
-		.phases[PHASE3] 	= &half_bridges[BRUSHLESS_MOTOR_1_PHASE3],
-		.commutation_scheme = BRUSHLESS_MOTOR_1_COMMUTATION,
-		.direction 			= BRUSHLESS_MOTOR_1_DIRECTION,
-		.ramp_steps 		= RAMP_STEPS_DUTY_CYCLE,
-		.nb_of_poles 		= BRUSHLESS_MOTOR_1_NB_POLES,
-		.zero_crossing 		= {
-			.advance_timing = (BRUSHLESS_MOTOR_1_ADVANCE_DEG/30)
-		}
+		.phases[PHASE1] 			= &half_bridges[BRUSHLESS_MOTOR_1_PHASE1],
+		.phases[PHASE2] 			= &half_bridges[BRUSHLESS_MOTOR_1_PHASE2],
+		.phases[PHASE3] 			= &half_bridges[BRUSHLESS_MOTOR_1_PHASE3],
+		.commutation_scheme 		= BRUSHLESS_MOTOR_1_COMMUTATION,
+		.direction 					= BRUSHLESS_MOTOR_1_DIRECTION,
+		.ramp_steps 				= RAMP_STEPS_DUTY_CYCLE,
+		.nb_of_poles 				= BRUSHLESS_MOTOR_1_NB_POLES,
+		.zero_crossing 	= {
+			.advance_timing 		= (BRUSHLESS_MOTOR_1_ADVANCE_DEG / 30)
+		},
+		.startup_duty_cycle 		= BRUSHLESS_MOTOR_1_STARTUP_DUTY_CYCLE,
+		.startup_timeout_time 		= BRUSHLESS_MOTOR_1_STARTUP_TIMEOUT_TIME,
+		.startup_commutation_period = (STM32_TIMCLK1 / BRUSHLESS_MOTOR_1_STARTUP_COMMUTATION_FREQ_HZ),
+		.spinning_speed_threshold 	= BRUSHLESS_MOTOR_1_SPINNING_SPEED_THRESHOLD,
 	},
 #if (NB_OF_BRUSHLESS_MOTOR > 1)
 #if (NB_OF_HALF_BRIDGES < 6)
 #error "we need at least 6 half bridges to drive two brushless motors !"
 #endif /* (NB_OF_HALF_BRIDGES < 6) */
 	{
-		.phases[PHASE1] 	= &half_bridges[BRUSHLESS_MOTOR_2_PHASE1],
-		.phases[PHASE2] 	= &half_bridges[BRUSHLESS_MOTOR_2_PHASE2],
-		.phases[PHASE3] 	= &half_bridges[BRUSHLESS_MOTOR_2_PHASE3],
-		.commutation_scheme = BRUSHLESS_MOTOR_2_COMMUTATION,
-		.direction 			= BRUSHLESS_MOTOR_2_DIRECTION,
-		.ramp_steps 		= RAMP_STEPS_DUTY_CYCLE,
-		.nb_of_poles 		= BRUSHLESS_MOTOR_2_NB_POLES,
+		.phases[PHASE1] 			= &half_bridges[BRUSHLESS_MOTOR_2_PHASE1],
+		.phases[PHASE2] 			= &half_bridges[BRUSHLESS_MOTOR_2_PHASE2],
+		.phases[PHASE3] 			= &half_bridges[BRUSHLESS_MOTOR_2_PHASE3],
+		.commutation_scheme 		= BRUSHLESS_MOTOR_2_COMMUTATION,
+		.direction 					= BRUSHLESS_MOTOR_2_DIRECTION,
+		.ramp_steps 				= RAMP_STEPS_DUTY_CYCLE,
+		.nb_of_poles 				= BRUSHLESS_MOTOR_2_NB_POLES,
 		.zero_crossing 		= {
-			.advance_timing = (BRUSHLESS_MOTOR_2_ADVANCE_DEG/30)
-		}
+			.advance_timing 		= (BRUSHLESS_MOTOR_2_ADVANCE_DEG / 30)
+		},
+		.startup_duty_cycle 		= BRUSHLESS_MOTOR_2_STARTUP_DUTY_CYCLE,
+		.startup_timeout_time 		= BRUSHLESS_MOTOR_2_STARTUP_TIMEOUT_TIME,
+		.startup_commutation_period = (STM32_TIMCLK1 / BRUSHLESS_MOTOR_2_STARTUP_COMMUTATION_FREQ_HZ),
+		.spinning_speed_threshold 	= BRUSHLESS_MOTOR_2_SPINNING_SPEED_THRESHOLD,
 	},
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 1) */
 #if (NB_OF_BRUSHLESS_MOTOR > 2)
@@ -681,8 +688,12 @@ static brushless_motor_t brushless_motors[NB_OF_BRUSHLESS_MOTOR] = {
 		.ramp_steps 		= RAMP_STEPS_DUTY_CYCLE,
 		.nb_of_poles 		= BRUSHLESS_MOTOR_3_NB_POLES,
 		.zero_crossing 		= {
-			.advance_timing = (BRUSHLESS_MOTOR_3_ADVANCE_DEG/30)
-		}
+			.advance_timing = (BRUSHLESS_MOTOR_3_ADVANCE_DEG / 30)
+		},
+		.startup_duty_cycle 		= BRUSHLESS_MOTOR_3_STARTUP_DUTY_CYCLE,
+		.startup_timeout_time 		= BRUSHLESS_MOTOR_3_STARTUP_TIMEOUT_TIME,
+		.startup_commutation_period = (STM32_TIMCLK1 / BRUSHLESS_MOTOR_3_STARTUP_COMMUTATION_FREQ_HZ),
+		.spinning_speed_threshold 	= BRUSHLESS_MOTOR_3_SPINNING_SPEED_THRESHOLD,
 	},
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 2) */
 #if (NB_OF_BRUSHLESS_MOTOR > 3)
@@ -698,8 +709,12 @@ static brushless_motor_t brushless_motors[NB_OF_BRUSHLESS_MOTOR] = {
 		.ramp_steps 		= RAMP_STEPS_DUTY_CYCLE,
 		.nb_of_poles 		= BRUSHLESS_MOTOR_4_NB_POLES,
 		.zero_crossing 		= {
-			.advance_timing = (BRUSHLESS_MOTOR_4_ADVANCE_DEG/30)
-		}
+			.advance_timing = (BRUSHLESS_MOTOR_4_ADVANCE_DEG / 30)
+		},
+		.startup_duty_cycle 		= BRUSHLESS_MOTOR_4_STARTUP_DUTY_CYCLE,
+		.startup_timeout_time 		= BRUSHLESS_MOTOR_4_STARTUP_TIMEOUT_TIME,
+		.startup_commutation_period = (STM32_TIMCLK1 / BRUSHLESS_MOTOR_4_STARTUP_COMMUTATION_FREQ_HZ),
+		.spinning_speed_threshold 	= BRUSHLESS_MOTOR_4_SPINNING_SPEED_THRESHOLD,
 	},
 #endif /* (NB_OF_BRUSHLESS_MOTOR > 3) */
 };
@@ -1124,14 +1139,14 @@ void _zero_crossing_cb(brushless_motor_t *motor){
 		RESET_COMMUTATION_TIMER();
 
 		// forced commutations to start the motor if no zc found (kind of startup sequence)
-		if(motor->spinning == false && zc->time > STARTUP_COMMUTATION_PERIOD){
+		if(motor->spinning == false && zc->time > motor->startup_commutation_period){
 			// By putting this after _update_duty_cycle(), we bypass it to have to not toast the motor if stuck at his duty_cycle,
 			// then _update_duty_cycle() will do its job of increasing the duty_cycle smoothly again.
-			if(motor->duty_cycle_now > STARTUP_DUTY_CYCLE){
-				motor->duty_cycle_now = STARTUP_DUTY_CYCLE;
+			if(motor->duty_cycle_now > motor->startup_duty_cycle){
+				motor->duty_cycle_now = motor->startup_duty_cycle;
 			}
 			SET_ZC_FLAG(zc);
-			zc->next_commutation_time = STARTUP_COMMUTATION_PERIOD;
+			zc->next_commutation_time = motor->startup_commutation_period;
 			if(chVTGetSystemTimeX() > motor->startup_timeout){
 				motor->emergency_stop = true;
 			}
@@ -1345,7 +1360,7 @@ void _set_running(brushless_motor_t *motor){
 	_update_brushless_phases(motor);
 	motor->spinning = false;
 	motor->good_spin_cnt = 0;
-	motor->startup_timeout = (chVTGetSystemTimeX() + STARTUP_TIMEOUT_TIME);
+	motor->startup_timeout = (chVTGetSystemTimeX() + motor->startup_timeout_time);
 }
 
 /**
@@ -1413,7 +1428,7 @@ void _rpm_counter_update(brushless_motor_t *motor){
 
 		// Conditions to tell if the motor made a correct startup.
 		if(motor->spinning == false && motor->state == RUNNING){
-			if(rpm->rpm >= SPINNING_SPEED_THRESHOLD){
+			if(rpm->rpm >= motor->spinning_speed_threshold){
 				motor->good_spin_cnt++;
 				if(motor->good_spin_cnt > GOOD_SPINNING_THRESHOLD){
 					motor->spinning = true;
