@@ -101,7 +101,28 @@ void motorsStop(void);
  */
 void motorSetDutyCycle(brushless_motors_names_t motor_name, uint8_t duty_cycle);
 
+/**
+ * @brief               Gets the actual duty cycle of the given motor
+ * 
+ * @param motor_name    Motor from which to get the duty cycle. See brushless_motors_names_t
+ * @return              The duty cycle in percent from 0 to 100
+ */
+float motorGetDutyCycle(brushless_motors_names_t motor_name);
+
+/**
+ * @brief               Changes the advance of the given motor.
+ * 
+ * @param motor_name    Motor to change the advance. See brushless_motors_names_t
+ * @param advance       Advance to apply. Between -1 and 1. Corresponds to 30° to -30° 
+ */
 void motorSetAdvance(brushless_motors_names_t motor_name, float advance);
+
+/**
+ * @brief               Gets the advance of the given motor.
+ * 
+ * @param motor_name    Motor from which to get the advance. See brushless_motors_names_t
+ * @return              Advance. Between -1 and 1. Corresponds to 30° to -30° 
+ */
 float motorGetAdvance(brushless_motors_names_t motor_name);
 
 /**
@@ -112,14 +133,6 @@ float motorGetAdvance(brushless_motors_names_t motor_name);
  * 
  */
 void motorSetBusVoltage(float bus_voltage);
-
-/**
- * @brief               Gets the actual duty cycle of the given motor
- * 
- * @param motor_name    Motor from which to get the duty cycle. See brushless_motors_names_t
- * @return              The duty cycle in percent from 0 to 100
- */
-float motorGetDutyCycle(brushless_motors_names_t motor_name);
 
 /**
  * @brief               Gets the actual average current consummed by the given motor

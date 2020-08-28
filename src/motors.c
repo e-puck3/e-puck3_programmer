@@ -1226,29 +1226,6 @@ void _compute_next_commutation(zero_crossing_t *zc)
 	zc->timeout_time 			= ZC_TIMEOUT_FACTOR * zc->next_commutation_time;
 }
 
-void motorSetAdvance(brushless_motors_names_t motor_name, float advance){
-
-	if(motor_name > NB_OF_BRUSHLESS_MOTOR){
-		return;
-	}
-
-	if(advance > 1){
-		advance = 1;
-	}else if(advance < -1){
-		advance = -1;
-	}
-
-	brushless_motors[motor_name].zero_crossing.advance_timing = advance;
-
-}
-float motorGetAdvance(brushless_motors_names_t motor_name){
-	if(motor_name > NB_OF_BRUSHLESS_MOTOR){
-		return -100;
-	}
-
-	return brushless_motors[motor_name].zero_crossing.advance_timing;
-}
-
 /**
  * @brief 			Updates the given line to the given state
  * 
@@ -1910,18 +1887,41 @@ void motorSetDutyCycle(brushless_motors_names_t motor_name, uint8_t duty_cycle){
 	brushless_motors[motor_name].duty_cycle_goal = duty_cycle;
 }
 
-void motorSetBusVoltage(float bus_voltage){
-	float half_bus = bus_voltage * HALF_BATT_V_TO_ADC_VALUE;
-
-	LOW_PASS_FILTER(_half_bus_adc_value, half_bus, LP_FILTER_COEFF_HALF_BUS);
-}
-
 float motorGetDutyCycle(brushless_motors_names_t motor_name){
 	if(motor_name >= NB_OF_BRUSHLESS_MOTOR){
 		return 0;
 	}
 
 	return brushless_motors[motor_name].duty_cycle_now;
+}
+
+void motorSetAdvance(brushless_motors_names_t motor_name, float advance){
+
+	if(motor_name > NB_OF_BRUSHLESS_MOTOR){
+		return;
+	}
+
+	if(advance > 1){
+		advance = 1;
+	}else if(advance < -1){
+		advance = -1;
+	}
+
+	brushless_motors[motor_name].zero_crossing.advance_timing = advance;
+
+}
+float motorGetAdvance(brushless_motors_names_t motor_name){
+	if(motor_name > NB_OF_BRUSHLESS_MOTOR){
+		return -100;
+	}
+
+	return brushless_motors[motor_name].zero_crossing.advance_timing;
+}
+
+void motorSetBusVoltage(float bus_voltage){
+	float half_bus = bus_voltage * HALF_BATT_V_TO_ADC_VALUE;
+
+	LOW_PASS_FILTER(_half_bus_adc_value, half_bus, LP_FILTER_COEFF_HALF_BUS);
 }
 
 float motorsGetCurrent(brushless_motors_names_t motor_name){
